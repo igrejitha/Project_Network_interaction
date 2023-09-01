@@ -1,0 +1,452 @@
+
+/* Import Orbitron font for headers */
+@import url('https://fonts.googleapis.com/css?family=Orbitron:400,500,700,900&display=swap');
+@import url('"https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+@import url('"https://fonts.googleapis.com/css2?family=Michroma&display=swap');
+@import url('"https://fonts.googleapis.com/css2?family=Rajdhani&display=swap');
+
+/* Style for the webpage body */
+body {
+    background-color: #123c64;
+    font-family: 'Orbitron', sans-serif;
+}
+
+/* Import the Orbitron font from a URL */
+@font-face {
+    font-family: 'Roboto';
+    src: url('https://fonts.googleapis.com/css?family=Orbitron');
+}
+/* Import the bold and regular styles of the Orbitron font from a URL */
+@font-face {
+    font-family: 'Orbitron';
+    src: url('https://fonts.googleapis.com/css?family=Orbitron:400,700');
+    font-weight: 400;
+    font-stretch: expanded;
+}
+
+/* Style for headers */
+h1, h2, h3, h4 {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 300;
+    font-variant: small-caps;
+    letter-spacing: 0.2em;
+    color: white
+}
+h5 {
+    font-family: 'Michroma', sans-serif;
+    font-weight: 200;
+    font-size: 16px;
+    letter-spacing: 0.1em;
+    color: white
+}
+
+h6 {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 200;
+    font-size: 16px;
+    letter-spacing: 0.1em;
+    color: white
+}
+/* Style for paragraph text */
+p {
+    font-family: 'Roboto Mono', monospace;
+    font-weight: 400;
+    color: white
+}
+/* Style dashboard section */
+.dashboard {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+/* Style dashboard cards */
+.dashboard-card {
+    background-color: #1e6ea0;
+    opacity: 0.95;
+    padding: 20px;
+    border-radius: 10px;
+    margin: 20px;
+    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.16);
+    color: #d2fcff;
+}
+
+/* Style dashboard card headers */
+.dashboard-card h3 {
+    color: #d2fcff;
+    font-weight: 900;
+    margin-bottom: 20px;
+}
+
+/* Style dashboard card content */
+.dashboard-card p {
+    color: white;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+    /* Style dashboard card buttons */
+    .dashboard-card button {
+        background-color: #d2fcff;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.3s ease-in-out;
+        background: url("https://cybereum.io/wp-content/uploads/2022/12/But3.png") no-repeat;
+        background-size: 100%; /* To fill the dimensions of container (button), or */
+        height: 114px;
+        width: 300px;
+    }
+
+    /* Style dashboard card buttons on hover */
+    .dashboard-card button:hover {
+        background-color: #3c6e9c;
+    }
+
+.dashboard-header {
+    text-align: center;
+    font-size: 2em;
+    font-weight: bold;
+}
+
+.dashboard-section {
+    padding: 20px;
+}
+
+.dashboard-stat {
+    font-size: 1.5em;
+    font-weight: bold;
+    display: inline-block;
+    margin: 10px;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: rgba(255, 255, 255, 0.2);
+    color: darkred;
+}
+
+.dashboard-stat-label {
+    font-size: 0.8em;
+    font-weight: normal;
+    display: block;
+    margin-top: 5px;
+    color: black;
+}
+
+.dashboard-button {
+    border: none;
+    padding: 10px 20px;
+    font-size: 1em;
+    border-radius: 5px;
+    cursor: pointer;
+    background: url("https://cybereum.io/wp-content/uploads/2022/12/But3.png") no-repeat;
+    background-size: 100%; /* To fill the dimensions of container (button), or */
+    height: 114px;
+    width: 300px;
+}
+
+    .dashboard-button:hover {
+        background: url("https://cybereum.io/wp-content/uploads/2022/12/But1.png") no-repeat;
+        background-size: 100%; /* To fill the dimensions of container (button), or */
+        color: #d2fcff
+    }
+
+    .dashboard-button:focus {
+        background: url("https://cybereum.io/wp-content/uploads/2022/12/But2-2.png") no-repeat;
+        background-size: 100%; /* To fill the dimensions of container (button), or */
+        color: darkred
+    }
+
+
+.dashboard-chart {
+    width: 100%;
+    height: 300px;
+}
+
+.dashboard-table {
+    width: 100%;
+    border-collapse: collapse;
+    color: #d2fcff;
+}
+
+.dashboard-table th,
+.dashboard-table td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.dashboard-table th {
+    font-weight: bold;
+    background-color: rgba(255, 255, 255, 0.1);
+    min-width: 100px;
+    max-width: 200px;
+}
+
+.dashboard-table tr:nth-child(even) {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.container {
+    display: flex;
+}
+
+.progress-bar {
+    width: 100%;
+    background-color: #e0e0e0;
+    margin-bottom: 10px;
+}
+
+.progress-bar-inner {
+    height: 20px;
+    line-height: 20px;
+    background-color: #4caf50;
+    text-align: center;
+    color: white;
+}
+
+
+#gantt-chart {
+    flex: 1;
+}
+
+#task-list-container {
+    flex: 1;
+}
+
+/* 
+button:before {
+    content: " ";
+    display: inline-block;
+    background: url("http://www.wdc.com/Global/images/icons/icon_supporthelp.gif") no-repeat;
+    height: 30px;
+    width: 50px;
+}
+*/
+.kanban-columns {
+    display: flex;
+    justify-content: space-between;
+    background-color: #d2fcff;
+}
+
+.kanban-column {
+    flex: 1;
+    margin-right: 20px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #0e2d46;
+}
+
+.kanban-card {
+    margin-bottom: 20px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #123c64;
+}
+
+.kanban-card[data-status="on-time"] {
+    border-color: #4CAF50; /* Green */
+}
+
+.kanban-card[data-status="late"] {
+    border-color: #F44336; /* Red */
+}
+
+.kanban-card[data-status="accomplished"] {
+    border-color: #2196F3; /* Blue */
+}
+
+
+button {
+    border: none;
+    text-align: center;
+    font-family: 'Orbitron';
+    letter-spacing: 0.2em;
+    color: #d2fcff;
+    font-size: 24px;
+    font-weight: 300;
+    padding: 20px 32px;
+    text-decoration: none;
+    display: inline-block;
+    background: url("https://cybereum.io/wp-content/uploads/2022/12/But3.png") no-repeat;
+    background-size: 100%; /* To fill the dimensions of container (button), or */
+    height: 114px; 
+    width: 300px;
+}
+
+    /* 
+
+button::-moz-focus-inner, a.button::-moz-focus-inner {
+    padding: 0;
+    border: 0;
+}
+*/
+
+
+    button:hover, a.button:hover {
+        cursor: pointer;
+        background: url("https://cybereum.io/wp-content/uploads/2022/12/But1.png") no-repeat;
+        background-size: 100%; /* To fill the dimensions of container (button), or */
+        color: #d2fcff
+    }
+
+    button:focus, a.button:hover {
+        cursor: pointer;
+        background: url("https://cybereum.io/wp-content/uploads/2022/12/But2-2.png") no-repeat;
+        background-size: 100%; /* To fill the dimensions of container (button), or */
+        color: darkred
+    }
+
+/* 
+button:active, a.button:active {
+    background: #ccc;
+    padding: 22px 34px 20px; /* Bump down text */
+/*
+    background: url("https://cybereum.io/wp-content/uploads/2022/12/But1.png") no-repeat;
+    box-shadow: 0 0 0 5px rgba(255,255,255,0.3), inset 0 -1px 0 0 rgba(255,255,255,0.5), inset 0 2px 5px 0 rgba(0,0,0,0.2);
+    text-shadow: none;
+}
+*/
+
+.gantt-chart {
+    width: 100%;
+    height: 500px;
+    position: relative;
+}
+
+.gantt-bar {
+    height: 30px;
+    position: absolute;
+    border-radius: 5px;
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.gantt-bar-label {
+    position: absolute;
+    top: -20px;
+    left: 0;
+    font-size: 0.8em;
+    font-weight: bold;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.gantt-date-label {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    font-size: 0.8em;
+    font-weight: bold;
+    color: rgba(255, 255, 255, 0.5);
+    transform: rotate(-90deg);
+    transform-origin: left bottom;
+}
+
+.gantt-today-marker {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 100%;
+    border-left: 3px solid rgba(255, 255, 255, 0.5);
+}
+
+/* Set the background color of the form to a dark blue */
+form {
+    color: white;
+    background-color: #0e2d46;
+}
+
+/* Set the font for the form to the Orbitron font */
+form {
+    font-family: "Orbitron", sans-serif;
+}
+
+    /* Style the form's input fields with a futuristic look */
+    form input[type="text"],
+    form input[type="password"],
+    form textarea {
+        /* Add some padding and a white border */
+        padding: 12px;
+        border: 1px solid white;
+        /* Set the text color to white */
+        color: white;
+        /* Add a hover effect that changes the border color to blue */
+        transition: border-color 0.2s ease-in-out;
+    }
+
+        form input[type="text"]:hover,
+        form input[type="password"]:hover,
+        form textarea:hover {
+            border-color: #00bfff;
+        }
+
+
+/* Style the form's submit button with a futuristic look */
+form input[type="submit"] {
+    /* Add some padding and a white border */
+    padding: 12px;
+    border: 1px solid white;
+    /* Set the text color to white and the background color to a dark blue */
+    color: white;
+    background-color: #123c64;
+    /* Add a hover effect that changes the background color to a lighter blue */
+    transition: background-color 0.2s ease-in-out;
+}
+
+    form input[type="submit"]:hover {
+        background-color: #2d5b9e;
+    }
+
+/* Style for form labels */
+.form-label {
+    padding-bottom: 10px;
+}
+
+.form-button {
+    background-color: #d2fcff; /* light blue color */
+    color: #fff; /* white text color */
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    /* Add a sci-fi looking background image */
+    background: url("https://cybereum.io/wp-content/uploads/2022/12/But3.png") no-repeat;
+    background-size: 100%; /* To fill the dimensions of container (button), or */
+    height: 114px;
+    width: 300px;
+}
+
+    /* Style form button on hover */
+    .form-button:hover {
+        background-color: #3c6e9c; /* dark blue color on hover */
+    }
+
+
+
+#graph_div {
+    width: 800px;
+    height: 600px;
+    margin: 20px;
+}
+
+.node circle {
+    fill: #007bff;
+    stroke: #000;
+    stroke-width: 1px;
+}
+
+.node .task-id {
+    font-size: 12px;
+    text-anchor: middle;
+}
+
+.edge {
+    stroke: #000;
+    stroke-width: 2px;
+}
