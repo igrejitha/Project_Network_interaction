@@ -718,7 +718,6 @@ function calculateSlack(nodes, links) {
     return slackValues;
 }
 
-
 function computeEigenvectorCentrality(nodes, links, maxIterations) {
     console.log("Entered computeNetworkMetrics computeEigenvectorCentrality", nodes, links, maxIterations);
     let adjacencyMatrix = [];
@@ -760,7 +759,6 @@ function computeEigenvectorCentrality(nodes, links, maxIterations) {
     console.log("Exiting computeNetworkMetrics computeEigenvectorCentrality", eigenvectorValues);
     return new Map(nodes.map((node, idx) => [node.ID, eigenvectorValues[idx]]));
 }
-
 
 //Betweenness Centrality
 function computeBetweennessCentrality(nodes, links) {
@@ -1131,7 +1129,6 @@ function computePageRank(nodes, links, dampingFactor, maxIterations) {
     return pageRankValues;
 }
 
-
 function enhanceWeightsWithCriticalPathAndOutliers(links, criticalPathSet, outlierTasksSet, criticalPathMultiplier, outlierMultiplier) {
     for (let link of links) {
         if (criticalPathSet.has(link.source.ID)) {
@@ -1221,7 +1218,6 @@ function distributeOverrunProbability(nodes, links, totalProjectOverrunProbabili
 
     return nodes;
 }
-
 
 function distributeOverrunForPath(path, nodes, links, totalProjectOverrunProbability) {
     let totalPathWeight = path.reduce((sum, node) => {
@@ -2334,8 +2330,6 @@ function findOutlierPaths(paths, links) {
     };
 }
 
-
-
 // Displaying all paths
 displayPaths(paths, 'All Paths:', 'pathsDisplay');
 // Displaying the longest path and outlier paths
@@ -2402,7 +2396,6 @@ function highlightPath(path, color, link, node, duration) {
     var tooltip = d3.select(".tooltip");
     tooltip.html(`Path Duration: ${duration} units`).style("background-color", 'color');
 }
-
 
 function clearHighlights() {
     link.style("stroke", null)
@@ -2671,7 +2664,6 @@ function drawHistogramChartJS(nodes, links) {
     });
 }
 
-
 function drawPieChart(nodes, links) {
     console.log("Drawing Pie Chart with links data:", links);
 
@@ -2727,7 +2719,6 @@ function drawPieChart(nodes, links) {
     var chart = new google.visualization.PieChart(document.getElementById('pie_chart'));
     chart.draw(data, options);
 }
-
 
 function drawPathsDistributionCurve(nodes, links) {
     // Find start and end nodes
@@ -2800,7 +2791,6 @@ function formatDate(dateString) {
     let year = date.getUTCFullYear();
     return `${day}-${month}-${year}`;
 }
-
 
 function drawRiskMatrix(nodes, links) {
     console.log("Entered drawRiskMatrix");
