@@ -1,0 +1,3596 @@
+﻿<!DOCTYPE html>
+
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Interactive Project Task Map</title>
+<!-- D3.js -->
+<script src="https://d3js.org/d3.v5.min.js"></script>
+<!-- Google Charts -->
+<script src="https://www.gstatic.com/charts/loader.js" type="text/javascript"></script>
+<script src="https://d3js.org/d3.v6.min.js"></script>
+<title>Gantt Chart</title>
+<script src="https://www.gstatic.com/charts/loader.js" type="text/javascript"></script>
+<script src="https://kryogenix.org/code/browser/sorttable/sorttable.js"></script>
+<script src="https://d3js.org/d3.v5.min.js"></script>
+<!-- Scripts for Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link href="https://unpkg.com/vis-network@7.6.2/dist/vis-network.min.css" rel="stylesheet" type="text/css"/>
+<script src="https://unpkg.com/vis-network@7.6.2/dist/vis-network.min.js" type="text/javascript"></script>
+<link href="css/style.css" rel="stylesheet"/>
+<link href="css/site.css" rel="stylesheet"/>
+<link href="img/Blue_Logo.png" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.css" type="text/css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
+<script>
+    const centerTextPlugin = {
+        afterDraw: (chart) => {
+            let width = chart.chart.width,
+                height = chart.chart.height,
+                ctx = chart.chart.ctx;
+
+            ctx.restore();
+            let fontSize = (height / 114).toFixed(2);
+            ctx.font = fontSize + "em Orbitron";
+            ctx.textBaseline = "middle";
+            
+            let sum = chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+            let text = `Total: ${sum} days`,
+                textX = Math.round((width - ctx.measureText(text).width) / 2),
+                textY = height / 2;
+
+            ctx.fillText(text, textX, textY);
+            ctx.save();
+        }
+    };
+    Chart.plugins.register(centerTextPlugin);
+
+</script>
+<style>
+        /* Links */
+        .links line {
+            stroke: linear-gradient(to right, #8ce6ff, #3292cd);
+            stroke-width: 3px;
+        }
+
+        .link {
+            stroke: #cdfaff;
+            stroke-opacity: 0.85;
+            stroke-width: 1.5px;
+        }
+
+        /* Refining links */
+        .links line {
+            stroke: #8ce6ff;
+            stroke-width: 2px;
+        }
+
+        /* Nodes */
+        .node text {
+            fill: #b4f5ff;
+            font-size: 12px;
+        }
+
+        .node circle {
+            stroke: #41afeb;
+            stroke-width: 2px;
+            fill: #0d2137;
+            transition: fill 0.3s;
+            filter: url(#drop-shadow);
+        }
+
+
+        /* Futuristic Node Label */
+        .node-label {
+            position: absolute;
+            background-color: rgba(0, 0, 0, 0.6);
+            border: 1px solid #58a6ff;
+            color: #58a6ff;
+            padding: 5px 10px;
+            border-radius: 5px;
+            transform: scale(0);
+            transition: transform 0.3s ease-out;
+            pointer-events: none;
+            text-shadow: 0 0 5px #58a6ff;
+        }
+
+        /* Enhanced Futuristic Connection Label */
+        .connection-label {
+            position: absolute;
+            background-color: rgba(10, 10, 50, 0.85);
+            border: 2px solid #58a6ff;
+            color: #58a6ff;
+            padding: 8px 15px;
+            border-radius: 8px;
+            transform: scale(0);
+            transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+            pointer-events: none;
+            font-size: 0.9em;
+            opacity: 0;
+            text-shadow: 0 0 10px #58a6ff, 0 0 20px #58a6ff, 0 0 30px #58a6ff;
+        }
+
+        /* Animation effect */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .tooltip {
+            position: absolute;
+            padding: 5px; /* Increased padding for more space */
+            background-color: rgba(16, 45, 80, 0.9);
+            color: #00ff00;
+            border-radius: 5px;
+            pointer-events: none;
+            max-width: 230px;
+            font-family: 'Roboto', sans-serif;
+            z-index: 1000; /* Ensure tooltip is above everything else */
+            /* Using a darker gradient border */
+            border: 3px solid transparent;
+            background-image: linear-gradient(rgba(16, 45, 80, 0.9), rgba(16, 45, 80, 0.9)), linear-gradient(90deg, #8ce6ff, #3292cd);
+            background-origin: padding-box, border-box;
+            background-clip: content-box, border-box;
+        }
+
+        .charts-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        #riskTable {
+            width: 80%; /* Increase table width */
+            margin: 0 auto; /* Center the table within its container */
+        }
+
+        .charts-row {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            width: 100%;
+            margin-bottom: 30px; /* Spacing between the rows */
+        }
+
+        /* Dashboard Card */
+        .dashboard-card {
+            background-color: #113464;
+            padding: 10px;
+            color: #b4f5ff;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .dashboard-card2 {
+            padding: 10px; /* Adjust this to set your desired padding */
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            background-color: #0e2446;
+            margin: 20px; /* Optional: Adds some margin around the card */
+            overflow: hidden; /* Optional: In case the content spills out */
+            font-size: 0.85em; /* This makes the font size smaller for all elements inside the card */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+            /* If you want specific elements to have even smaller fonts, you can target them like this */
+            .dashboard-card2 h3 {
+                font-size: 1em; /* Adjusted font-size for h3 elements inside the dashboard card */
+            }
+
+            .dashboard-card2 p, .dashboard-card2 li {
+                font-size: 0.8em; /* Adjusted font-size for p and li elements inside the dashboard card */
+            }
+
+            .dashboard-card2 button {
+            width: 100px; /* Compact width */
+            height: 30px; /* Compact height */
+            background: linear-gradient(45deg, #5ac8fa, #287dc8); /* Gradient background */
+            color: #ffffff; /* Font color */
+            border: none; /* Removing the default border */
+            border-radius: 5px; /* Slightly rounded corners */
+            cursor: pointer;
+            font-weight: bold; /* Bold font for clarity */
+            text-transform: uppercase; /* Uppercase letters for a modern look */
+            letter-spacing: 1px; /* Spacing between letters for clarity */
+            box-shadow: 0 0 10px rgba(90, 200, 250, 0.5); /* A soft glow effect */
+            transition: all 0.3s; /* Transition for hover effects */
+        }
+
+            .dashboard-card2 button:hover {
+                transform: translateY(-3px); /* Button moves up slightly on hover */
+                box-shadow: 0 0 15px rgba(90, 200, 250, 0.7); /* Increased glow on hover */
+            }
+
+            .dashboard-card2 button:active {
+                transform: translateY(0); /* Button returns to original position when clicked */
+            }
+
+        .dashboard-card2 {
+            flex: 1;
+            max-width: calc(33.33% - 20px); /* Three cards per row with spacing */
+        }
+
+        .dashboard-card-full {
+            width: 90%; /* Occupying most of the width for emphasis */
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15); /* Enhanced shadow for emphasis */
+            border: 1px solid #29395f; /* Slight border for definition against the background */
+        }
+
+        .risk-content {
+            display: flex;
+            flex-direction: column; /* Stack the children vertically */
+            gap: 16px; /* Provide a small gap between the chart and table */
+            align-items: center; /* Center-align the children horizontally */
+        }
+
+        .chart-container, .table-container {
+            width: 100%; /* Use full available width */
+        }
+
+        .chart-container {
+            flex: 1.2; /* Allow the chart container to be slightly wider */
+        }
+
+        .table-container {
+            flex: 1; /* Allow the table container to grow and shrink */
+        }
+
+        #riskTable {
+            width: 90%; /* Increase table width */
+            margin: 0 auto; /* Center the table within its container */
+        }
+
+        .futuristic-card {
+            background-image: url('https://www.transparenttextures.com/patterns/space.png');
+            background-color: rgba(0, 0, 0, 0.6);
+            padding: 40px;
+        }
+
+            .futuristic-card:hover {
+                box-shadow: 0px 0px 20px #58a6ff;
+            }
+
+        .futuristic-header {
+            background: rgba(0, 0, 0, 0.2);
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
+            padding: 10px 20px;
+            box-shadow: 0 0 10px #5ac8fa;
+        }
+
+        .futuristic-introduction {
+            color: #cdfaff;
+            font-size: 18px;
+            margin-top: 20px;
+            line-height: 1.6;
+            text-align: center;
+            padding: 0 10%;
+            margin-bottom: 30px;
+        }
+
+        .label-container {
+            display: flex;
+            justify-content: space-between; /* Adjusts spacing between label and span */
+            align-items: center; /* Centers items vertically */
+        }
+
+        #outDegreeFilterValue, #filterValue, #degreeFilterValue {
+            font-size: 1.5em; /* Adjusts the size of the span text */
+        }
+
+        #graph-container {
+            background-color: #0d2137;
+            overflow: auto;
+            position: relative;
+            height: 1000px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            flex-grow: 1; /* Allow graph container to grow and occupy available space */
+        }
+
+            #graph-container svg {
+                width: 100%;
+                height: 100%;
+            }
+
+        /* Control Panel */
+        .control-panel {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: space-between;
+            background: #0e2446;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .controls {
+            background: #113464;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .control-label {
+            font-weight: bold;
+            color: #b4f5ff;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .control-panel button {
+            width: 50px; /* Compact width */
+            height: 30px; /* Compact height */
+            background: linear-gradient(45deg, #5ac8fa, #287dc8); /* Gradient background */
+            color: #ffffff; /* Font color */
+            border: none; /* Removing the default border */
+            border-radius: 5px; /* Slightly rounded corners */
+            cursor: pointer;
+            font-weight: bold; /* Bold font for clarity */
+            text-transform: uppercase; /* Uppercase letters for a modern look */
+            letter-spacing: 1px; /* Spacing between letters for clarity */
+            box-shadow: 0 0 10px rgba(90, 200, 250, 0.5); /* A soft glow effect */
+            transition: all 0.3s; /* Transition for hover effects */
+        }
+
+            .control-panel button:hover {
+                transform: translateY(-3px); /* Button moves up slightly on hover */
+                box-shadow: 0 0 15px rgba(90, 200, 250, 0.7); /* Increased glow on hover */
+            }
+
+            .control-panel button:active {
+                transform: translateY(0); /* Button returns to original position when clicked */
+            }
+
+        transform: scale(1.1);
+        }
+
+        .joystick {
+            display: grid;
+            grid-template-rows: repeat(3, 30px);
+            grid-template-columns: repeat(3, 30px);
+            gap: 5px;
+        }
+
+            .joystick .arrow,
+            .joystick .center {
+                width: 30px; /* Consistent width */
+                height: 30px; /* Consistent height */
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: linear-gradient(45deg, #5ac8fa, #287dc8); /* Gradient background */
+                color: #ffffff; /* Font color */
+                border: none; /* Removing the default border */
+                cursor: pointer;
+                font-weight: bold; /* Bold font for arrows */
+                text-transform: uppercase; /* Uppercase letters */
+                box-shadow: 0 0 10px rgba(90, 200, 250, 0.5); /* A soft glow effect */
+                transition: all 0.3s; /* Transition for hover effects */
+            }
+
+                .joystick .arrow:hover,
+                .joystick .center:hover {
+                    transform: translateY(-3px); /* Slight move up on hover */
+                    box-shadow: 0 0 15px rgba(90, 200, 250, 0.7); /* Increased glow on hover */
+                }
+
+                .joystick .arrow:active,
+                .joystick .center:active {
+                    transform: translateY(0); /* Button returns to original position when clicked */
+                }
+
+            .joystick .center {
+                border-radius: 50%; /* Circular shape for the center button */
+            }
+
+
+        .slider {
+            width: 100%;
+            margin: 10px 0;
+            -webkit-appearance: none; /* Remove default appearance for Webkit browsers */
+            appearance: none;
+            height: 5px; /* Height of the slider */
+            background: #b4f5ff; /* Lighter background color for the track */
+            border-radius: 5px; /* Rounded edges */
+            outline: none; /* Remove default outline */
+            box-shadow: 0 0 10px rgba(205, 250, 255, 0.3); /* Soft shadow with a lighter color */
+        }
+
+            .slider::-webkit-slider-thumb {
+                -webkit-appearance: none; /* Remove default appearance for Webkit browsers */
+                appearance: none;
+                width: 15px; /* Width of the thumb */
+                height: 15px; /* Height of the thumb */
+                background: linear-gradient(45deg, #cdfaff, #8ce6ff); /* Lighter gradient background */
+                border-radius: 50%; /* Circular shape for the thumb */
+                cursor: pointer; /* Cursor changes to pointer */
+                box-shadow: 0 0 5px rgba(205, 250, 255, 0.5); /* Soft shadow with a lighter color */
+                transition: transform 0.3s; /* Transition for hover effect */
+            }
+
+                .slider::-webkit-slider-thumb:hover {
+                    transform: scale(1.1); /* Slightly enlarge the thumb on hover */
+                }
+
+            /* For Firefox browsers */
+            .slider::-moz-range-track {
+                background: #b4f5ff;
+                border-radius: 5px;
+                box-shadow: 0 0 10px rgba(205, 250, 255, 0.3);
+            }
+
+            .slider::-moz-range-thumb {
+                width: 15px;
+                height: 15px;
+                background: linear-gradient(45deg, #cdfaff, #8ce6ff);
+                border-radius: 50%;
+                cursor: pointer;
+                box-shadow: 0 0 5px rgba(205, 250, 255, 0.5);
+                transition: transform 0.3s;
+            }
+
+                .slider::-moz-range-thumb:hover {
+                    transform: scale(1.1);
+                }
+
+        .zoom-controls, .rotate-controls {
+            flex-basis: 30%;
+        }
+
+        .pan-controls {
+            flex-basis: 35%;
+        }
+
+        .control-panel button {
+            width: 100%;
+        }
+
+        #legend {
+            font-family: 'Arial', sans-serif;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .color-box {
+            width: 20px;
+            height: 20px;
+            border: 1px solid #000;
+            margin-right: 10px;
+        }
+
+        .accordion-button {
+            cursor: pointer;
+            padding: 10px;
+            width: 100%;
+            text-align: left;
+            background: #007bff;
+            color: #fff;
+            border: none;
+            outline: none;
+            transition: background-color 0.3s;
+        }
+
+            .accordion-button:hover {
+                background-color: #0056b3;
+            }
+
+        button, input[type="submit"], input[type="button"] {
+            background-color: #195a8c;
+            border: 1px solid #5ac8fa;
+            color: #b4f5ff;
+            padding: 8px 16px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 3px;
+            transition: background-color 0.3s, transform 0.3s, box-shadow 0.2s, color 0.3s;
+        }
+
+            button:hover, input[type="submit"]:hover, input[type="button"]:hover {
+                background-color: #287dc8;
+                color: #cdfaff;
+                transform: scale(1.02);
+                box-shadow: 0 0 8px #41afeb;
+            }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #113464; /* Dark blue background for a space-like aesthetic */
+        }
+
+        .panel {
+            padding: 0 10px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+
+        .bar {
+            fill: #3292cd; /* Updated from the color palette */
+        }
+
+            .bar:hover {
+                fill: #5ac8fa; /* Updated from the color palette */
+            }
+
+        .axis-label {
+            font-size: 14px;
+            fill: #b4f5ff; /* Updated from the color palette */
+        }
+
+        .axis path,
+        .axis line {
+            fill: none;
+            stroke: #b4f5ff; /* Updated from the color palette */
+            shape-rendering: crispEdges;
+        }
+
+        .chart-container {
+            padding: 20px;
+            border: 1px solid #3292cd; /* Updated from the color palette */
+            margin: 20px 0;
+            background: linear-gradient(145deg, #113464, #0e2446);
+            box-shadow: 4px 4px 10px #102d50, -4px -4px 10px #0e2446;
+        }
+
+        .chart-title {
+            text-align: center;
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            color: #b4f5ff; /* Updated from the color palette */
+        }
+
+        .chart-legend {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            color: #b4f5ff; /* Updated from the color palette */
+        }
+
+        .chart-legend-item {
+            margin: 0 10px;
+        }
+
+        #scurve_chart, #histogramChart, #pie_chart {
+            width: 100%;
+            max-width: 600px;
+            height: 400px;
+            margin: 0 auto;
+        }
+
+        /* Added hover effects for the interactive feel */
+        .chart-container:hover {
+            background: linear-gradient(145deg, #0e2446, #113464);
+            box-shadow: 6px 6px 14px #102d50, -6px -6px 14px #0e2446;
+        }
+
+        /* Style for the new chart containers */
+        #taskDurationHistogram, #taskDegreePieChart {
+            width: 100%;
+            max-width: 600px;
+            height: 400px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #3292cd;
+            background: linear-gradient(145deg, #113464, #0e2446);
+            box-shadow: 4px 4px 10px #102d50, -4px -4px 10px #0e2446;
+        }
+
+        .tooltip {
+            position: absolute;
+            background-color: white;
+            border: 1px solid black;
+            padding: 5px;
+            border-radius: 5px;
+            pointer-events: none;
+            opacity: 0;
+        }
+
+        .activity-list {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: rgba(255, 255, 255, 0.7);
+            padding: 10px;
+            border-radius: 5px;
+            max-height: 500px; /* Adjust as needed */
+            overflow-y: auto;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 20px;
+            background-color: #f3f3f3;
+            border-radius: 5px;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: #ddd; /* This represents the duration */
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background-color: #4CAF50; /* This represents the completion */
+            width: 0%; /* Default to 0% completion */
+            border-radius: 5px 0 0 5px;
+            animation: progressBarFillAnimation 1s ease-in-out;
+        }
+
+        @keyframes progressBarFillAnimation {
+            0% {
+                width: 0%;
+            }
+
+            100% {
+                width: /* This will be set dynamically */;
+            }
+        }
+
+        .dashboard-table td:nth-child(7) { /* assuming 'Progress Bar' is the 9th column */
+            width: 400px; /* adjust to a larger value as needed */
+            max-width: 400px; /* add this line to ensure it doesn't shrink beyond this width */
+        }
+
+
+        .vis-configuration-wrapper {
+            background-color: #f4f4f4;
+            // Adjust as needed font-family: 'Arial', sans-serif;
+            // Adjust as needed
+        }
+
+            .vis-configuration-wrapper button {
+                background-color: #007bff;
+                color: white;
+                border: none;
+                padding: 5px 15px;
+                border-radius: 5px;
+            }
+
+                .vis-configuration-wrapper button:hover {
+                    background-color: #0056b3;
+                }
+
+        /* Adjusting the layout for better spacing and alignment */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        table, th, td {
+            border: 1px solid #3292cd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #195a8c;
+            color: #cdfaff;
+        }
+
+        td {
+            background-color: #0d2137;
+            color: #b4f5ff;
+        }
+
+        tr:hover {
+            background-color: #195a8c;
+        }
+
+        .project-dropdown-container {
+            border: 2px solid #5ac8fa;
+        }
+
+        button, input[type="submit"], input[type="button"] {
+            background-color: #41afeb;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+            button:hover, input[type="submit"]:hover, input[type="button"]:hover {
+                background-color: #00d4ff;
+                transform: scale(1.05);
+            }
+
+        .project-dropdown {
+            transition: all 0.3s ease;
+            border: none;
+            border-bottom: 2px solid #46b9fa;
+            background: transparent;
+            color: white;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+
+            .project-dropdown:focus {
+                outline: none;
+                border-bottom: 2px solid #ffffff;
+            }
+
+            .project-dropdown:hover {
+                background: linear-gradient(145deg, #5ac8fa, #1e69aa);
+            }
+
+        .upload-section {
+            background: linear-gradient(145deg, #0e2446, #287dc8);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 10px 10px 30px #0b2c55, -10px -10px 30px #66dbff;
+            transition: transform 0.3s ease;
+        }
+
+        .upload-btn-wrapper .btn {
+            border-radius: 30px;
+            letter-spacing: 1.5px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px #46b9fa, inset 0 0 10px #5ac8fa;
+        }
+
+            .upload-btn-wrapper .btn:hover {
+                background: linear-gradient(145deg, #287dc8, #0e2446);
+                box-shadow: 0 0 30px #46b9fa, inset 0 0 20px #5ac8fa;
+                transform: translateY(-2px) scale(1.05);
+            }
+
+        .upload-description {
+            font-size: 18px;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 10px #0e2446;
+            font-weight: bold;
+        }
+
+        .upload-btn-wrapper .btn {
+            background: transparent;
+            border: 2px solid #5ac8fa;
+        }
+
+            .upload-btn-wrapper .btn:hover {
+                background: #5ac8fa;
+                color: #0e2446;
+            }
+
+        .project-dropdown {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #5ac8fa;
+            border-radius: 30px;
+            background: transparent;
+            font-size: 18px;
+            color: #5ac8fa;
+            margin-bottom: 20px;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+            .project-dropdown:focus {
+                background: #5ac8fa;
+                color: #0e2446;
+                outline: none;
+            }
+
+            .project-dropdown option {
+                color: #0e2446;
+                background: #5ac8fa;
+            }
+
+        #networkCanvasEnhanced {
+            width: 100%;
+            height: 100%;
+        }
+
+        .upload-section h1 {
+            font-size: 30px;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 10px #0e2446;
+        }
+
+        .upload-btn-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+
+            .upload-btn-wrapper .btn {
+                background-color: #287dc8;
+                color: #fff;
+                padding: 10px 30px;
+                font-size: 16px;
+                transition: background 0.3s ease;
+                cursor: pointer;
+                border: none;
+                border-radius: 30px;
+                box-shadow: 0 0 20px rgba(40, 125, 200, 0.5);
+                position: relative;
+                z-index: 1;
+            }
+
+                .upload-btn-wrapper .btn::before {
+                    content: "";
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(255, 255, 255, 0.1);
+                    z-index: -1;
+                    border-radius: 30px;
+                    transition: all 0.3s ease;
+                }
+
+                .upload-btn-wrapper .btn:hover::before {
+                    background: rgba(255, 255, 255, 0.3);
+                    transform: scale(1.1);
+                }
+
+            .upload-btn-wrapper input[type=file] {
+                font-size: 100px;
+                position: absolute;
+                left: 0;
+                top: 0;
+                opacity: 0;
+            }
+
+        #cybereum-intro:hover {
+            color: #FFEB3B; /* Bright yellow color on hover */
+            transition: color 0.3s ease-in-out;
+        }
+
+        #drop-shadow {
+            height: 130%;
+        }
+
+            #drop-shadow feGaussianBlur {
+                stdDeviation: 2;
+                result: "blur";
+            }
+
+            #drop-shadow feOffset {
+                dx: 2;
+                dy: 2;
+                result: "offsetBlur";
+            }
+
+            #drop-shadow feMerge {
+                feMergeNode: "";
+                .upload-btn-wrapper
+
+        {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .upload-btn-wrapper:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px 3px #cdfaff;
+        }
+
+        .upload-btn-wrapper input[type=file] {
+            font-size: 100px;
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .btn {
+            border: 2px solid #cdfaff;
+            color: #cdfaff;
+            background-color: transparent;
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.2s ease-in-out;
+        }
+
+            .btn:hover {
+                background-color: rgba(205, 250, 255, 0.2);
+            }
+
+
+        a {
+            color: #58a6ff;
+            text-decoration: none;
+        }
+
+            a:hover {
+                text-decoration: underline;
+            }
+
+        .custom-cursor {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #58a6ff;
+            border-radius: 50%;
+            position: absolute;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 10000;
+            mix-blend-mode: difference;
+            transition: all 0.3s ease-out;
+        }
+
+        /* Parallax effect */
+        .parallax-element {
+            transition: transform 0.5s;
+        }
+
+        /* For the dropdown */
+        #projectSectorDropdown {
+            border: 2px solid #cdfaff;
+            color: #cdfaff;
+            background-color: transparent;
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.2s ease-in-out;
+            width: 250px;
+            margin-left: 10px;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background: url('https://cdn.icon-icons.com/icons2/2699/PNG/512/white_down_icon_17046.png') no-repeat;
+            background-position: 90% center;
+            background-size: 20px;
+        }
+
+            #projectSectorDropdown:hover {
+                background-color: rgba(205, 250, 255, 0.2);
+            }
+
+
+    </style>
+<script type="text/javascript">
+        google.charts.load('current', { 'packages': ['gantt'] });
+        google.charts.setOnLoadCallback(initFileInput);
+
+        function initFileInput() {
+            var fileInput = document.getElementById('xmlFileInput');
+            fileInput.addEventListener('change', handleFileSelect, false);
+        }
+
+        function clearPreviousData() {
+            // Clear the data table
+            document.getElementById('data_div').innerHTML = '';
+
+            // Clear Graphs and Charts
+            document.getElementById('graph-container').innerHTML = '<div id="tooltip" style="position: absolute; visibility: hidden; background: #8ce6ff; padding: 8px; border: 2px solid #3292cd; border-radius: 3px; "></div><svg><defs><marker id="arrow" viewBox="0 -6 10 12" refX="9" refY="0" markerWidth="6" markerHeight="10" orient="auto"><path d="M0,-5 L10,0 L0,5" fill="#cdfaff" /></marker><marker id="arrow2" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#0f0" /></marker></defs><g class="container"></g></svg>';
+            document.getElementById('chart_div').innerHTML = '';
+            document.getElementById('scurve_chart').innerHTML = '';
+            document.getElementById('histogramChart').getContext('2d').clearRect(0, 0, 300, 280);  // Clearing canvas for histogram
+            document.getElementById('pie_chart').innerHTML = '';
+            document.getElementById('path_distribution_chart').innerHTML = '';
+            document.getElementById('dependency_chart').innerHTML = '';
+
+            // Clear Error Messages
+            document.getElementById('error_div').innerText = '';
+
+            // Clearing Control Values
+            document.getElementById('searchInput').value = '';
+            document.getElementById('highlightAllConnected').checked = false;
+            document.getElementById('highlightCriticalPath').checked = false;
+            document.getElementById('highlightOutliers').checked = false;
+
+            // Reset sliders
+            document.getElementById('zoomSlider').value = 50;
+            document.getElementById('filterSlider').value = 0;
+            document.getElementById('outDegreeFilterSlider').value = 0;
+            document.getElementById('degreeFilterSlider').value = 0;
+
+            // Clear Path Details
+            document.getElementById('criticalPathDetails').innerText = 'Critical path details go here...';
+            document.getElementById('outlierPathsDetails').innerText = 'Outlier paths details go here...';
+            document.getElementById('allPathsDetails').innerText = 'All paths details go here...';
+        }
+
+        var nodes = [];
+        var links = [];
+        function clearGraphData() {
+            nodes.length = 0;  // Clear the array without losing reference
+            links.length = 0;
+        }
+
+        function handleFileSelect(event) {
+            clearPreviousData();  // Clearing the DOM
+            clearGraphData();     // Clearing the data structures
+            var file = event.target.files[0];
+            console.log("Selected file: ", file);
+            if (file) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    var contents = e.target.result;
+                    var parser = new DOMParser();
+                    var xmlDoc = parser.parseFromString(contents, "text/xml");
+                    console.log("Parsed XML: ", xmlDoc);
+                    drawChart(xmlDoc);
+                };
+                reader.readAsText(file);
+            } else {
+                console.error("Failed to load file");
+            }
+        }
+        /**
+         * Draws the data table.
+         * @param {Object} data - The Google visualization DataTable.
+         */
+        function drawDataTable(data) {
+            // Create the table and set its class.
+            var table = document.createElement('table');
+            table.className = 'dashboard-table';
+
+            // Create the table header and body elements.
+            var thead = document.createElement('thead');
+            var tbody = document.createElement('tbody');
+
+            // Add column names to the table header.
+            var headerRow = document.createElement('tr');
+            for (var i = 0; i < data.getNumberOfColumns(); i++) {
+                var th = document.createElement('th');
+                th.innerText = data.getColumnLabel(i);
+                headerRow.appendChild(th);
+            }
+            thead.appendChild(headerRow);
+            table.appendChild(thead);
+            table.appendChild(tbody);
+
+            // Clear previous contents of the data_div and append the new table.
+            var dataDiv = document.getElementById('data_div');
+            dataDiv.innerHTML = '';
+            dataDiv.appendChild(table);
+
+            // Use event delegation to handle cell editing.
+            table.addEventListener('input', function (e) {
+                if (e.target.tagName.toLowerCase() === 'td') {
+                    var cell = e.target;
+                    var newValue = cell.innerText;
+                    var row = cell.parentNode.rowIndex - 1;
+                    var col = cell.cellIndex;
+
+                    // Validate the newValue based on its column
+                    if (!validateCellValue(col, newValue)) {
+                        // If invalid, revert the cell's value and show an error
+                        cell.innerText = data.getFormattedValue(row, col);
+                        displayError("Invalid input. Please try again.");
+                        return;
+                    }
+
+                    // If valid, update the data model and redraw the charts
+                    data.setCell(row, col, newValue);
+                    var graphData = parseXML(xmlDocGlobal, data);
+                    drawGanttChart(data);
+                    drawGraph(graphData.nodes, graphData.links);
+                }
+            });
+
+            function validateCellValue(col, value) {
+                switch (col) {
+                    case 0: // Task ID
+                        return /^\d+$/.test(value);
+                    case 3: // Start Date
+                    case 4: // End Date
+                        return !isNaN(new Date(value).getTime());
+                    case 5: // Duration
+                        return !isNaN(value) && parseFloat(value) >= 0;
+                    case 6: // Percent Complete
+                        var percent = parseFloat(value);
+                        return !isNaN(percent) && percent >= 0 && percent <= 100;
+                    case 7: // Dependencies
+                        // Check if all dependencies are positive integers
+                        return value.split(',').every(dep => /^\d+$/.test(dep.trim()));
+                    default:
+                        return true;
+                }
+            }
+
+            function displayError(message) {
+                // Assuming there's a <div> with id 'error-message' to display errors
+                var errorDiv = document.getElementById('error_div');
+                errorDiv.innerText = message;
+                errorDiv.style.display = 'block';
+                setTimeout(() => {
+                    errorDiv.style.display = 'none';
+                }, 5000); // Hide the error message after 5 seconds
+            }
+
+            var maxTaskDuration = 0;
+            for (var i = 0; i < data.getNumberOfRows(); i++) {
+                var taskDuration = data.getValue(i, data.getColumnIndex('Duration'));
+                maxTaskDuration = Math.max(maxTaskDuration, taskDuration);
+            }
+
+            // Populate the table body with data from the Google DataTable.
+            for (var i = 0; i < data.getNumberOfRows(); i++) {
+                var dataRow = document.createElement('tr');
+                for (var j = 0; j < data.getNumberOfColumns(); j++) {
+                    var td = document.createElement('td');
+                    if (j === data.getColumnIndex('Progress Bar')) {
+                        var taskDuration = data.getValue(i, data.getColumnIndex('Duration'));
+                        var barLengthPercentage = (taskDuration / maxTaskDuration) * 100;
+                        td.innerHTML = `
+                                                        <div class="progress-bar-container" style="width: 100%;">
+                                                            <div class="progress-bar" style="width: ${barLengthPercentage}%;">
+                                                                <div class="progress-bar-fill" style="width: 0%;"></div>
+                                                            </div>
+                                                        </div>`;
+                    } else {
+                        td.innerText = data.getFormattedValue(i, j);
+                        td.contentEditable = 'true';
+                    }
+                    dataRow.appendChild(td);
+                }
+                tbody.appendChild(dataRow);
+            }
+
+            // Make the table sortable.
+            sorttable.makeSortable(table);
+        }
+
+        function drawChart(xmlDoc) {
+            console.log("Drawing chart with data: ", xmlDoc);
+            var data = new google.visualization.DataTable();
+            data.addColumn('string', 'Task ID');
+            data.addColumn('string', 'Task Name');
+            data.addColumn('string', 'Resource');
+            data.addColumn('date', 'Start Date');
+            data.addColumn('date', 'End Date');
+            data.addColumn('number', 'Duration');
+            data.addColumn('number', 'Percent Complete');
+            data.addColumn('string', 'Dependencies');
+            data.addColumn('number', 'Progress Bar');
+
+            try {
+                parseXML(xmlDoc, data);
+                var dataJSON = data.toJSON();
+                //document.getElementById('data_div').innerText = "DataTable in JSON format: \n" + dataJSON;
+                drawDataTable(data);
+                drawGanttChart(data);
+                console.log('Nodes2')
+                console.log("About to call drawGraph")
+
+                var graphData = parseXML(xmlDoc, data);
+
+                console.log('Nodes to the Charts', graphData.nodes)
+                console.log('Links to the Charts', graphData.links)
+                //drawCharts(graphData.nodes, graphData.links);
+                console.log('Links to the Graph', graphData.links)
+                drawGraph(graphData.nodes, graphData.links);
+                // Now, call the chart functions with the parsed nodes and links
+
+            } catch (err) {
+                console.error("Error while parsing the XML data: ", err);
+                document.getElementById('error_div').innerText = "Error: " + err.message;
+            }
+        }
+
+        function insertStartMilestone(data, nodes, taskIDs, date) {
+            if (!taskIDs['0']) {
+                date.setHours(0, 0, 0, 0);
+                data.addRow(['0', 'Start Milestone', '', date, date, 0, 100, null, null]);
+                taskIDs['0'] = true;
+                nodes.push({ ID: '0', Name: 'Start Milestone', Duration: '0', Start: date.toISOString(), Finish: date.toISOString() }); // Add the Start Node to the nodes array
+            }
+        }
+
+        function insertEndMilestone(endMilestoneID, data, nodes, taskIDs, date, tasksWithoutSuccessors) {
+            var milestoneID = endMilestoneID.toString();
+            console.log('endMilestoneID: ', endMilestoneID)
+            if (!taskIDs[milestoneID]) {
+                date.setHours(23, 59, 59, 999);  // Set the time to the end of the day
+                // Convert tasksWithoutSuccessors array to a comma-separated string to use as dependencies
+                var dependencies = tasksWithoutSuccessors.join(", ");
+                //data.addRow([milestoneID, 'End Milestone', '', date, date, 0, 0, null]);
+                data.addRow([milestoneID, 'End Milestone', '', date, date, 0, 0, dependencies, null]);
+                taskIDs[milestoneID] = true;
+                //nodes.push({ ID: milestoneID, Name: 'End Milestone', Duration: '0'; Start: date.toISOString(), Finish: date.toISOString() }); // Add the End Node to the nodes array
+            }
+        }
+
+        /**
+         * Parses the XML to extract task data and dependencies.
+         * @param {Object} xmlDoc - The XML document.
+         * @param {Object} data - The Google visualization DataTable.
+         */
+        function parseXML(xmlDoc, data) {
+            console.log("parseXML called");
+            // Store the XML data for future use
+            xmlDocGlobal = xmlDoc;
+            var root = xmlDoc.documentElement;
+            console.log("Root element: ", root.nodeName);
+
+            var minStartDate = new Date(2100, 0, 1); // a future date
+            var maxEndDate = new Date(1900, 0, 1);   // a past date
+
+            var tasks = xmlDoc.getElementsByTagName("Task");
+            console.log("Number of tasks: ", tasks.length);
+
+            var taskIDs = {}; // To keep track of task IDs
+            var taskUIDtoID = {}; // To map UIDs to IDs
+            var idIncrementRequired = false; //if there is a Task IDs with '0' it coincides theh our start node and all IDs must be incremented
+            var selfReferencingTasks = [];
+
+            // Initialize nodes and links arrays for the graph
+            console.log("Initialize nodes and links arrays for the graph")
+            var nodes = [];
+            var links = [];
+
+            // Initialize dependencyGraph and checkedTasks
+            var dependencyGraph = {};
+            var checkedTasks = {};
+
+            var minDate = null;  // To keep track of the minimum start date
+
+            var parsedTasks = [];
+
+            // First pass to extract task IDs and UIDs
+            var tasksData = [];
+            for (var i = 0; i < tasks.length; i++) {
+                // Initialize tasksData array to store task details
+                //var parsedTask = parseTask(tasks[i], data, taskUIDtoID, idIncrementRequired, selfReferencingTasks);
+
+                //tasksData.push(parsedTask);
+                var uidElement = tasks[i].getElementsByTagName("UID")[0];
+                var idElement = tasks[i].getElementsByTagName("ID")[0];
+
+                if (uidElement && idElement) {
+                    var uid = uidElement.childNodes[0].nodeValue.trim();
+                    var id = idElement.childNodes[0].nodeValue.trim();
+                    taskUIDtoID[uid] = id;
+                    if (id === '0') {
+                        idIncrementRequired = true;
+                    }
+                }
+            }
+            console.log('Log the taskUIDtoID', taskUIDtoID); // Log the taskUIDtoID
+            console.log('Log the taskUIDtoID'); // Log the taskUIDtoID
+
+            if (idIncrementRequired) {
+                for (var uid in taskUIDtoID) {
+                    taskUIDtoID[uid] = (parseInt(taskUIDtoID[uid], 10) + 1).toString();
+                }
+            }
+
+            // Find minimum date
+            for (var i = 0; i < tasks.length; i++) {
+                var startDateNode = tasks[i].getElementsByTagName("Start")[0];
+                if (startDateNode) {
+                    var startDateText = startDateNode.childNodes[0].nodeValue.trim();
+                    var startDate = new Date(startDateText);  // Parse the date string
+                    if (!minDate || startDate < minDate) {
+                        minDate = startDate;
+                    }
+                }
+            }
+
+            insertStartMilestone(data, nodes, taskIDs, minDate); // Insert Start Milestone after finding the minimum date.
+
+            //Determine the Maximum ID:
+            var maxID = -1;
+            for (var i = 0; i < tasks.length; i++) {
+                var taskIDElement = tasks[i].getElementsByTagName("ID")[0];
+                if (taskIDElement && taskIDElement.childNodes[0]) {
+                    var taskID = parseInt(taskIDElement.childNodes[0].nodeValue.trim(), 10);
+                    if (idIncrementRequired) {
+                        taskID += 1;
+                    }
+                    maxID = Math.max(maxID, taskID);
+                }
+            }
+
+            //Create the End Milestone:
+            var endMilestoneID = maxID + 1;
+            //nodes.push({ ID: endMilestoneID, Name: 'End Milestone', Start: 'someStartDate', Finish: 'someEndDate' });
+            nodes.push({ ID: endMilestoneID, Name: 'End Milestone', Duration: '0', Start: maxEndDate, Finish: maxEndDate });
+            //data.addRow([endMilestoneID, 'End Milestone', '', 'someStartDate', 'someEndDate', null, 100, null]);
+
+
+            // Second pass to parse the tasks
+            var successorCounts = {};
+            for (var i = 0; i < tasks.length; i++) {
+                var task = tasks[i];
+                var parsedTask = parseTask(tasks[i], data, taskUIDtoID, idIncrementRequired, selfReferencingTasks, minDate, maxEndDate);
+                parsedTasks.push(parsedTask);
+
+                var taskID = parsedTask.taskID;
+                var taskName = task.getElementsByTagName("Name")[0].childNodes[0].nodeValue.trim();
+                var startDate = task.getElementsByTagName("Start")[0].childNodes[0].nodeValue.trim();
+                var endDate = task.getElementsByTagName("Finish")[0].childNodes[0].nodeValue.trim();
+                var duration = parsedTask.duration;
+
+                // Update minStartDate and maxEndDate
+                var parsedStartDate = new Date(startDate);
+                var parsedEndDate = new Date(endDate);
+                if (parsedStartDate < minStartDate) {
+                    minStartDate = parsedStartDate;
+                }
+                if (parsedEndDate > maxEndDate) {
+                    maxEndDate = parsedEndDate;
+                }
+
+                // Add the task to the nodes array
+                //nodes.push({ UID: taskID, Name: taskName, Start: startDate, Finish: endDate });
+                nodes.push({ ID: taskID, Name: taskName, Duration: duration, Start: startDate, Finish: endDate }); //Using ID instead of UID
+
+                console.log('Nodes', nodes)
+
+                taskIDs[taskID] = true;
+                var dependenciesNodeList = tasks[i].getElementsByTagName("PredecessorLink");
+                for (var j = 0; j < dependenciesNodeList.length; j++) {
+                    var predecessorUIDNode = dependenciesNodeList[j].getElementsByTagName("PredecessorUID")[0];
+                    if (predecessorUIDNode) {
+                        var dependencyUID = predecessorUIDNode.childNodes[0].nodeValue.trim();
+                        var dependency = taskUIDtoID[dependencyUID];
+                        var dependencyID = taskUIDtoID[dependencyUID];
+                        // Log the values being used
+                        console.log("Dependency UID:", dependencyUID);
+                        console.log("Mapped Dependency ID (source):", dependencyID);
+                        console.log("Task ID (target):", taskID);
+                        console.log("Task duration:", duration);
+                        links.push({ source: dependencyID, target: taskID, duration: duration });
+                        if (!(taskID in dependencyGraph)) {
+                            dependencyGraph[taskID] = [];
+                        }
+                        dependencyGraph[taskID].push(dependency);
+                    }
+                }
+                // Check if the task has no predecessors
+                if (dependenciesNodeList.length === 0) {
+                    // Link the task with no predecessors to the Start Milestone (ID 0)
+                    links.push({ source: '0', target: taskID, duration: duration.toString() });
+                }
+
+                // Initialize successor counts
+                successorCounts[taskID] = 0;
+
+            }
+
+            // Increment successor counts
+            for (var i = 0; i < tasks.length; i++) {
+                //var task = tasks[i];
+                //var parsedTask = parseTask(tasks[i], data, taskUIDtoID, idIncrementRequired, selfReferencingTasks);
+                var taskID = parsedTask.taskID;
+                var dependenciesNodeList = tasks[i].getElementsByTagName("PredecessorLink");
+                for (var j = 0; j < dependenciesNodeList.length; j++) {
+                    var predecessorUIDNode = dependenciesNodeList[j].getElementsByTagName("PredecessorUID")[0];
+                    if (predecessorUIDNode) {
+                        var dependencyUID = predecessorUIDNode.childNodes[0].nodeValue.trim();
+                        var dependencyID = taskUIDtoID[dependencyUID];
+                        // Increment successor count for each predecessor
+                        successorCounts[dependencyID]++;
+                    }
+                }
+            }
+
+            // Connect Tasks Without Successors
+            var tasksWithoutSuccessors = [];
+            for (var taskID in successorCounts) {
+                if (successorCounts[taskID] === 0) {
+                    links.push({ source: taskID, target: endMilestoneID, duration: duration });
+                    tasksWithoutSuccessors.push(taskID);
+                }
+            }
+
+            console.log('Links', links);
+            // Insert Start and End Milestones
+            //insertStartMilestone(data, nodes, taskIDs, minStartDate);
+            insertEndMilestone(endMilestoneID, data, nodes, taskIDs, maxEndDate, tasksWithoutSuccessors);
+
+            // Third pass to check for invalid dependencies
+            for (var i = 0; i < tasks.length; i++) {
+                checkDependencies(tasks[i], taskIDs, taskUIDtoID, dependencyGraph);
+            }
+
+            // After constructing the entire dependency graph
+            try {
+                checkCycles(dependencyGraph);
+            } catch (error) {
+                console.error(error);
+            }
+
+
+            if (selfReferencingTasks.length > 0) {
+                var warningMessage = "Self-referencing tasks found with IDs: " + selfReferencingTasks.join(", ");
+                console.warn(warningMessage);
+                document.getElementById('self-referencing-tasks-warning').innerText = warningMessage;
+            }
+
+            return { nodes: nodes, links: links, selfReferencingTasks: selfReferencingTasks, tasksData: tasksData };
+
+        }
+
+
+        function checkDependencies(task, taskIDs, taskUIDtoID, dependencyGraph) {
+            var taskIDElement = task.getElementsByTagName("ID")[0];
+            var taskID = taskIDElement.childNodes[0].nodeValue.trim();
+            var dependencies = dependencyGraph[taskID] || [];
+            for (var i = 0; i < dependencies.length; i++) {
+                var dependency = dependencies[i];
+                if (!taskIDs[dependency]) {
+                    throw new Error("Invalid task dependency ID: " + dependency + " in task with ID: " + taskID);
+
+                }
+            }
+        }
+
+        function detectCycle(graph, startNode, visited, recursionStack) {
+            visited[startNode] = true;
+            recursionStack[startNode] = true;
+
+            var neighbors = graph[startNode];
+            if (neighbors) {
+                for (var i = 0; i < neighbors.length; i++) {
+                    var neighbor = neighbors[i];
+
+                    if (!visited[neighbor]) {
+                        if (detectCycle(graph, neighbor, visited, recursionStack)) {
+                            return true;
+                        }
+                    } else if (recursionStack[neighbor]) {
+                        // if the neighbor node is visited and it's in the recursion stack, then it's a cycle
+                        return true;
+                    }
+                }
+            }
+
+            recursionStack[startNode] = false; // remove the node from the recursion stack before returning
+            return false;
+        }
+
+        function checkCycles(graph) {
+            var visited = {};
+            var recursionStack = {};
+
+            function detectCycle(graph, startNode) {
+                visited[startNode] = true;
+                recursionStack[startNode] = true;
+
+                var neighbors = graph[startNode];
+                if (neighbors) {
+                    for (var i = 0; i < neighbors.length; i++) {
+                        var neighbor = neighbors[i];
+
+                        if (!visited[neighbor]) {
+                            if (detectCycle(graph, neighbor)) {
+                                return true;
+                            }
+                        } else if (recursionStack[neighbor]) {
+                            // if the neighbor node is visited and it's in the recursion stack, then it's a cycle
+                            console.error("Cycle detected involving tasks with IDs: " + startNode + " and " + neighbor);
+                            // Removing the cycle-causing dependency:
+                            var index = graph[startNode].indexOf(neighbor);
+                            if (index > -1) {
+                                graph[startNode].splice(index, 1);
+                            }
+                            return false; // Remove the cycle but continue checking
+                        }
+                    }
+                }
+
+                recursionStack[startNode] = false; // remove the node from the recursion stack before returning
+                return false;
+            }
+
+            for (var node in graph) {
+                if (!visited[node]) {
+                    detectCycle(graph, node);
+                }
+            }
+        }
+
+        function parseTask(task, data, taskUIDtoID, idIncrementRequired, selfReferencingTasks, minDate, maxEndDate) {
+            console.log("parseTask called");
+
+            // Extract the data from the XML task element, with checks for missing elements
+
+            var taskIDElement = task.getElementsByTagName("ID")[0];
+            var taskNameElement = task.getElementsByTagName("Name")[0];
+            var startDateElement = task.getElementsByTagName("Start")[0];
+            var endDateElement = task.getElementsByTagName("Finish")[0];
+            var durationElement = task.getElementsByTagName("Duration")[0];
+
+            if (!taskIDElement || !taskNameElement || !startDateElement || !endDateElement || !durationElement) {
+                throw new Error("Task element missing one or more expected child elements");
+            }
+
+            var taskID = taskIDElement.childNodes[0].nodeValue.trim();
+            if (idIncrementRequired) {
+                taskID = String(Number(taskID) + 1);
+            }
+            console.log("Task ID: ", taskID);
+
+
+            var taskName = taskNameElement.childNodes[0].nodeValue.trim();
+            console.log("Task Name: ", taskName);
+
+            var startDateString = startDateElement.childNodes[0].nodeValue.trim();
+            console.log("Start Date: ", startDateString);
+
+            var endDateString = endDateElement.childNodes[0].nodeValue.trim();
+            console.log("End Date: ", endDateString);
+
+            var durationString = durationElement.childNodes[0].nodeValue.trim();
+            console.log("Duration: ", durationString);
+
+            // If PercentComplete element is missing, set it to "0"
+            var percentCompleteElement = task.getElementsByTagName("PercentComplete")[0];
+            var percentCompleteString = percentCompleteElement ? percentCompleteElement.childNodes[0].nodeValue.trim() : "0";
+            console.log("Percent Complete: ", percentCompleteString);
+
+            // When parsing dependencies, convert PredecessorUID into the corresponding ID
+            var dependenciesNodeList = task.getElementsByTagName("PredecessorLink");
+            var dependencies = [];
+
+            for (var i = 0; i < dependenciesNodeList.length; i++) {
+                var predecessorUIDNode = dependenciesNodeList[i].getElementsByTagName("PredecessorUID")[0];
+
+                if (predecessorUIDNode) {
+                    var uid = predecessorUIDNode.childNodes[0].nodeValue.trim();
+                    if (taskUIDtoID[uid]) {
+                        dependencies.push(taskUIDtoID[uid]);
+                    }
+                }
+            }
+
+            var dependenciesString = dependencies.length > 0 ? dependencies.join(",") : "None";
+            console.log("Dependencies: ", dependenciesString);
+
+
+            // Instead of throwing an error for invalid task ID, just log it and return
+            if (isNaN(parseFloat(taskID))) {
+                console.error("Invalid task ID value.");
+                return;
+            }
+
+            // Validate date strings match expected format (yyyy-mm-dd or yyyy-mm-ddThh:mm:ss)
+            var dateRegexShort = /^\d{4}-\d{2}-\d{2}$/;
+            var dateRegexLong = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/;
+            if (startDateString.length === 10 && !dateRegexShort.test(startDateString) ||
+                startDateString.length === 19 && !dateRegexLong.test(startDateString) ||
+                endDateString.length === 10 && !dateRegexShort.test(endDateString) ||
+                endDateString.length === 19 && !dateRegexLong.test(endDateString)) {
+                throw new Error("Invalid date format in task with ID: " + taskID);
+
+            }
+
+            // Create dates from strings, and add error checking.
+            var startDate = new Date(startDateString);
+            var endDate = new Date(endDateString);
+
+            // Check if dates are valid
+            if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+                console.error("Invalid task date format for taskID: " + taskID);
+                return;
+            }
+
+            // Remove time portion of date if exists
+            if (startDateString.length === 19) {
+                startDate.setHours(0, 0, 0, 0);
+            }
+            if (endDateString.length === 19) {
+                endDate.setHours(0, 0, 0, 0);
+            }
+
+            if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+                throw new Error("Invalid task date format.");
+            }
+
+            // Handle invalid duration values
+            var duration;
+            if (durationString.startsWith('PT')) {
+                // Parse ISO 8601 duration format (PTxxHxxMxxS)
+                var match = durationString.match(/PT(\d+H)?(\d+M)?(\d+S)?/);
+                var hours = match[1] ? parseInt(match[1].slice(0, -1)) : 0;
+                var minutes = match[2] ? parseInt(match[2].slice(0, -1)) : 0;
+                var seconds = match[3] ? parseInt(match[3].slice(0, -1)) : 0;
+                duration = hours + minutes / 60 + seconds / 3600;
+            } else {
+                duration = parseFloat(durationString);
+            }
+            if (isNaN(duration) || duration < 0) {
+                console.error("Invalid task duration value for task with ID: " + taskID);
+                return;
+            }
+
+            // Validate percent complete value, and handle invalid values.
+            var percentComplete = parseFloat(percentCompleteString);
+            if (isNaN(percentComplete) || percentComplete < 0 || percentComplete > 100) {
+                console.error("Invalid task percent complete value for task with ID: " + taskID);
+                return;
+            }
+
+            // Check the validity of dependency IDs and handle invalid values
+            for (var i = 0; i < dependencies.length; i++) {
+                if (isNaN(parseFloat(dependencies[i]))) {
+                    throw new Error("Invalid task dependencies format.");
+                }
+            }
+
+            // Handle empty/missing dependency values
+            if (dependencies.length === 0) {
+                dependenciesString = "0";  // Here the startMilestoneID should be "0";
+            } else {
+                // Adjust dependencies array based on the incremented task IDs
+                dependencies = dependencies.map(dependency => {
+                    if (dependency === "0") {
+                        return "1";
+                    } else {
+                        //return String(parseInt(dependency) + 1);
+                        return String(parseInt(dependency) + 0);
+                    }
+                });
+
+                // Convert dependencies array to a string with comma separated values
+                dependenciesString = dependencies.join(",");
+            }
+
+            // Handle empty/missing dependency values and self-referencing tasks
+            var hasOtherDependencies = false;
+            for (var i = 0; i < dependencies.length; i++) {
+                if (dependencies[i] === taskID) {
+                    console.warn("Task with ID: " + taskID + " has itself as a dependency. Removing the self-referencing dependency.");
+                    selfReferencingTasks.push(taskID);
+                } else {
+                    hasOtherDependencies = true;
+                }
+            }
+            if (dependencies.length === 0 || (!hasOtherDependencies && dependencies.includes(taskID))) {
+                dependenciesString = "0";  // Default to the startMilestoneID if no valid dependencies
+            } else {
+                dependenciesString = dependencies.join(",");
+            }
+
+            // Add parsed task data to the DataTable.
+            //console.log("Row: ", taskID, taskName, '', startDate, endDate, duration, percentComplete, dependenciesString);
+            var maxEndDateObj = new Date(maxEndDate);
+            var minDateObj = new Date(minDate);
+            var endDateObj = new Date(endDate);
+            var startDateObj = new Date(startDate);
+
+            var totalDuration = (maxEndDateObj - minDateObj) / (1000 * 60 * 60 * 24);
+            var taskDuration = (endDateObj - startDateObj) / (1000 * 60 * 60 * 24);
+
+            var barWidthPercentage = totalDuration !== 0 ? (taskDuration / totalDuration) * 100 : 0;
+
+            var progressBar = '<div class="progress-bar-container"><div class="progress-bar" style="width: ' + barWidthPercentage + '%;"></div></div>';
+
+            //data.addRow([taskID, taskName, resource, taskStartDate, taskEndDate, taskDuration, percentComplete, dependencies, progressBar]);
+            try {
+                data.addRow([taskID, taskName, '', startDate, endDate, duration, percentComplete, dependenciesString, barWidthPercentage]);
+
+            } catch (err) {
+                console.error("Error adding row to DataTable for taskID: " + taskID);
+                console.error(err.message);
+                return;
+            }
+
+            return {
+                taskID: taskID,
+                duration: duration,
+                taskName: taskName,
+                startDate: startDate,
+                endDate: endDate
+            };
+            // Return the task ID
+
+        }
+        function drawGanttChart(data) {
+            console.log("drawGanttChart called");
+            try {
+                var numRows = data.getNumberOfRows();
+                var height = numRows * 30 + 80;
+                var options = {
+                    height: height,
+                    backgroundColor: '#cdfaff',
+                    gantt: {
+                        trackHeight: 30,
+                        barCornerRadius: 5,
+                        criticalPathEnabled: true,
+                        criticalPathStyle: {
+                            stroke: '#1e69aa',
+                            strokeWidth: 2
+                        },
+                        labelStyle: {
+                            fontName: 'Orbitron',  // Futuristic font
+                            fontSize: 14,
+                            color: '#113464' // Dark blue text
+                        },
+                        barHeight: 25,
+                        percentEnabled: false,
+                        shadowEnabled: true,
+                        arrow: {
+                            angle: 90,  // Make links less curvy
+                            width: 2,
+                            color: '#195a8c',
+                            length: 10
+                        },
+                        defaultStartDate: null,
+                        palette: [
+                            {
+                                color: {
+                                    linearGradient: { x0: 0, y0: 0, x1: 0, y1: 1 },
+                                    colorStops: [{ offset: 0, color: '#3292cd' }, { offset: 1, color: '#287dc8' }]
+                                },
+                                dark: '#113464',
+                                stroke: '#195a8c',
+                                strokeWidth: 2
+                            }
+                        ],
+                        gridlines: {
+                            color: '#3292cd'
+                        },
+                        minorGridlines: {
+                            color: '#287dc8',
+                            count: 15
+                        },
+                        labelMaxWidth: 300, // Increase if labels are long
+                        labelTextStyle: {
+                            fontName: 'Orbitron',
+                            fontSize: 14,
+                            color: '#113464'
+                        },
+                        tooltip: {
+                            isHtml: true
+                        }
+                    },
+                    chartArea: {
+                        backgroundColor: '#cdfaff'
+                    },
+                    hAxis: {
+                        textStyle: {
+                            fontName: 'Orbitron',
+                            color: '#1e69aa'
+                        },
+                        gridlines: {
+                            color: '#287dc8'
+                        }
+                    },
+                    vAxis: {
+                        textStyle: {
+                            fontName: 'Orbitron',
+                            color: '#1e69aa'
+                        }
+                    }
+                };
+                var chart = new google.visualization.Gantt(document.getElementById('chart_div'));
+                chart.draw(data, options);
+            } catch (err) {
+                console.error(err);
+            }
+        }
+    // Completion of all computations and renderings
+    updateProgressBar(100);
+    document.querySelector(".sci-fi-loading-text").innerText = "";
+</script>
+<script src="https://d3js.org/d3.v5.min.js"></script>
+<script src="generateGraph6.js"></script>
+<style>
+        #sidebar {
+            position: fixed;
+            top: 15%;
+            left: 0;
+            width: 200px;
+            background-color: #0e2446;
+            padding: 10px;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+        }
+
+            #sidebar h3 {
+                color: #fff;
+                text-align: center;
+                margin-bottom: 10px;
+            }
+
+            #sidebar ul {
+                list-style-type: none;
+                padding: 0;
+            }
+
+                #sidebar ul li {
+                    margin-bottom: 10px;
+                }
+
+                    #sidebar ul li a {
+                        color: #ddd;
+                        text-decoration: none;
+                        font-size: 0.9em;
+                        display: block;
+                        padding: 5px;
+                        border-radius: 5px;
+                        transition: background-color 0.3s;
+                    }
+
+                        #sidebar ul li a:hover {
+                            background-color: #575757;
+                            #sidebar ul li:hover
+
+        {
+            background-color: #8ce6ff; /* Lighter shade for hover */
+            color: #113464;
+        }
+
+        #toggleSidebar {
+            position: absolute;
+            top: 20px;
+            left: 260px;
+            background-color: transparent; /* Making the button background transparent */
+            color: #0d2137; /* Darker shade for the arrow */
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            padding: 10px 15px;
+            font-size: 20px;
+            transition: transform 0.3s; /* Transition for rotation */
+        }
+
+            #toggleSidebar:hover {
+                color: #113464; /* Slightly different darker shade for hover */
+            }
+
+        #sidebar.collapsed {
+            width: 40px; /* Adjust the width when collapsed to fit the button */
+        }
+
+            #sidebar.collapsed h3,
+            #sidebar.collapsed ul {
+                display: none; /* Hide other elements of the sidebar when collapsed */
+            }
+
+            #sidebar.collapsed #toggleSidebar {
+                transform: rotate(180deg); /* Rotate the arrow when the sidebar is collapsed */
+            }
+        }
+    </style>
+<style>
+        /* Sidebar Styles */
+        #sidebar {
+            transition: width 0.5s; /* Smooth transition for width changes */
+            overflow-x: hidden; /* Hide horizontal scrollbar */
+        }
+
+            /* Collapsed state styles for the sidebar */
+            #sidebar.collapsed {
+                width: 50px; /* Width of the sidebar when collapsed */
+            }
+
+                #sidebar.collapsed ul {
+                    display: none; /* Hide the list items when sidebar is collapsed */
+                }
+
+        /* Button styles for toggling sidebar */
+        #sidebarToggleBtn {
+            background-color: #113464; /* Dark color from the theme */
+            color: #cdfaff; /* Light color from the theme */
+            border: none;
+            cursor: pointer;
+            padding: 10px 15px;
+            margin: 10px;
+            border-radius: 5px;
+            font-size: 24px; /* Size of the icon */
+            transition: background-color 0.3s; /* Smooth transition for hover effect */
+        }
+
+            #sidebarToggleBtn:hover {
+                background-color: #1e69aa; /* Lighter color from the theme for hover effect */
+            }
+
+        /* Toggle Button in collapsed state */
+        #sidebar.collapsed #sidebarToggleBtn {
+            background-color: #113464; /* Dark color from the theme */
+            padding: 10px 5px; /* Reduced padding to make the button more compact */
+            font-size: 24px; /* Size of the icon */
+        }
+
+        /* Adjusting the position and z-index of the toggle button */
+        #sidebarToggleBtn {
+            position: relative; /* Relative positioning */
+            z-index: 9999; /* Ensuring the button stays above other elements but doesn't interfere */
+        }
+    </style>
+<style>
+        /* New low-profile toggle button styles */
+        #sidebarToggleBtn {
+            background-color: #113464; /* Dark blue from the provided palette */
+            border: none;
+            cursor: pointer;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+            #sidebarToggleBtn:hover {
+                background-color: #0d2137; /* Slightly darker blue on hover */
+            }
+
+            #sidebarToggleBtn svg {
+                fill: #b4f5ff; /* Light blue for the icon */
+                width: 20px;
+                height: 20px;
+            }
+
+        #sidebar.collapsed #sidebarToggleBtn {
+            transform: scaleX(0.7); /* Squeeze the button horizontally when sidebar is collapsed */
+        }
+
+        /* SVG icon styles for the toggle button */
+        .toggle-icon {
+            transition: transform 0.3s; /* Smooth transition for icon rotation */
+        }
+    </style>
+<style>
+        /* Distinct sci-fi theme for the container */
+        .dashboard-section.introduction-section {
+            background: linear-gradient(135deg, #113464, #287dc8);
+            border-radius: 25px;
+            padding: 30px;
+            box-shadow: 0 0 25px #3292cd;
+            font-family: 'Arial', sans-serif; /* Modern font */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        /* Distinct styling for the dropdowns */
+        .project-dropdown, .location-dropdown {
+            width: 80%;
+            background: linear-gradient(135deg, #287dc8, #113464);
+            border: none;
+            border-bottom: 3px solid #3292cd;
+            border-radius: 0;
+            color: #cdfaff;
+            padding: 8px 15px;
+            outline: none;
+            box-shadow: none;
+            cursor: pointer;
+            transition: border-bottom 0.3s;
+            font-weight: bold;
+            appearance: none;
+        }
+
+            .project-dropdown:hover, .location-dropdown:hover {
+                border-bottom: 3px solid #cdfaff;
+            }
+
+        /* Distinct styling for the custom file upload button */
+        /* Hiding the traditional file input */
+        #xmlFileInput {
+            display: none;
+        }
+
+        /* Custom designed button for file selection */
+        .custom-file-upload {
+            display: inline-block;
+            background: linear-gradient(45deg, #3292cd, #195a8c);
+            border: 2px solid #3292cd;
+            border-radius: 10px;
+            color: #cdfaff;
+            padding: 10px 20px;
+            outline: none;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.3s;
+            text-align: center;
+            font-size: 16px;
+            box-shadow: 0 0 10px #3292cd;
+            position: relative;
+        }
+
+            .custom-file-upload:hover {
+                background: linear-gradient(45deg, #287dc8, #113464);
+                transform: translateY(-2px);
+            }
+
+            .custom-file-upload:active {
+                transform: translateY(0);
+            }
+
+            /* Icon for the custom file upload button */
+            .custom-file-upload:before {
+                content: '⬆'; /* Arrow up icon */
+                font-size: 20px;
+                position: absolute;
+                left: 15px;
+                top: 50%;
+                transform: translateY(-50%);
+            }
+
+        /* Feedback after file selection */
+        #xmlFileInput:after {
+            content: attr(data-content);
+            display: block;
+            background: #113464;
+            color: #cdfaff;
+            border: 2px dashed #3292cd;
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 15px;
+            transition: all 0.3s;
+            font-style: italic;
+        }
+    </style>
+<style>
+        /* General body styling */
+        body {
+            font-family: 'Arial', sans-serif; /* Modern font */
+            background: #113464;
+            color: #cdfaff;
+        }
+
+        /* Links enhancement */
+        a {
+            color: #3292cd;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+            a:hover {
+                color: #cdfaff;
+            }
+
+        /* Button enhancements */
+        button {
+            background: linear-gradient(135deg, #287dc8, #113464);
+            border: 2px solid #3292cd;
+            border-radius: 15px;
+            color: #cdfaff;
+            padding: 8px 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 16px;
+            font-weight: bold;
+            outline: none;
+        }
+
+            button:hover {
+                background: linear-gradient(135deg, #3292cd, #195a8c);
+                transform: translateY(-2px);
+                box-shadow: 0 0 15px #cdfaff;
+            }
+
+            button:active {
+                transform: translateY(0);
+            }
+
+        /* Enhancements for different containers and sections */
+        .dashboard-section {
+            margin: 20px;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 0 20px #3292cd;
+        }
+
+        /* Enhancements for headers and titles */
+        h2, h3, h4, h5, h6 {
+            color: #cdfaff;
+            border-bottom: 2px solid #3292cd;
+            padding-bottom: 10px;
+        }
+    </style>
+<style>
+        .dashboard-stat .zoom-in-icon,
+        .dashboard-stat .zoom-out-icon,
+        .dashboard-stat .reset-icon,
+        .dashboard-stat .arrow-icon {
+            font-size: 24px !important; /* Increase font size specifically for these icons */
+        }
+    </style>
+<style>
+        /* Ensuring the progress bar content is visible */
+        .dashboard-stat .progress-bar {
+            background-color: #5ac8fa; /* Using a color from the provided theme */
+            height: 20px; /* Increasing height for better visibility */
+            border-radius: 10px; /* Rounded corners for aesthetic appeal */
+        }
+
+        /* Increasing width of the column containing the progress bar */
+        .dashboard-stat .progress-column {
+            width: 150px !important; /* Assigning a fixed width to ensure full visibility */
+        }
+    </style>
+<style>
+        /* Typography */
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&display=swap');
+
+        body {
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        /* Colors & Background */
+        body {
+            background: linear-gradient(to bottom right, #0e2446, #113464);
+            color: #b4f5ff;
+        }
+
+        .dashboard-section {
+            background: rgba(16, 45, 80, 0.8);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Buttons */
+        .btn, .icon-button {
+            background: #5ac8fa;
+            border: none;
+            border-radius: 20px;
+            padding: 10px 20px;
+            font-size: 14px;
+            color: #0d2137;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+            .btn:hover, .icon-button:hover {
+                background: #3292cd;
+                box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5);
+                transform: translateY(-2px);
+            }
+
+        /* Hover & Transition Effects */
+        a:hover {
+            text-decoration: underline;
+            color: #cdfaff;
+        }
+
+        /* Additional Styling for Progress Bars */
+        .progress-bar {
+            background-color: #0d2137;
+            border: 1px solid #287dc8;
+        }
+
+        .progress-bar-fill {
+            background-color: #5ac8fa;
+            height: 100%;
+            transition: width 0.5s ease;
+        }
+    </style>
+
+<style>
+        .sci-fi-loading-bar-container {
+            width: 100%;
+            height: 30px;
+            border: 2px solid #5ac8fa;
+            border-radius: 15px;
+            position: relative;
+            margin-top: 20px;
+            background: #0d2137;
+            overflow: hidden;
+        }
+
+        .sci-fi-loading-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #5ac8fa, #287dc8);
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .sci-fi-loading-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #ffffff;
+            font-size: 14px;
+            z-index: 10;
+        }
+
+        @keyframes loadingGlow {
+            0% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .sci-fi-loading-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #5ac8fa, #287dc8, #5ac8fa);
+            background-size: 200% 200%;
+            animation: loadingGlow 1.5s infinite;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        @keyframes loadingGlow {
+            0% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .sci-fi-loading-bar-container {
+            width: 60%; /* Extended length */
+            height: 30px;
+            border: 2px solid #5ac8fa;
+            border-radius: 15px;
+            position: relative;
+            margin-top: 20px;
+            background: #0d2137;
+            overflow: hidden;
+            display: inline-block; /* Displayed inline with the file upload button */
+            vertical-align: middle;
+        }
+
+        .sci-fi-loading-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #5ac8fa, #287dc8, #5ac8fa);
+            background-size: 200% 200%;
+            animation: loadingGlow 1.5s infinite;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        #xmlFileInput {
+            display: inline-block;
+            padding: 10px 15px;
+            background: linear-gradient(90deg, #5ac8fa, #287dc8);
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            outline: none;
+            transition: background 0.3s;
+            margin-right: 15px;
+        }
+
+            #xmlFileInput:hover {
+                background: linear-gradient(90deg, #287dc8, #5ac8fa);
+            }
+
+    /* Additional styles for the new elements */
+    .uploading-text {
+        display: none;
+        font-size: 16px;
+        font-weight: bold;
+        color: darkred;
+        margin-left: 15px;
+    }
+
+    .sci-fi-loading-bar-container {
+        width: 70%; /* Adjusted to accommodate the "upload in progress" text */
+    }
+
+    </style>
+<style>
+        #xmlFileInput {
+            display: none;
+        }
+
+        .upload-label {
+            display: inline-block;
+            padding: 10px 15px;
+            background: linear-gradient(90deg, #5ac8fa, #287dc8);
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.3s;
+            margin-right: 15px;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            font-size: 14px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+            .upload-label:hover {
+                background: linear-gradient(90deg, #287dc8, #5ac8fa);
+                transform: scale(1.05);
+            }
+
+            .upload-label::before {
+                content: "📂";
+                font-size: 18px;
+                margin-right: 5px;
+            }
+
+            .upload-label:hover::before {
+                content: "📤";
+            }
+    </style>
+<style>
+        #xmlFileInput {
+            display: none;
+        }
+
+        .upload-label {
+            display: inline-block;
+            padding: 10px 20px;
+            background: linear-gradient(90deg, #5ac8fa, #287dc8);
+            color: #ffffff;
+            border: 2px solid #5ac8fa;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.3s;
+            font-size: 16px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+            .upload-label:hover {
+                background: linear-gradient(90deg, #287dc8, #5ac8fa);
+            }
+
+            .upload-label::before {
+                content: "📤";
+                font-size: 20px;
+                margin-right: 8px;
+            }
+
+        .sci-fi-loading-bar-container {
+            width: 70%;
+            height: 20px;
+            border: 3px solid #5ac8fa;
+            border-radius: 10px;
+            background: #0d2137;
+            overflow: hidden;
+            box-shadow: 0 0 20px #5ac8fa;
+            position: relative;
+        }
+
+        .sci-fi-loading-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #5ac8fa, #287dc8, #5ac8fa);
+            position: absolute;
+            top: 0;
+            left: 0;
+            box-shadow: 0 0 10px #5ac8fa, 0 0 20px #5ac8fa, 0 0 30px #287dc8, 0 0 40px #5ac8fa;
+        }
+        .upload-container {
+            display: flex;
+            align-items: center;
+            justify-content: start;
+            gap: 20px;
+            transition: all 0.3s;
+        }
+
+            .upload-container:hover {
+                transform: scale(1.05);
+            }
+
+        .sci-fi-loading-bar-container {
+            width: 80%;
+            margin-left: 10px;
+        }
+
+        .upload-label {
+            background: linear-gradient(90deg, #287dc8, #5ac8fa);
+            border: 3px solid #5ac8fa;
+            box-shadow: 0 0 15px rgba(42, 125, 200, 0.6);
+            transition: all 0.3s;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .upload-label:hover {
+            transform: translateY(-3px);
+            background: linear-gradient(90deg, #5ac8fa, #287dc8);
+        }
+        .upload-label::before {
+                animation: iconBounce 1s infinite alternate;
+            }
+
+        .sci-fi-loading-bar-container {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .sci-fi-loading-bar {
+            background-color: #287dc8;
+            height: 5px;
+            border-radius: 5px;
+        }
+
+        .sci-fi-loading-text {
+            color: #5ac8fa;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        @keyframes iconBounce {
+            from {
+                transform: translateY(0);
+            }
+
+            to {
+                transform: translateY(-5px);
+            }
+        }
+
+        .megaproject-icon {
+            width: 100px;
+            height: 100px;
+            display: inline-block;
+            position: relative;
+        }
+
+        .rotating-line {
+            transform-origin: 50% 50%;
+            animation: rotateAnimation 10s infinite linear;
+        }
+
+        @keyframes rotateAnimation {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .pulsing-circle {
+            transform-origin: 50% 50%;
+            animation: pulseAnimation 1.5s infinite alternate;
+        }
+
+        @keyframes pulseAnimation {
+            from {
+                opacity: 0.2;
+                stroke-width: 2px;
+            }
+
+            to {
+                opacity: 1;
+                stroke-width: 3px;
+            }
+        }
+
+        .megaproject-icon-container {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+        }
+
+        .cybereum-logo {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20%; /* Adjusted size */
+            height: 20%; /* Adjusted size */
+            transform: translate(-50%, -50%);
+            z-index: 5;
+        }
+        .futuristic-modal {
+            display: none;
+            position: fixed;
+            padding-top: 100px;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background: repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(90, 200, 250, 0.2) 35px, rgba(90, 200, 250, 0.2) 70px);
+            background-color: rgba(0, 0, 0, 0.5); /* Increased transparency */
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .futuristic-modal-content {
+            background: linear-gradient(145deg, #0d2137, #1a3458); /* Gradient background */
+            margin: 10% auto;
+            padding: 20px;
+            width: 60%;
+            max-width: 800px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4), 0 0 20px #5ac8fa; /* Glowing border effect */
+            border: 1px solid #5ac8fa;
+            border-radius: 10px;
+            position: relative; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Sleek font */
+        }
+
+        .futuristic-modal-header {
+            background-color: #5ac8fa;
+            padding: 10px;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+            color: white;
+            font-size: 20px;
+        }
+
+        .modal-header {
+            background: linear-gradient(145deg, #5ac8fa, #287dc8); /* Gradient background for header */
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            color: white;
+        }
+
+        .modal-body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+        }
+
+        .futuristic-list {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .futuristic-list li {
+            position: relative;
+            margin-bottom: 10px;
+            padding-left: 20px;
+        }
+
+        .futuristic-list li:before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            top: 0;
+            color: #5ac8fa; /* Glowing bullet points */
+            text-shadow: 0 0 5px #5ac8fa;
+        }
+
+        .futuristic-list li:hover {
+            color: #5ac8fa; /* Hover effect */
+            text-shadow: 0 0 5px #5ac8fa;
+        }
+
+        .close-btn {
+            color: white;
+            float: right;
+            font-size: 28px;
+            margin-left: 15px;
+            cursor: pointer;
+            transition: color 0.3s, text-shadow 0.3s;
+        }
+
+        .close-btn:hover {
+            color: red;
+            text-shadow: 0 0 5px #5ac8fa; /* Glowing effect on hover */
+        }
+
+    </style>
+
+></head></html>
+<style>
+        .cybereum-logo {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20%; /* Adjusted size */
+            height: 20%; /* Adjusted size */
+            transform: translate(-50%, -50%);
+            z-index: 5;
+        }
+
+
+    </style>
+<body>
+    <script charset="utf-8" src="//js.hsforms.net/forms/embed/v2.js" type="text/javascript"></script>
+    <div class="dashboard-card futuristic-card" style="background: rgba(255, 255, 255, 0.03); border: 2px solid rgba(255, 255, 255, 0.2); border-radius: 15px; margin: 20px 0; padding: 20px; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);background-image: url('https://www.transparenttextures.com/patterns/space.png');background-color: rgba(0, 0, 0, 0.6);padding: 40px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; position: relative;">
+        <div class="project-network-animation-enhanced" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: auto; z-index: 0;">
+            <canvas id="networkCanvasEnhanced"></canvas>
+        </div>
+        <div class="border-graphic-container" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1;"></div>
+        <div class="introduction-logo-container" style="text-align: center; margin-bottom: 20px;position: relative; z-index: 2;">
+            <img alt="Cybereum Logo" src="https://cybereum.io/wp-content/uploads/2022/12/cropped-circle6.png" style="max-width: 120px; border-radius: 50%; box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);box-shadow: 0 0 40px #5ac8fa;" />
+        </div>
+        <div id="networkAnimationTooltip" style="position: absolute; display: none; padding: 5px 10px; background-color: rgba(0, 0, 0, 0.8); border-radius: 5px; color: #cdfaff; pointer-events: none; font-size: 14px; transition: opacity 0.3s; z-index: 999;"></div>
+        <div id="connectionLabel" style="position: absolute; display: none; padding: 5px 10px; background-color: rgba(0, 0, 0, 0.8); border-radius: 5px; color: #cdfaff; pointer-events: none; font-size: 14px; transition: opacity 0.3s; z-index: 1000;"></div>
+        <div class="block-header futuristic-header" style="background: rgba(0, 0, 0, 0.2); border-top-left-radius: 15px; border-top-right-radius: 15px; padding: 10px 20px; box-shadow: 0 0 10px #5ac8fa;position: relative; z-index: 2;">
+            <h1 class="block-title text-white" style="text-shadow: 0 0 10px #5ac8fa;"><i class="fas fa-rocket"></i> Welcome to Cybereum - the Future of Project Management</h1>
+        </div>
+        <p class="futuristic-introduction" style="color: #cdfaff; font-size: 18px; margin-top: 20px; line-height: 1.6; text-align: center; padding: 0 10%; margin-bottom: 30px;position: relative; z-index: 2;max-width: 600px; text-align: center;">
+            Dive deep into a world where data-driven decision-making and insights merge seamlessly.
+            Harness the unmatched power of Cybereum's futuristic project analysis platform, a harmonious blend of advanced algorithms
+            and intuitive design. Every piece of project data tells a story, and our tools are crafted meticulously to bring those stories to life.
+            Embark on this transformative journey with us and redefine the boundaries of project management.
+
+            The Cybereum platform offers not just ground-breaking tools; it  transcends traditional boundaries between companies and data,
+            offering insights that are profound and ground breaking. Cybereum is here to revolutionize the way you
+            perceive project management. So, are you ready to take a leap into the future?
+        </p>
+        <div class="introduction-graphic-container" style="text-align: center; margin-top: 30px;position: relative; z-index: 2;">
+            <img alt="Futuristic Graphic" src="https://placeimg.com/500/500/tech" style="max-width: 100%; border-radius: 15px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);" />
+        </div>
+        <style>
+            .block-title.text-white:hover {
+                color: #5ac8fa; /* Change to the desired "lit up" color */
+                text-shadow: 0 0 15px #5ac8fa; /* Adds a glow effect */
+            }
+
+            .project-network-animation-enhanced {
+                position: relative;
+                width: 80%;
+                height: 80%;
+                overflow: hidden;
+                background-color: rgba(0, 0, 0, 0.2);
+                border-radius: 10px;
+            }
+
+            #networkCanvasEnhanced {
+                width: 100%;
+                height: 100%;
+            }
+
+            #connectionLabel {
+                position: absolute;
+                display: none; /* Initially hidden */
+                padding: 5px 10px;
+                background-color: rgba(0, 0, 0, 0.8);
+                border-radius: 5px;
+                color: #cdfaff;
+                pointer-events: none;
+                font-size: 14px;
+                transition: opacity 0.3s;
+                z-index: 1000;
+                transform-origin: center;
+            }
+        </style>
+        <script>
+            const canvasEnhanced = document.getElementById('networkCanvasEnhanced');
+            const ctxEnhanced = canvasEnhanced.getContext('2d');
+            //const nodeLabel = document.getElementById('nodeLabel');
+            //const tooltipDiv = document.getElementById('networkAnimationTooltip');
+            canvasEnhanced.width = canvasEnhanced.parentElement.offsetWidth;
+            canvasEnhanced.height = canvasEnhanced.parentElement.offsetHeight;
+
+            const phrases = [
+                "Empower your projects with Cybereum's cutting-edge platform.",
+                "Dive deep into data-driven decision-making.",
+                "Harness the power of Cybereum's futuristic platform.",
+                "Blend of advanced algorithms and intuitive design.",
+                "ML for forecasting, AI for intelligence, DLT for collaboration.",
+                "Every piece of data tells a story with Cybereum.",
+                "Redefine the boundaries of project management.",
+                "We offer experiences, not just tools.",
+                "Revolutionize the way you perceive project management.",
+                "Take a leap into the future with Cybereum.",
+                "Experience the next-gen project analytics.",
+                "Where innovation meets intuition.",
+                "Your project's success, our priority.",
+                "Elevate project management norms through Cybereum",
+                "Strategic choices through data-driven insights.",
+                "Leapfrog into the future with Cybereum at your side.",
+                "Predictive analytics, intelligent AI, and collaborative DLT - Cybereum's trifecta."
+            ];
+
+            const connectionLabel = document.getElementById('connectionLabel');
+            const synergyPhrases = [
+                "Synergistic combination of AI & DLT",
+                "DLT for collaboration",
+                "AI for intelligence and assistance",
+                "ML for forecasting",
+                "Connecting project teams into a symbiotic organization"
+            ];
+            let lastPhraseIndex = -1;  // to keep track of last shown phrase
+
+            class NodeEnhanced {
+                constructor(x, y, phrase) {
+                    this.x = x;
+                    this.y = y;
+                    this.vx = (Math.random() - 0.5) * 2;
+                    this.vy = (Math.random() - 0.5) * 2;
+                    this.radius = Math.random() * 5 + 5;
+                    this.color = 'rgba(205, 250, 255, 0.8)';
+                    this.phrase = phrase;
+                }
+
+                draw() {
+                    ctxEnhanced.beginPath();
+                    ctxEnhanced.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                    ctxEnhanced.fillStyle = this.color;
+                    ctxEnhanced.fill();
+                    ctxEnhanced.shadowColor = 'rgba(205, 250, 255, 1)';
+                    ctxEnhanced.shadowBlur = 15;
+                }
+
+                update() {
+                    this.x += this.vx;
+                    this.y += this.vy;
+
+                    if (this.x < 0 || this.x > canvasEnhanced.width) this.vx = -this.vx;
+                    if (this.y < 0 || this.y > canvasEnhanced.height) this.vy = -this.vy;
+
+                    this.draw();
+                }
+            }
+
+            const nodesEnhanced = [];
+            for (let i = 0; i < phrases.length; i++) {
+                const x = Math.random() * canvasEnhanced.width;
+                const y = Math.random() * canvasEnhanced.height;
+                nodesEnhanced.push(new NodeEnhanced(x, y, phrases[i]));
+            }
+
+            canvasEnhanced.addEventListener('mousemove', (e) => {
+                const tooltipDiv = document.getElementById('networkAnimationTooltip');
+                const rect = canvasEnhanced.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+
+                let closestNodes = [];
+                nodesEnhanced.forEach(node => {
+                    if (Math.pow(x - node.x, 2) + Math.pow(y - node.y, 2) < Math.pow(node.radius * 7, 2)) {
+                        closestNodes.push(node);
+                    }
+                });
+
+                if (closestNodes.length === 1) {
+                    tooltipDiv.style.display = 'block';  // Make the tooltip visible
+                    tooltipDiv.innerHTML = closestNodes[0].phrase;
+                    tooltipDiv.style.left = `${closestNodes[0].x}px`;
+                    tooltipDiv.style.top = `${closestNodes[0].y - 20}px`; // Above the node
+                    tooltipDiv.style.transform = 'scale(1)';
+                    tooltipDiv.style.opacity = '1';
+                } else if (closestNodes.length >= 2) {
+                    console.log('Two or more closest nodes found!');  // Debug line
+                    const midX = (closestNodes[0].x + closestNodes[1].x) / 2;
+                    const midY = (closestNodes[0].y + closestNodes[1].y) / 2;
+
+                    lastPhraseIndex = (lastPhraseIndex + 1) % synergyPhrases.length;
+                    connectionLabel.innerHTML = synergyPhrases[lastPhraseIndex];
+                    connectionLabel.style.left = `${midX}px`;
+                    connectionLabel.style.top = `${midY}px`;
+                    connectionLabel.style.display = 'block';  // <-- Make sure you're setting display to block
+                    connectionLabel.style.transform = 'scale(1)';
+                    connectionLabel.style.opacity = '1';
+                    connectionLabel.style.animation = 'fadeIn 0.5s ease-out';
+                } else {
+                    tooltipDiv.style.display = 'none';  // Hide the tooltip
+                    connectionLabel.style.display = 'none';  // <-- Also hide the connectionLabel
+                    connectionLabel.style.transform = 'scale(0)';
+                    connectionLabel.style.opacity = '0';
+                    tooltipDiv.style.transform = 'scale(0)';
+                    tooltipDiv.style.opacity = '0';
+                }
+            });
+
+            let connectionDivs = [];
+
+            const maxConnections = nodesEnhanced.length * (nodesEnhanced.length - 1) / 2;
+            const connectionPool = Array.from({ length: maxConnections }, (_, i) => {
+                const div = document.createElement('div');
+                div.style.position = 'absolute';
+                div.style.padding = '5px 10px';
+                div.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+                div.style.borderRadius = '5px';
+                div.style.color = '#cdfaff';
+                div.style.pointerEvents = 'none';
+                div.style.fontSize = '14px';
+                div.style.zIndex = '1000';
+                div.style.display = 'none';
+                document.querySelector('.project-network-animation-enhanced').appendChild(div);
+                return div;
+            });
+
+            // Create a mapping to store a synergy phrase for each unique pair of nodes
+            const nodePairToSynergyPhrase = new Map();
+
+            function animateEnhanced() {
+                ctxEnhanced.clearRect(0, 0, canvasEnhanced.width, canvasEnhanced.height);
+
+                nodesEnhanced.forEach(node => {
+                    node.update();
+                });
+
+                connectionLabel.style.display = 'none';  // Hide the connectionLabel by default
+
+                for (let i = 0; i < nodesEnhanced.length; i++) {
+                    for (let j = i + 1; j < nodesEnhanced.length; j++) {
+                        const dx = nodesEnhanced[i].x - nodesEnhanced[j].x;
+                        const dy = nodesEnhanced[i].y - nodesEnhanced[j].y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+
+                        if (distance < 150) {
+                            ctxEnhanced.beginPath();
+                            ctxEnhanced.moveTo(nodesEnhanced[i].x, nodesEnhanced[i].y);
+                            ctxEnhanced.lineTo(nodesEnhanced[j].x, nodesEnhanced[j].y);
+                            ctxEnhanced.strokeStyle = 'rgba(205, 250, 255, ' + (1 - distance / 150) + ')';
+                            ctxEnhanced.lineWidth = 0.5;
+                            ctxEnhanced.stroke();
+
+                            // Show the connectionLabel between the nodes
+                            const midX = (nodesEnhanced[i].x + nodesEnhanced[j].x) / 2;
+                            const midY = (nodesEnhanced[i].y + nodesEnhanced[j].y) / 2;
+
+                            // Create a unique identifier for each pair of nodes
+                            const nodePairIdentifier = `${i}-${j}`;
+
+                            // Assign a synergy phrase to each unique pair of nodes, if not already done
+                            if (!nodePairToSynergyPhrase.has(nodePairIdentifier)) {
+                                nodePairToSynergyPhrase.set(nodePairIdentifier, synergyPhrases[lastPhraseIndex]);
+                                lastPhraseIndex = (lastPhraseIndex + 1) % synergyPhrases.length;
+                            }
+
+                            connectionLabel.innerHTML = nodePairToSynergyPhrase.get(nodePairIdentifier);
+                            connectionLabel.style.left = `${midX}px`;
+                            connectionLabel.style.top = `${midY}px`;
+                            connectionLabel.style.display = 'block';  // Make sure you're setting display to block
+                        }
+                    }
+                }
+
+                requestAnimationFrame(animateEnhanced);
+            }
+
+
+            animateEnhanced();
+
+            document.querySelector('.block-title.text-white').addEventListener('mouseover', function () {
+                this.style.color = '#5ac8fa';  // Change to the desired "lit up" color
+                this.style.textShadow = '0 0 15px #5ac8fa';  // Adds a glow effect
+            });
+
+            document.querySelector('.block-title.text-white').addEventListener('mouseout', function () {
+                this.style.color = 'white';  // Resets to the original color
+                this.style.textShadow = '0 0 10px #5ac8fa';  // Resets to the original shadow
+            });</script>
+    </div>
+    <script charset="utf-8" src="//js.hsforms.net/forms/embed/v2.js" type="text/javascript"></script>
+    <script>
+        hbspt.forms.create({
+            region: "na1",
+            portalId: "20558785",
+            formId: "9535e8fc-88e8-43f6-b6e9-c06e15d584a2"
+        });</script>
+    <div id="hubspot-form-container">
+        <script>
+            hbspt.forms.create({
+                region: "na1",
+                portalId: "20558785",
+                formId: "9535e8fc-88e8-43f6-b6e9-c06e15d584a2"
+            });</script>
+    </div>
+    <section class="dashboard-section introduction-section">
+        <div class="project-selection-container">
+            <!--
+                <div class="megaproject-icon-container">
+                    <div class="megaproject-icon">
+                        <img alt="Cybereum Logo" class="cybereum-logo" src="https://cybereum.io/wp-content/uploads/2022/12/cropped-circle6.png" />
+                        <svg fill="none" height="100" viewbox="0 0 100 100" width="100" xmlns="http://www.w3.org/2000/svg"> -->
+            <!-- Outer Circle
+                    <circle cx="50" cy="50" fill="none" r="48" stroke="#5ac8fa" stroke-width="2"></circle>
+                    <!-- Rotating Lines
+                    <line class="rotating-line" stroke="#b4f5ff" stroke-width="2" x1="50" x2="50" y1="2" y2="20"></line>
+                    <line class="rotating-line" stroke="#b4f5ff" stroke-width="2" x1="50" x2="50" y1="98" y2="80"></line>
+                    <line class="rotating-line" stroke="#b4f5ff" stroke-width="2" x1="2" x2="20" y1="50" y2="50"></line>
+                    <line class="rotating-line" stroke="#b4f5ff" stroke-width="2" x1="98" x2="80" y1="50" y2="50"></line>
+                    <!-- Central Node
+                    <circle cx="50" cy="50" fill="#5ac8fa" r="10"></circle>
+                    <!-- Pulsing Effects
+                    <circle class="pulsing-circle" cx="50" cy="50" fill="none" r="15" stroke="#5ac8fa" stroke-width="2"></circle>
+                    <circle class="pulsing-circle" cx="50" cy="50" fill="none" r="20" stroke="#5ac8fa" stroke-width="2"></circle>
+                    </svg>
+                </div>
+                    </div>
+                        -->
+            <div class="project-dropdown-container">
+                <label for="projectDropdown">Select Project Sector:</label>
+                <select class="project-dropdown" id="projectDropdown">
+                    <option value="Residential Construction">Residential Construction</option>
+                    <option value="Commercial Construction">Commercial Construction</option>
+                    <option value="Industrial Construction">Industrial Construction</option>
+                    <option value="Highway Construction">Highway Construction</option>
+                    <option value="Heavy Civil Construction">Heavy Civil Construction</option>
+                    <option value="Offshore O&amp;G">Offshore O&amp;G</option>
+                    <option value="Offshore Wind">Offshore Wind</option>
+                    <option value="Refinery">Refinery</option>
+                    <option value="Solar Farm">Solar Farm</option>
+                    <option value="Railway">Railway</option>
+                </select>
+            </div>
+            <div class="location-dropdown-container">
+                <label for="locationDropdown">Select Location:</label>
+                <select class="location-dropdown" id="locationDropdown">
+                    <!-- Adding a few countries for illustration. In the actual code, you'll have all countries listed. -->
+                    <option value="USA">USA</option>
+                    <option value="Canada">Canada</option>
+                    <option value="UK">UK</option>
+                    <option value="Australia">Australia</option>
+                    <option value="India">India</option>
+                    <!-- ... and so on for all countries -->
+                </select>
+            </div>
+        </div>
+        <label class="custom-file-upload">
+            Upload File
+
+            <label class="upload-label" for="xmlFileInput" style="font-weight: bold; font-size: 16px; padding: 12px 25px; box-shadow: inset 0 0 15px rgba(42, 125, 200, 0.6);">
+                Upload File
+            </label>
+            <input accept=".xml" id="xmlFileInput" name="file" style="display: none;" type="file" />
+            <div class="sci-fi-loading-bar-container" style="width: 100%; margin-top: 10px; background: rgba(40, 125, 200, 0.3); border-radius: 8px;">
+                <div class="sci-fi-loading-bar" style="background: linear-gradient(90deg, #287dc8, #5ac8fa); height: 5px; border-radius: 5px; transition: width 0.5s;"></div>
+                <div class="sci-fi-loading-text" style="color: #5ac8fa; font-size: 14px; margin-top: 5px; font-weight: bold; transition: opacity 0.5s;">0%</div>
+                <span class="uploading-text">Upload in progress...</span>
+            </div>
+        </label>
+        <div id="data_div"></div>
+    </section>
+
+    <style>
+        #networkViualization,
+        #chart_div_wrapper,
+        #riskTable,
+        #referenceTable,
+        #riskMatrix,
+        #histogram,
+        #pieChart,
+        #pathsDistributionCurve,
+        #radialChart,
+        #sidebar,
+        #dash1,
+        #chart-container,
+        #SCurve,
+        #graph-container,
+        #dash4,
+        #RadialRisk,
+        #reducedGraph {
+            display: none; /* Initially hide the sections */
+        }
+    </style>
+
+
+    <div class="dashboard-section" id="dash1">
+        <div id="self-referencing-tasks-warning"><h1>Self Referencing Errors</h1></div>
+    </div>
+    <div class="dashboard-card" id="networkViualization">
+        <h1>Interactive Project Task Map</h1>
+        <button onclick="openModal('modal0')">More Information about Project NEtwork Visualization</button>
+        <div class="control-panel">
+            <div class="dashboard-stat">
+                <label class="control-label">Zoom:</label>
+                <button onclick="zoomIn()">+</button>
+                <button onclick="zoomOut()">-</button>
+                <input class="slider" id="zoomSlider" max="100" min="1" type="range" value="50" />
+                <button onclick="zoomExtents()">Extents</button>
+                <label class="control-label">Rotate:</label>
+                <button onclick="rotate(10)">Right</button>
+                <button onclick="rotate(-10)">Left</button>
+            </div>
+            <!-- Pan Controls -->
+            <div class="dashboard-stat">
+                <label class="control-label">Pan:</label>
+                <div class="joystick">
+                    <div class="arrow up" onclick="pan(0, -50)">↑</div>
+                    <div class="arrow left" onclick="pan(-50, 0)">←</div>
+                    <div class="center" onclick="center()">•</div>
+                    <div class="arrow right" onclick="pan(50, 0)">→</div>
+                    <div class="arrow down" onclick="pan(0, 50)">↓</div>
+                </div>
+            </div>
+            <!-- Rotate Controls -->
+            <!-- Node Color Legend -->
+            <div class="dashboard-stat">
+                <div id="legend">
+                    <h3>Node Colors by <span id="legendMetric">In-degree</span>:</h3>
+                    <label><input checked="" name="colorMetric" type="radio" value="inDegree" /> In-degree</label>
+                    <label><input name="colorMetric" type="radio" value="outDegree" /> Out-degree</label>
+                    <label><input name="colorMetric" type="radio" value="degree" /> Degree</label>
+                    <div class="legend-item"><span class="color-box" style="background-color: #b4f5ff;"></span> &gt; 0</div>
+                    <div class="legend-item"><span class="color-box" style="background-color: #8ce6ff;"></span> &gt; 1</div>
+                    <div class="legend-item"><span class="color-box" style="background-color: #5ac8fa;"></span> &gt; 2</div>
+                    <div class="legend-item"><span class="color-box" style="background-color: #46b9fa;"></span> &gt; 3</div>
+                    <div class="legend-item"><span class="color-box" style="background-color: #41afeb;"></span> &gt; 4</div>
+                </div>
+            </div>
+            <!-- Filter Controls -->
+            <div class="dashboard-stat">
+                <div class="= dashboard-card2">
+                    <label class="control-label">Filter Nodes (in-degree):</label>
+                    <span id="filterValue">&gt; 0</span>
+                    <input class="slider" id="filterSlider" max="5" min="0" step="1" type="range" />
+                </div>
+                <div class="= dashboard-card2">
+                    <div class="label-container">
+                        <label class="control-label">Filter Nodes (out-degree):</label>
+                        <span id="outDegreeFilterValue">&gt; 0</span>
+                    </div>
+                    <input class="slider" id="outDegreeFilterSlider" max="5" min="0" step="1" type="range" />
+                </div>
+                <div class="= dashboard-card2">
+                    <div class="label-container">
+                        <!-- New section for degree -->
+                        <label class="control-label">Filter Nodes (degree):</label>
+                        <span id="degreeFilterValue">&gt; 0</span>
+                    </div>
+                    <input class="slider" id="degreeFilterSlider" max="10" min="0" step="1" type="range" />
+                </div>
+            </div>
+            <!-- Accordion for Path Details -->
+            <div class="accordion">
+                <button class="accordion-button">Critical Path</button>
+                <div class="panel">
+                    <p id="criticalPathDetails">Critical path details go here...</p>
+                </div>
+                <button class="accordion-button">Outlier Paths</button>
+                <div class="panel">
+                    <p id="outlierPathsDetails">Outlier paths details go here...</p>
+                </div>
+                <button class="accordion-button">All Paths</button>
+                <div class="panel">
+                    <p id="allPathsDetails">All paths details go here...</p>
+                </div>
+            </div>
+        </div>
+        <div class="control-panel">
+            <!-- Search and Highlight Controls -->
+            <div class="controls search-controls">
+                <input id="searchInput" placeholder="Search by name or ID" type="text" />
+            </div>
+            <div class="highlight-controls">
+                <label><input id="highlightAllConnected" type="checkbox" /> Highlight All Connected Nodes</label>
+            </div>
+            <!-- Path Details Display -->
+            <div id="pathsDisplay"></div>
+            <div id="longestPathDisplay"></div>
+            <div id="outlierPathsDisplay"></div>
+            <div class="highlight-controls">
+                <label><input id="highlightCriticalPath" type="checkbox" /> Highlight Critical Path</label>
+                <label><input id="highlightOutliers" type="checkbox" /> Highlight Outlier Paths</label>
+            </div>
+            <!-- Info Panel -->
+            <div id="infoPanel"></div>
+        </div>
+    </div>
+    <div id="graph-container">
+        <!-- Your other graph-related content here -->
+        <div id="tooltip" style="position: absolute; visibility: hidden; background: #8ce6ff; padding: 8px; border: 2px solid #3292cd; border-radius: 3px; "></div>
+        <svg>
+            <defs>
+                <marker id="arrow" markerheight="10" markerwidth="6" orient="auto" refx="9" refy="0" viewbox="0 -6 10 12">
+                    <path d="M0,-5 L10,0 L0,5" fill="#cdfaff"></path>
+                </marker>
+                <marker id="arrow2" markerheight="10" markerunits="strokeWidth" markerwidth="10" orient="auto" refx="8" refy="3">
+                    <path d="M0,0 L0,6 L9,3 z" fill="#0f0"></path>
+                </marker>
+            </defs>
+            <g class="container"></g>
+        </svg>
+    </div>
+   
+    <div id="sidebar" style="z-index: 1000;">
+        <button id="sidebarToggleBtn" onclick="toggleSidebar(event)">
+            <svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path class="toggle-icon" d="M4 6h16l-8 -8Z"></path>
+            </svg>
+        </button>
+        <h3>Navigation Menu</h3>
+        <ul>
+            <li><a href="#networkViualization">Network Visualization </a></li>
+            <li><a href="#chart_div_wrapper">GANTT Chart</a></li>
+            <li><a href="#riskTable">Risk Table</a></li>
+            <li><a href="#referenceTable">Path Metrics</a></li>
+            <li><a href="#riskMatrix">Risk Matrix</a></li>
+            <li><a href="#histogram">Histogram</a></li>
+            <li><a href="#pieChart">Pie Chart</a></li>
+            <li><a href="#pathsDistributionCurve">Paths Distribution Curve</a></li>
+            <li><a href="#radialChart">Radial Chart</a></li>
+            <li><a href="#reducedGraph">Reduced Graph</a></li>
+        </ul>
+    </div>
+    <div class="charts-container">
+        <!-- Row for Risk Matrix -->
+        <div class="charts-row">
+            <div class="dashboard-card-full" id="dash4">
+
+                <h2>Risk Matrix</h2>
+                <style>
+                    .legend {
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+                    }
+
+                    .scale {
+                        width: 60px;
+                        height: 20px;
+                        border: 1px solid #000;
+                        display: inline-block;
+                    }
+
+                    .low {
+                        background: rgb(255, 255, 0);
+                    }
+
+                    .medium {
+                        background: rgb(255, 128, 0);
+                    }
+
+                    .high {
+                        background: rgb(255, 0, 0);
+                    }
+
+                    .legend-text {
+                        color: #0d2137; /* Set the text color to white */
+                        font-weight: bold; /* Made the text bold for better visibility */
+                    }
+                </style>
+                <div class="risk-content">
+                    <div class="charts-row">
+                        <div class="dashboard-card2" id="chart-container">
+                            <h2>Risk Matrix</h2>
+                            
+                            <div class="legend">
+                                <h4>Risk Importance Scale:</h4>
+                                <div class="scale low">Low</div>
+                                <div class="scale medium">Medium</div>
+                                <div class="scale high">High</div>
+                            </div>
+                                <canvas height="280" id="riskMatrix" width="300"></canvas>
+                        </br>
+                            <button class="learn-more-btn" onclick="openModal('riskMatrixModal')">Learn More</button>
+                        </div>
+                        <div class="dashboard-card2" id="RadialRisk">
+                            <h2>Radial Risk Chart</h2>
+                            <canvas height="280" id="radialChart" width="300"></canvas>
+                        </br>
+                            <button class="learn-more-btn" onclick="openModal('radialChartModal')">Learn More</button>
+                        </div>
+                    </div>
+                    <div class="table-container" id="pathMetrics">
+                        <!-- Risk Table -->
+                        <h2>Risk Table</h2>
+                        <table class="sortable" id="riskTable">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Risk</th>
+                                    <th>Importance</th>
+                                    <th>Path</th> <!-- Column for Path -->
+                                    <th>PageRank Centrality</th>
+                                    <th>Start Date</th> <!-- New column for Start Date -->
+                                    <th>End Date</th> <!-- New column for End Date -->
+                                    <th>Slack</th>  <!--  slack -->
+                                    <th>Overrun</th>
+                                </tr>
+                            </thead>
+                            <tbody id="riskTableBody"></tbody>
+                        </table>
+                        <!-- Reference Table for Critical & Outlier Paths -->
+                        <div class="table-container" id="referenceTable">
+                            <h2>Critical & Outlier Paths</h2>
+                            <table class="sortable">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Name</th>
+                                        <th>Path</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="referenceTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="charts-row">
+                        <div class="dashboard-card2" id="pathsDistributionCurve">
+                            <h2>Paths Distribution Curve</h2>
+                            <div id="path_distribution_chart" style="width: 300px; height: 280px;"></div>
+                        </br>
+                            <button class="learn-more-btn" onclick="openModal('pathsDistributionCurveModal')">Learn More</button>
+                        </div>
+                        <div class="dashboard-card2" id="pathDistributionCard">
+                            <h2>Path Distribution Bar Chart</h2>
+                            <canvas height="280" id="pathDistributionStackedBarChart" width="300"></canvas>
+                            </br>
+                            <button class="learn-more-btn" onclick="openModal('pathDistributionModal')">Learn More</button>
+                        </div>
+                    </div>
+                        <!-- Paths Distribution Table -->
+                        <div class="table-container" id="pathsDistributionTableContainer">
+                            <h2>Paths Distribution</h2>
+                            <table class="sortable" id="pathsDistributionTable">
+                                <thead>
+                                    <tr>
+
+                                    </tr>
+                                </thead>
+                                <tbody id="pathsDistributionTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="charts-row">
+            <div class="dashboard-card2" id="SCurve">
+                <h2>S-Curve (Cumulative Distribution Chart)</h2>
+                
+                <div id="scurve_chart" style="width: 300px; height: 280px;"></div>
+            </br>
+                <button class="learn-more-btn" onclick="openModal('SCurveModal')">Learn More</button>
+            </div>
+            <div class="dashboard-card2" id="histogram">
+                <h2>Task Duration Histogram</h2>
+                <canvas height="280" id="histogramChart" width="300"></canvas>
+            </br>
+                <button class="learn-more-btn" onclick="openModal('histogramModal')">Learn More</button>
+            </div>
+            <div class="dashboard-card2" id="pieChart">
+                <h2>Distribution of Task Types (Pie Chart)</h2>
+                <div id="pie_chart" style="width: 300px; height: 280px;"></div>
+            </br>
+                <button class="learn-more-btn" onclick="openModal('pieChartModal')">Learn More</button>
+
+            </div>
+            <div class="dashboard-card2" id="pathsDistributionCurve">
+                <h2>Paths Distribution Curve</h2>
+                <div id="path_distribution_chart" style="width: 300px; height: 280px;"></div>
+            </br>
+                <button class="learn-more-btn" onclick="openModal('pathsDistributionCurveModal')">Learn More</button>
+            </div>
+            <div class="dashboard-card2" id="RadialRisk">
+                <h2>Radial Risk Chart</h2>
+                <canvas height="280" id="radialChart" width="300"></canvas>
+            </br>
+                <button class="learn-more-btn" onclick="openModal('radialChartModal')">Learn More</button>
+            </div>
+        </div>
+    </div>
+    <div class="dashboard-section" id="chart_div_wrapper">
+        <h2>GANTT Chart</h2>
+        <div id="chart_div"></div>
+    </div>
+    <div id="error_div"></div>
+    
+    <div class="dashboard-section" id="reducedGraph">
+        <h1>Reduced Graph</h1>
+        <!--
+        <button id="clusterBtn">Cluster</button>
+        <button id="declusterBtn">De-cluster</button>
+        -->
+        <div id="graph-container">
+            <div id="tooltip" style="position: absolute; visibility: hidden; background: #8ce6ff; padding: 8px; border: 2px solid #3292cd; border-radius: 3px; "></div>
+            <div id="path-list" style="position: absolute; top: 0; left: 0; max-height: 600px; overflow-y: auto;"></div>
+            <div id="dependency_chart" style="width: 90%; height: 600px; margin-left: 10%;"></div>
+        </div>
+        <div id="configuration-container"></div>
+    </div>
+    <section class="dashboard-section banner-section"><div class="ran-inspired-banner" style="background: linear-gradient(to bottom, #ffff00, #ff0000); padding: 50px 0; text-align: center; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); margin: 40px 0; border-radius: 20px; position: relative; overflow: hidden;"><canvas class="particle-canvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;"></canvas><img alt="Cybereum Logo" src="https://cybereum.io/wp-content/uploads/2023/05/Red_Logo.png" style="width: 120px; margin-bottom: 20px; filter: drop-shadow(0 0 15px #fdfd96);" /><h1 style="color: #ffff00; font-size: 28px; margin-bottom: 15px; font-weight: bold; text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);">Cybereum: A Symphony of Data and Design</h1><p style="color: #ffff00; font-size: 20px; max-width: 900px; margin: 0 auto; text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);">Our platform combines traditional project management with cutting-edge innovation. Expereince and Manage your Projects.</p></div></section>
+    <!-- Footer -->
+    <div class="footer" style="background-color: rgba(0, 0, 0, 0.8); padding: 20px; color: #58a6ff; text-align: center;">
+        <p>© 2023 Cybereum. All rights reserved.</p>
+        <p>Powered by Advanced Algorithms, Intuitive Design, ML, AI, and DLT.</p>
+    </div>
+    <script>
+        function toggleSidebar() {
+            var sidebar = document.getElementById('sidebar');
+            if (sidebar.classList.contains('collapsed')) {
+                sidebar.classList.remove('collapsed');
+            } else {
+                sidebar.classList.add('collapsed');
+            }
+        }</script>
+    <script>
+        function toggleSidebar(event) {
+            event.stopPropagation();  // Prevent event from propagating further
+
+            var sidebar = document.getElementById('sidebar');
+            var toggleBtn = document.getElementById('sidebarToggleBtn');
+            if (sidebar.classList.contains('collapsed')) {
+                sidebar.classList.remove('collapsed');
+                toggleBtn.innerHTML = "≡";  /* Hamburger icon for expanded state */
+            } else {
+                sidebar.classList.add('collapsed');
+                toggleBtn.innerHTML = "←";  /* Arrow icon for collapsed state */
+            }
+        }</script>
+    <script>
+        document.getElementById('xmlFileInput').addEventListener('change', function () {
+            var fileName = this.files[0].name;
+            this.setAttribute('data-content', 'Selected: ' + fileName);
+        });</script>
+
+    <script>
+        document.getElementById("xmlFileInput").addEventListener("change", function () {
+            if (this.files.length > 0) {
+                // If a file is selected, show all the sections
+                document.getElementById('networkViualization').style.display = 'block';
+                document.getElementById('chart_div_wrapper').style.display = 'block';
+                document.getElementById('riskTable').style.display = 'block';
+                document.getElementById('referenceTable').style.display = 'block';
+                document.getElementById('riskMatrix').style.display = 'block';
+                document.getElementById('histogram').style.display = 'block';
+                document.getElementById('pieChart').style.display = 'block';
+                document.getElementById('pathsDistributionCurve').style.display = 'block';
+                document.getElementById('radialChart').style.display = 'block';
+                document.getElementById('reducedGraph').style.display = 'block';
+                document.getElementById('dash1').style.display = 'block';
+                document.getElementById('chart-container').style.display = 'block';
+                document.getElementById('sidebar').style.display = 'block';
+                document.getElementById('SCurve').style.display = 'block';
+                document.getElementById('graph-container').style.display = 'block';
+                document.getElementById('dash4').style.display = 'block';
+                document.getElementById('RadialRisk').style.display = 'block';
+            }
+            //document.querySelector(".sci-fi-loading-text").innerText = "Loading...";
+            // Simulate loading progression (this can be replaced with actual loading progression in the real environment)
+            let progress = 0;
+            document.querySelector('.uploading-text').style.display = 'inline-block';
+            const interval = setInterval(() => {
+                progress += 10;
+                if (progress > 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    document.querySelector(".sci-fi-loading-text").innerText = "";
+                    document.querySelector('.uploading-text').style.display = 'none';
+                }
+                document.querySelector(".sci-fi-loading-bar").style.width = progress + "%";
+            }, 500);
+        });
+    </script>
+        <div id="modal0" class="futuristic-modal">
+            <div class="futuristic-modal-content">
+                <span class="close-btn" onclick="closeModal('modal0')">&times;</span>
+                <h2 class="modal-header">Introduction:</h2>
+                <div class="modal-body">
+                    <b>Features & Navigation:</b>
+                    <ul class="futuristic-list">
+                        <li><b>Zoom & Pan:</b> Navigate across the expansive network with ease. Use the mouse wheel to zoom in or out and click-drag to pan.</li>
+                        <li><b>Node Details:</b> Hover over nodes to see detailed insights. Click on them for a deeper dive.</li>
+                        <li><b>Color-coded Paths:</b> Different paths, like 'Critical' or 'Outlier', are represented with distinct colors for better clarity.</li>
+                        <li><b>Interactive Links:</b> The connections between nodes are as informative as the nodes themselves. Hover or click for more details.</li>
+                        <li><b>Dynamic Layout:</b> Add, remove, or modify nodes and watch the network adjust in real-time.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>        
+        
+        <div id="networkVisualizationModal" class="futuristic-modal">
+            <div class="futuristic-modal-content">
+                <span class="close-btn" onclick="closeModal('networkVisualizationModal')">&times;</span>
+                <h2>Introduction:</h2>
+                Dive deep into the interconnections of your project with Cybereum's Network Visualization. This interactive tool offers a graphical representation of nodes and their relationships, making complex data structures understandable at a glance.
+                <br><br>
+                <b>Features & Navigation:</b>
+                <ul>
+                    <li><b>Zoom & Pan:</b> Navigate across the expansive network with ease. Use the mouse wheel to zoom in or out and click-drag to pan.</li>
+                    <li><b>Node Details:</b> Hover over nodes to see detailed insights. Click on them for a deeper dive.</li>
+                    <li><b>Color-coded Paths:</b> Different paths, like 'Critical' or 'Outlier', are represented with distinct colors for better clarity.</li>
+                    <li><b>Interactive Links:</b> The connections between nodes are as informative as the nodes themselves. Hover or click for more details.</li>
+                    <li><b>Dynamic Layout:</b> Add, remove, or modify nodes and watch the network adjust in real-time.</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div id="ganttChartModal" class="futuristic-modal">
+            <div class="futuristic-modal-content">
+                <span class="close-btn" onclick="closeModal('ganttChartModal')">&times;</span>
+                <h2>GANTT Chart: A Timeline of Progress</h2>
+                Track project milestones and task progress with the GANTT Chart. This horizontal bar chart gives you a visual timeline of when each task starts, its duration, and when it concludes.
+                <br><br>
+                <b>Features & Navigation:</b>
+                <ul>
+                    <li><b>Resizable Bars:</b> Adjust task durations by dragging the edges of the bars.</li>
+                    <li><b>Dependencies:</b> See how tasks are interlinked with arrows. A delay in one task impacts dependent tasks.</li>
+                    <li><b>Hover Insights:</b> For a quick summary of task details, just hover over its bar.</li>
+                    <li><b>Color-coded Status:</b> Tasks are color-coded based on their progress or status, making it easy to identify pending, ongoing, or completed tasks.</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div id="riskMatrixModal" class="futuristic-modal">
+            <div class="futuristic-modal-content">
+                <span class="close-btn" onclick="closeModal('riskMatrixModal')">&times;</span>
+                <h2>Risk Matrix: Evaluating Potential Pitfalls</h2>
+                The Risk Matrix helps assess and prioritize risks based on their potential impact and likelihood. Understand which risks require immediate attention and which can be monitored over time.
+                <br><br>
+                <b>Features & Navigation:</b>
+                <ul>
+                    <li><b>Quadrant View:</b> Risks are plotted on a 2D matrix, categorizing them into four quadrants based on severity and occurrence probability.</li>
+                    <li><b>Interactive Points:</b> Hover over points to see detailed risk descriptions.</li>
+                    <li><b>Color Indicators:</b> High-priority risks are marked distinctly for quick identification.</li>
+                    <li><b>Adjustable Axes:</b> Customize the matrix's axes to suit your risk evaluation criteria.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="histogramModal" class="futuristic-modal">
+            <div class="futuristic-modal-content">
+                <span class="close-btn" onclick="closeModal('histogramModal')">&times;</span>
+                <h2>Histogram: Data Distribution Insights</h2>
+                The Histogram offers a visual representation of the frequency distribution of your data. It helps you understand where most of your data points lie and identify any outliers.
+                <br><br>
+                <b>Features & Navigation:</b>
+                <ul>
+                    <li><b>Bins:</b> The x-axis represents data ranges, while the y-axis shows the frequency of data points within those ranges.</li>
+                    <li><b>Interactive Bars:</b> Hover over bars for exact counts.</li>
+                    <li><b>Customizable Ranges:</b> Adjust the bin width to analyze data distribution at varying levels of granularity.</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div id="pieChartModal" class="futuristic-modal">
+            <div class="futuristic-modal-content">
+                <span class="close-btn" onclick="closeModal('pieChartModal')">&times;</span>
+                <h2>Pie Chart: A Slice of Your Data</h2>
+                The Pie Chart provides a circular statistical graphic divided into slices to illustrate numerical proportions. It's a visual treat that also offers deep data insights.
+                <br><br>
+                <b>Features & Navigation:</b>
+                <ul>
+                    <li><b>Segmented View:</b> Each segment represents a category, and its size is proportional to its value.</li>
+                    <li><b>Hover Insights:</b> For detailed percentages and values, hover over slices.</li>
+                    <li><b>Color-coded Categories:</b> Each category gets a unique color for easy differentiation.</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div id="pathsDistributionCurveModal" class="futuristic-modal">
+            <div class="futuristic-modal-content">
+                <span class="close-btn" onclick="closeModal('pathsDistributionCurveModal')">&times;</span>
+                <h2>Paths Distribution Curve: Understanding Path Frequencies</h2>
+                The Paths Distribution Curve visualizes how often different paths are taken within your project. It aids in identifying common routes and anomalies.
+                <br><br>
+                <b>Features & Navigation:</b>
+                <ul>
+                    <li><b>Area Under Curve:</b> The shaded region helps understand path frequencies at a glance.</li>
+                    <li><b>Interactive Points:</b> Hover over specific points on the curve for detailed insights.</li>
+                    <li><b>Customizable Axes:</b> Adjust axis scales to focus on specific sections of the distribution.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="radialChartModal" class="futuristic-modal">
+            <div class="futuristic-modal-content">
+                <span class="close-btn" onclick="closeModal('radialChartModal')">&times;</span>
+                <h2>Radial Chart: A 360° View of Your Data</h2>
+                The Radial Chart, or Circular Bar Chart, offers a unique twist to traditional bar charts. Data categories are represented in a circular fashion, providing a comprehensive view of your metrics.
+                <br><br>
+                <b>Features & Navigation:</b>
+                <ul>
+                    <li><b>Circular Bars:</b> Each bar's length is proportional to its value.</li>
+                    <li><b>Hover Details:</b> Hover over bars for specific data insights.</li>
+                    <li><b>Segmented Categories:</b> Each category is distinctly color-coded.</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div id="reducedGraphModal" class="futuristic-modal">
+            <div class="futuristic-modal-content">
+                <span class="close-btn" onclick="closeModal('reducedGraphModal')">&times;</span>
+                <h2>Reduced Graph: A Simplified Network View</h2>
+                When networks become overwhelmingly complex, the Reduced Graph comes into play. It offers a simplified view, focusing on key nodes and connections.
+                <br><br>
+                <b>Features & Navigation:</b>
+                <ul>
+                    <li><b>Key Nodes:</b> Only the most significant nodes are displayed.</li>
+                    <li><b>Simplified Connections:</b> Redundant or non-critical links are omitted for clarity.</li>
+                    <li><b>Interactive Elements:</b> As with the full Network Visualization, you can zoom, pan, and click for detailed insights.</li>
+                </ul>
+            </div>
+        </div>
+        
+
+        <div id="SCurveModal" class="futuristic-modal">
+            <div class="futuristic-modal-content">
+                <span class="close-btn" onclick="closeModal('SCurveModal')">&times;</span>
+                <h2>S Curve: Cumulative Distribution</h2>
+                When networks become overwhelmingly complex, the Reduced Graph comes into play. It offers a simplified view, focusing on key nodes and connections.
+                <br><br>
+                <b>Features & Navigation:</b>
+                <ul>
+                    <li><b>Key Nodes:</b> Only the most significant nodes are displayed.</li>
+                    <li><b>Simplified Connections:</b> Redundant or non-critical links are omitted for clarity.</li>
+                    <li><b>Interactive Elements:</b> As with the full Network Visualization, you can zoom, pan, and click for detailed insights.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="pathDistributionModal" class="futuristic-modal">
+            <div class="futuristic-modal-content">
+                <span class="close-btn" onclick="closeModal('pathDistributionModal')">&times;</span>
+                <h2>Path Distribution Bar Chart: Visualizing Path Durations</h2>
+                The Path Distribution Bar Chart showcases the number of paths based on their durations. It aids in understanding the most frequent path durations and their respective counts within the network.
+                <br><br>
+                <b>Features & Navigation:</b>
+                <ul>
+                    <li><b>Duration Bins:</b> The x-axis showcases various path durations, while the y-axis displays the count of paths for each duration.</li>
+                    <li><b>Interactive Bars:</b> Hover over bars to get the exact count of paths for specific durations.</li>
+                    <li><b>Cumulative Line Overlay:</b> A line overlaying the bars shows the cumulative count of paths, aiding in understanding the growth in path counts as duration increases.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="riskMatrixModal" class="futuristic-modal">
+            <div class="futuristic-modal-content">
+                <span class="close-btn" onclick="closeModal('riskMatrixModal')">&times;</span>
+                <h2>Risk Matrix: Evaluating Risk Impact vs. Likelihood</h2>
+                The Risk Matrix is a critical tool for risk assessment. By plotting risks based on their impact and likelihood, it helps in prioritizing and strategizing risk management efforts.
+                <br><br>
+                <b>Features & Navigation:</b>
+                <ul>
+                    <li><b>Risk Importance Scale:</b> Risks are color-coded based on their importance. Shades of red, yellow, and green signify high, medium, and low risks respectively.</li>
+                    <li><b>Interactive Cells:</b> Hover over specific cells in the matrix to get detailed insights on the number of risks and their descriptions.</li>
+                    <li><b>Grid Layout:</b> The matrix is divided into a grid where the x-axis represents risk likelihood and the y-axis showcases risk impact.</li>
+                </ul>
+            </div>
+        </div>
+
+    <script>
+        // Function to open a modal
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = "block";
+        }
+    
+        // Function to close a modal
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = "none";
+        }
+    
+        // Closing modal if clicked outside the modal content
+        window.onclick = function(event) {
+            if (event.target.classList.contains('futuristic-modal')) {
+                event.target.style.display = "none";
+            }
+        }
+    </script>
+</body>
