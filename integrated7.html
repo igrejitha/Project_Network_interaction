@@ -2,30 +2,37 @@
 
 <html>
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Interactive Project Task Map</title>
-<!-- D3.js -->
-<script src="https://d3js.org/d3.v5.min.js"></script>
-<!-- Google Charts -->
-<script src="https://www.gstatic.com/charts/loader.js" type="text/javascript"></script>
-<script src="https://d3js.org/d3.v6.min.js"></script>
-<title>Gantt Chart</title>
-<script src="https://www.gstatic.com/charts/loader.js" type="text/javascript"></script>
-<script src="https://kryogenix.org/code/browser/sorttable/sorttable.js"></script>
-<script src="https://d3js.org/d3.v5.min.js"></script>
-<!-- Scripts for Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<link href="https://unpkg.com/vis-network@7.6.2/dist/vis-network.min.css" rel="stylesheet" type="text/css"/>
-<script src="https://unpkg.com/vis-network@7.6.2/dist/vis-network.min.js" type="text/javascript"></script>
-<link href="css/style.css" rel="stylesheet"/>
-<link href="css/site.css" rel="stylesheet"/>
-<link href="img/Blue_Logo.png" rel="stylesheet"/>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.css" type="text/css" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
-<script>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Interactive Project Task Map</title>
+    <!-- D3.js -->
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <!-- Google Charts -->
+    <script src="https://www.gstatic.com/charts/loader.js" type="text/javascript"></script>
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+    <title>Gantt Chart</title>
+    <script src="https://www.gstatic.com/charts/loader.js" type="text/javascript"></script>
+    <script src="https://kryogenix.org/code/browser/sorttable/sorttable.js"></script>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <!-- Scripts for Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://unpkg.com/vis-network@7.6.2/dist/vis-network.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://unpkg.com/vis-network@7.6.2/dist/vis-network.min.js" type="text/javascript"></script>
+    <link href="css/style.css" rel="stylesheet" />
+    <link href="css/site.css" rel="stylesheet" />
+    <link href="img/Blue_Logo.png" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.css" type="text/css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+
+    <!-- Include Flatpickr CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+    <!-- Include Flatpickr JS -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
     const centerTextPlugin = {
         afterDraw: (chart) => {
             let width = chart.chart.width,
@@ -36,7 +43,7 @@
             let fontSize = (height / 114).toFixed(2);
             ctx.font = fontSize + "em Orbitron";
             ctx.textBaseline = "middle";
-            
+
             let sum = chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
             let text = `Total: ${sum} days`,
                 textX = Math.round((width - ctx.measureText(text).width) / 2),
@@ -48,8 +55,8 @@
     };
     Chart.plugins.register(centerTextPlugin);
 
-</script>
-<style>
+    </script>
+    <style>
         /* Links */
         .links line {
             stroke: linear-gradient(to right, #8ce6ff, #3292cd);
@@ -125,17 +132,20 @@
                 transform: translateY(0);
             }
         }
-        .input {
 
-width: 50% !important;
-margin: 0px auto;
-}
-div.vis-configuration.vis-config-label{
-    color: black !important;
-}
-.vis-configuration-wrapper{
-    width: 100% !important;
-}
+        .input {
+            width: 50% !important;
+            margin: 0px auto;
+        }
+
+        div.vis-configuration.vis-config-label {
+            color: black !important;
+        }
+
+        .vis-configuration-wrapper {
+            width: 100% !important;
+        }
+
         .tooltip {
             position: absolute;
             padding: 5px; /* Increased padding for more space */
@@ -213,28 +223,28 @@ div.vis-configuration.vis-config-label{
             }
 
             .dashboard-card2 button {
-            /* width: 23%;  */
-            height: 30px; /* Compact height */
-            background: linear-gradient(45deg, #5ac8fa, #287dc8); /* Gradient background */
-            color: #ffffff; /* Font color */
-            border: none; /* Removing the default border */
-            border-radius: 5px; /* Slightly rounded corners */
-            cursor: pointer;
-            font-weight: bold; /* Bold font for clarity */
-            text-transform: uppercase; /* Uppercase letters for a modern look */
-            letter-spacing: 1px; /* Spacing between letters for clarity */
-            box-shadow: 0 0 10px rgba(90, 200, 250, 0.5); /* A soft glow effect */
-            transition: all 0.3s; /* Transition for hover effects */
-        }
-
-            .dashboard-card2 button:hover {
-                transform: translateY(-3px); /* Button moves up slightly on hover */
-                box-shadow: 0 0 15px rgba(90, 200, 250, 0.7); /* Increased glow on hover */
+                /* width: 23%;  */
+                height: 30px; /* Compact height */
+                background: linear-gradient(45deg, #5ac8fa, #287dc8); /* Gradient background */
+                color: #ffffff; /* Font color */
+                border: none; /* Removing the default border */
+                border-radius: 5px; /* Slightly rounded corners */
+                cursor: pointer;
+                font-weight: bold; /* Bold font for clarity */
+                text-transform: uppercase; /* Uppercase letters for a modern look */
+                letter-spacing: 1px; /* Spacing between letters for clarity */
+                box-shadow: 0 0 10px rgba(90, 200, 250, 0.5); /* A soft glow effect */
+                transition: all 0.3s; /* Transition for hover effects */
             }
 
-            .dashboard-card2 button:active {
-                transform: translateY(0); /* Button returns to original position when clicked */
-            }
+                .dashboard-card2 button:hover {
+                    transform: translateY(-3px); /* Button moves up slightly on hover */
+                    box-shadow: 0 0 15px rgba(90, 200, 250, 0.7); /* Increased glow on hover */
+                }
+
+                .dashboard-card2 button:active {
+                    transform: translateY(0); /* Button returns to original position when clicked */
+                }
 
         .dashboard-card2 {
             flex: 1;
@@ -243,12 +253,14 @@ div.vis-configuration.vis-config-label{
 
         .dashboard-card-full {
             width: 98%; /* Occupying most of the width for emphasis */
-            /* box-shadow: 0 6px 12px rgba(0,0,0,0.15);  Enhanced shadow for emphasis 
+            /* box-shadow: 0 6px 12px rgba(0,0,0,0.15);  Enhanced shadow for emphasis
             border: 1px solid #29395f;  Slight border for definition against the background */
         }
+
         div#pathMetrics {
-    width: 98%;
-}
+            width: 98%;
+        }
+
         .risk-content {
             display: flex;
             flex-direction: column; /* Stack the children vertically */
@@ -272,23 +284,28 @@ div.vis-configuration.vis-config-label{
             width: 100%; /* Increase table width */
             margin: 0 auto; /* Center the table within its container */
         }
-        div.vis-configuration.vis-config-item.vis-config-s3{
-        
-        background-color: #0f2d51 !important;
-        }
-        div.vis-configuration.vis-config-item.vis-config-s2{
+
+        div.vis-configuration.vis-config-item.vis-config-s3 {
             background-color: #0f2d51 !important;
         }
-        div.vis-configuration.vis-config-item.vis-config-s4{
+
+        div.vis-configuration.vis-config-item.vis-config-s2 {
             background-color: #0f2d51 !important;
         }
-        div.vis-configuration.vis-config-label{
+
+        div.vis-configuration.vis-config-item.vis-config-s4 {
+            background-color: #0f2d51 !important;
+        }
+
+        div.vis-configuration.vis-config-label {
             color: white !important;
         }
-        #configuration-container .vis-configuration .vis-config-item{
+
+        #configuration-container .vis-configuration .vis-config-item {
             margin: 1.5rem !important;
             padding: 2rem !important;
         }
+
         .futuristic-card {
             background-image: url('https://www.transparenttextures.com/patterns/space.png');
             background-color: rgba(0, 0, 0, 0.6);
@@ -360,9 +377,9 @@ div.vis-configuration.vis-config-label{
         }
 
         input#searchInput {
-    width: 95%;
-    padding: 0.6rem;
-}
+            width: 95%;
+            padding: 0.6rem;
+        }
 
         .control-label {
             font-weight: bold;
@@ -699,7 +716,7 @@ div.vis-configuration.vis-config-label{
 
         .vis-configuration-wrapper {
             background-color: #0f2d51;
-          /* Adjust as needed font-family: 'Arial', sans-serif;
+            /* Adjust as needed font-family: 'Arial', sans-serif;
             // Adjust as needed */
         }
 
@@ -838,7 +855,7 @@ div.vis-configuration.vis-config-label{
             transition: background 0.3s ease, color 0.3s ease;
         }
 
-            .project-dropdown:focus , .location-dropdown:focus {
+            .project-dropdown:focus, .location-dropdown:focus {
                 background: #5ac8fa;
                 color: #0e2446;
                 outline: none;
@@ -1018,10 +1035,97 @@ div.vis-configuration.vis-config-label{
             #projectSectorDropdown:hover {
                 background-color: rgba(205, 250, 255, 0.2);
             }
+        .bar-chart-tooltip {
+            position: absolute;
+            padding: 8px;
+            background-color: white;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            pointer-events: none;
+        }
+
+        .sci-fi-card {
+            background: linear-gradient(145deg, #0d2137, #1a3458); /* Gradient background */
+            margin-bottom: 20px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4), 0 0 20px #5ac8fa; /* Glowing border effect */
+            border: 1px solid #5ac8fa;
+            border-radius: 10px;
+            position: relative;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Sleek font */
+        }
+
+            .sci-fi-card .alarm-indicators {
+                display: flex;
+                justify-content: flex-end;
+            }
+
+            .sci-fi-card .card-icons {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-top: 10px;
+            }
+
+            .sci-fi-card .outlier-indicators {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                margin-top: 10px;
+                font-size: 0.9em; /* A bit smaller than the main content */
+            }
+
+            /* Progress bar with a sci-fi look */
+            .sci-fi-card .progress-bar {
+                height: 10px;
+                width: 100%;
+                border: 1px solid #5ac8fa;
+                border-radius: 5px;
+                margin-top: 10px;
+                background: linear-gradient(145deg, #0d2137, #5ac8fa);
+                position: relative;
+            }
+
+                .sci-fi-card .progress-bar::before {
+                    content: "";
+                    height: 100%;
+                    border-radius: 4px;
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    background: #5ac8fa;
+                    box-shadow: 0 0 10px #5ac8fa;
+                    transition: width 0.3s;
+                }
+
+            .sci-fi-card.futuristic-list {
+                list-style-type: none;
+                padding-left: 0;
+            }
+
+                .sci-fi-card.futuristic-list li {
+                    position: relative;
+                    margin-bottom: 10px;
+                    padding-left: 20px;
+                }
+
+                    .sci-fi-card.futuristic-list li:before {
+                        content: '•';
+                        position: absolute;
+                        left: 0;
+                        top: 0;
+                        color: #5ac8fa; /* Glowing bullet points */
+                        text-shadow: 0 0 5px #5ac8fa;
+                    }
+
+                    .sci-fi-card.futuristic-list li:hover {
+                        color: #5ac8fa; /* Hover effect */
+                        text-shadow: 0 0 5px #5ac8fa;
+                    }
 
 
     </style>
-<script type="text/javascript">
+    <script type="text/javascript">
         google.charts.load('current', { 'packages': ['gantt'] });
         google.charts.setOnLoadCallback(initFileInput);
 
@@ -1387,9 +1491,24 @@ div.vis-configuration.vis-config-label{
                     maxEndDate = parsedEndDate;
                 }
 
+                // Extracting "Percentage Complete" and "Time Units"
+                var percentCompleteNode = task.getElementsByTagName("PercentComplete")[0];
+                var percentComplete = percentCompleteNode ? percentCompleteNode.childNodes[0].nodeValue.trim() : "0";
+
+                var timeUnitsNode = task.getElementsByTagName("TimeUnits")[0]; // Assuming the XML tag is "TimeUnits"
+                var timeUnits = timeUnitsNode ? timeUnitsNode.childNodes[0].nodeValue.trim() : "Hours"; // Defaulting to "Hours" if not found
+
                 // Add the task to the nodes array
                 //nodes.push({ UID: taskID, Name: taskName, Start: startDate, Finish: endDate });
-                nodes.push({ ID: taskID, Name: taskName, Duration: duration, Start: startDate, Finish: endDate }); //Using ID instead of UID
+                nodes.push({
+                    ID: taskID,
+                    Name: taskName,
+                    Duration: duration,
+                    Start: startDate,
+                    Finish: endDate,
+                    PercentComplete: percentComplete,
+                    TimeUnits: timeUnits
+                });
 
                 console.log('Nodes', nodes)
 
@@ -1840,9 +1959,9 @@ div.vis-configuration.vis-config-label{
     // Completion of all computations and renderings
     updateProgressBar(100);
     document.querySelector(".sci-fi-loading-text").innerText = "";
-</script>
-<script src="https://d3js.org/d3.v5.min.js"></script>
-<script>
+    </script>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script>
         google.charts.load('current', { 'packages': ['corechart'] });
         google.charts.setOnLoadCallback(initializeDataAndDrawCharts);
         var currentRotation = 0;
@@ -2422,52 +2541,97 @@ div.vis-configuration.vis-config-label{
                 Finish: node.Finish,
                 duration: node.duration, // Assuming you have a 'duration' property on each node
             }));
-            drawCharts(nodes, links);       
+            drawCharts(nodes, links);
         }
 
         function findAllPaths(startNode, endNode, links, nodes) {
-            console.log("Finding paths from", startNode, "to", endNode);
+            const neighborsMap = {};
+            nodes.forEach(node => {
+                neighborsMap[node.ID] = links
+                    .filter(link => (link.source.ID || link.source) === node.ID)
+                    .map(link => nodes.find(n => n.ID === (link.target.ID || link.target)));
+            });
+
+            const memo = {};  // for memoization
             let paths = [];
-            let stack = [[startNode]];
-            i = 0;
-            console.log("i:", i);
 
-            // Log details about links and nodes
-            console.log("Links at the start:", JSON.stringify(links));
-            console.log("Nodes at the start:", JSON.stringify(nodes));
+            function dfs(currentNode, currentPath, visited) {
+                if (currentNode.ID === endNode.ID) {
+                    paths.push([...currentPath]);
+                    return;
+                }
 
-            while (stack.length > 0) {
-                let path = stack.pop();
-                let lastNode = path[path.length - 1];
+                if (memo[currentNode.ID]) {
+                    paths = paths.concat(memo[currentNode.ID].map(subpath => currentPath.concat(subpath)));
+                    return;
+                }
 
-                let neighbors = links
-                    .filter(link => (link.source.ID || link.source) === lastNode.ID)
-                    .map(link => nodes.find(node => node.ID === (link.target.ID || link.target)))
-                    .filter(neighbor => !path.includes(neighbor));
-
-                console.log("Neighbors of", lastNode, ":", neighbors);
-
-                for (let neighbor of neighbors) {
-                    let newPath = [...path, neighbor];
-                    console.log("New Path:", JSON.stringify(newPath));  // Logging the new path
-
-                    if (neighbor.ID === endNode.ID) {
-                        // Convert newPath to string and check if it's already in paths
-                        let newPathString = JSON.stringify(newPath.map(node => node.ID));
-                        if (!paths.some(path => JSON.stringify(path.map(node => node.ID)) === newPathString)) {
-                            paths.push(newPath);
-                        }
-                    } else {
-                        stack.push(newPath);
+                visited.add(currentNode.ID);
+                let subpaths = [];
+                for (let neighbor of neighborsMap[currentNode.ID]) {
+                    if (!visited.has(neighbor.ID)) {
+                        currentPath.push(neighbor);
+                        dfs(neighbor, currentPath, visited);
+                        currentPath.pop();
                     }
                 }
-                i = i + 1
-                console.log("i++:", i);
+                visited.delete(currentNode.ID);
+
+                memo[currentNode.ID] = subpaths;
             }
 
-            console.log("All paths found:", paths);
+            dfs(startNode, [startNode], new Set());
+
             return paths;
         }
+
+
+        /*
+        For all graphs including cyclic
+            function findAllPaths(startNode, endNode, links, nodes) {
+                console.log("Finding paths from", startNode, "to", endNode);
+                let paths = [];
+                let stack = [[startNode]];
+                i = 0;
+                console.log("i:", i);
+
+                // Log details about links and nodes
+                console.log("Links at the start:", JSON.stringify(links));
+                console.log("Nodes at the start:", JSON.stringify(nodes));
+
+                while (stack.length > 0) {
+                    let path = stack.pop();
+                    let lastNode = path[path.length - 1];
+
+                    let neighbors = links
+                        .filter(link => (link.source.ID || link.source) === lastNode.ID)
+                        .map(link => nodes.find(node => node.ID === (link.target.ID || link.target)))
+                        .filter(neighbor => !path.includes(neighbor));
+
+                    console.log("Neighbors of", lastNode, ":", neighbors);
+
+                    for (let neighbor of neighbors) {
+                        let newPath = [...path, neighbor];
+                        console.log("New Path:", JSON.stringify(newPath));  // Logging the new path
+
+                        if (neighbor.ID === endNode.ID) {
+                            // Convert newPath to string and check if it's already in paths
+                            let newPathString = JSON.stringify(newPath.map(node => node.ID));
+                            if (!paths.some(path => JSON.stringify(path.map(node => node.ID)) === newPathString)) {
+                                paths.push(newPath);
+                            }
+                        } else {
+                            stack.push(newPath);
+                        }
+                    }
+                    i = i + 1
+                    console.log("i++:", i);
+                }
+
+                console.log("All paths found:", paths);
+                return paths;
+            }
+            */
 
         function calculateSlack(nodes, links) {
             if (!nodes || !links || nodes.length === 0 || links.length === 0) {
@@ -2475,7 +2639,7 @@ div.vis-configuration.vis-config-label{
                 return;
             }
             console.log("calculateSlack entered", nodes, links)
-            
+
             nodes.forEach(node => {
                 node.ES = -1;
                 node.EF = -1;
@@ -2494,7 +2658,7 @@ div.vis-configuration.vis-config-label{
             var endNode = nodes.reduce((a, b) => (a.ID > b.ID) ? a : b);
             console.log("calculateSlack start node", startNode)
             console.log("calculateSlack end node", endNode)
-            
+
             let forwardPass = (node) => {
                 let outgoingLinks = links.filter(link => link.source.ID === node.ID);
                 for (let link of outgoingLinks) {
@@ -2515,12 +2679,12 @@ div.vis-configuration.vis-config-label{
                 }
             };
             forwardPass(startNode);
-            
+
             if (!endNode || endNode.EF === -1) {
                 console.error("End node not identified or has invalid EF.");
                 return;
             }
-            
+
             endNode.LF = endNode.EF;
             endNode.LS = endNode.LF;
 
@@ -3029,7 +3193,7 @@ div.vis-configuration.vis-config-label{
                     console.log("distributeOverrunProbability: probalilityyyyyyyyyyyy", originalPathLength, adjustedPathLength);
                     path.forEach(node => {
                         console.log("distributeOverrunProbability: probalility", node.Duration, node.overrun_probability);
-                    });                  
+                    });
                     if (adjustedPathLength < originalPathLength) {
                         console.warn(`Adjusted path length ${adjustedPathLength} is less than original path length ${originalPathLength} for path:`, path);
                     }
@@ -3039,12 +3203,12 @@ div.vis-configuration.vis-config-label{
                 console.log("distributeOverrunProbability: Updated Critical Path Info:", updatedCriticalPathInfo);
 
                 currentLongestDuration = updatedCriticalPathInfo.duration;
-                
+
                 let currentDifference = Math.abs(currentLongestDuration - targetDuration);
                 if (currentDifference < EPSILON || Math.abs(currentDifference - previousDifference) < EPSILON) {
                     break;
                 }
-                
+
                 previousDifference = currentDifference;
                 iterationCount++;
 
@@ -3057,7 +3221,7 @@ div.vis-configuration.vis-config-label{
             allPaths.forEach(path => {
                 const originalPathLength = path.reduce((sum, node) => sum + parseFloat(node.Duration), 0);
                 const adjustedPathLength = path.reduce((sum, node) => sum + parseFloat(node.Duration) * (1 + node.overrun_probability), 0);
-                
+
                 console.log("distributeOverrunProbability: Path:", path, "Original Length:", originalPathLength, "Adjusted Length:", adjustedPathLength);
 
                 if (adjustedPathLength < originalPathLength) {
@@ -3109,7 +3273,7 @@ div.vis-configuration.vis-config-label{
                 if (adjustedDuration < parseFloat(node.Duration)) {
                     node.overrun_probability = 0;
                     console.warn(`Adjusted duration ${adjustedDuration} is less than original duration ${node.Duration} for Node ID ${node.ID}. Setting overrun_probability to 0.`);
-                }         
+                }
                 if (isNaN(node.overrun_probability) || !isFinite(node.overrun_probability)) {
                     console.warn(`Invalid overrun_probability for Node ID ${node.ID}. Setting to 0.`);
                     node.overrun_probability = 0;
@@ -3125,6 +3289,22 @@ div.vis-configuration.vis-config-label{
             const allPaths = findAllPaths(startNode, endNode, links, nodes);
             const criticalPathData = findCriticalPath(allPaths, links);
             const outlierPathsData = findOutlierPaths(allPaths, links);
+
+            // Adjust duration based on time units
+            function adjustDuration(duration, timeUnits) {
+                switch (timeUnits) {
+                    case 'Hours':
+                        return duration / 8; // assuming 8-hour workdays
+                    case 'Days':
+                        return duration;
+                    default:
+                        return duration;
+                }
+            }
+            // Adjust the duration of each node based on its time units
+            nodes.forEach(node => {
+                node.AdjustedDuration = adjustDuration(node.Duration, node.TimeUnits);
+            });
 
             // Start generating table
             let tableHTML = '<table border="1">';
@@ -3162,11 +3342,11 @@ div.vis-configuration.vis-config-label{
             })).sort((a, b) => a.duration - b.duration);
 
             // Outlier paths data rows
-            sortedOutlierPaths.forEach(({path, duration}, index) => {
+            sortedOutlierPaths.forEach(({ path, duration }, index) => {
                 // Scale the color based on index
                 const color = d3.scaleLinear()
-                                .domain([0, sortedOutlierPaths.length - 1])
-                                .range(['orange', 'red'])(index);
+                    .domain([0, sortedOutlierPaths.length - 1])
+                    .range(['orange', 'red'])(index);
                 console.log("colorissue", color, duration, criticalPathData.duration);
                 tableHTML += '<tr>';
                 tableHTML += `<td>Outlier Path ${index + 1}</td>`;
@@ -3183,10 +3363,112 @@ div.vis-configuration.vis-config-label{
 
             tableHTML += '</table>';
 
+            // Calculate the longest risk-adjusted duration
+            const longestRiskAdjustedDuration = sortedOutlierPaths.reduce((max, curr) => {
+                return Math.max(max, Math.round(calculateExpectedOverrunDurationForPath(curr.path)));
+            }, 0);
+
+            // Create the bar chart
+            function createBarChart() {
+                // Retrieve the start date from the Start Milestone
+                const startDate = new Date(nodes.find(node => node.ID === "0").Start);
+
+                // Calculate the planned completion date
+                const plannedCompletionDate = new Date(criticalPathData.path[criticalPathData.path.length - 1].Finish);
+
+                // Calculate the probable end date
+                const probableEndDate = new Date(startDate);
+                probableEndDate.setDate(startDate.getDate() + Math.round(longestRiskAdjustedDuration));
+
+                const data = [
+                    {
+                        label: 'Critical Path',
+                        value: adjustDuration(criticalPathData.duration, 'Days'),
+                        units: 'Days',
+                        startDate: startDate,
+                        endDate: plannedCompletionDate
+                    },
+                    {
+                        label: 'Risk Adjusted',
+                        value: adjustDuration(longestRiskAdjustedDuration, 'Days'),
+                        units: 'Days',
+                        startDate: startDate,
+                        endDate: probableEndDate
+                    }
+                ];
+                console.log(data);
+
+                const margin = { top: 20, right: 50, bottom: 40, left: 100 }; // Adjusted the margins
+                const width = 700 - margin.left - margin.right;  // Increased the width
+                const height = 250 - margin.top - margin.bottom;
+
+                const svg = d3.select("#progressBars").append("svg")
+                    .attr("width", width + margin.left + margin.right)
+                    .attr("height", height + margin.top + margin.bottom)
+                    .append("g")
+                    .attr("transform", `translate(${margin.left},${margin.top})`);
+
+                const x = d3.scaleLinear()
+                    .domain([0, d3.max(data, d => d.value)])
+                    .range([0, width]);
+
+                const y = d3.scaleBand()
+                    .domain(data.map(d => d.label))
+                    .range([height, 0])
+                    .padding(0.1);
+
+                // Add tooltip
+                const tooltip = d3.select("body").append("div")
+                    .attr("class", "bar-chart-tooltip")
+                    .style("opacity", 0);
+
+                svg.selectAll(".bar")
+                    .data(data)
+                    .enter().append("rect")
+                    .attr("class", "bar")
+                    .attr("y", d => y(d.label))
+                    .attr("height", y.bandwidth())
+                    .attr("x", 0)
+                    .attr("width", d => x(d.value))
+                    .on("mouseover", (event, d) => {
+                        console.log("Tooltip Data:", d); // Log data for debugging
+                        tooltip.style("opacity", 0.9);   // Explicitly set opacity before transition
+                        tooltip.transition()
+                            .duration(200)
+                            .style("opacity", 0.9);
+                        tooltip.html(`Path: ${d.label}<br>Duration: ${d.value} ${d.units}<br>Start Date: ${d.startDate.toLocaleDateString()}<br>End Date: ${d.endDate.toLocaleDateString()}`)
+                            .style("left", `${event.pageX + 5}px`)
+                            .style("top", `${event.pageY - 70}px`);
+                    })
+                    .on("mouseout", () => {
+                        tooltip.transition()
+                            .duration(500)
+                            .style("opacity", 0);
+                    });
+
+
+                svg.append("g")
+                    .call(d3.axisLeft(y));
+
+                svg.append("g")
+                    .attr("transform", `translate(0,${height})`)
+                    .call(d3.axisBottom(x).ticks(10).tickFormat(d => `${d} Days`))
+                    .append("text")
+                    .attr("x", width / 2)
+                    .attr("y", 30)
+                    .attr("fill", "#000")
+                    .attr("text-anchor", "middle")
+                    .text("Duration (Days)");
+            }
+
+            // Call the createBarChart function to insert the chart
+            createBarChart();
+
             // Insert the table into the DOM
             document.getElementById("pathsDistributionTableBody").innerHTML = tableHTML;
-            // 3. Make the table sortable
-            makeTableSortable(document.getElementById("pathsDistributionTableBody"));
+
+            // Make the table sortable
+            makeTableSortable(document.getElementById("pathsDistributionTableBody").closest('table'));
         }
 
         function makeTableSortable(table) {
@@ -3368,6 +3650,8 @@ div.vis-configuration.vis-config-label{
             });
             container.appendChild(searchInput);
 
+            console.log("drawReducedGraphWithVis2");
+
             // Modify nodes based on their degree
             nodes.forEach(node => {
                 if (node.degree > 4) {
@@ -3381,7 +3665,7 @@ div.vis-configuration.vis-config-label{
             links.forEach(edge => {
                 edge.label = `Duration: ${edge.length / 20}`;
             });
-
+            console.log("drawReducedGraphWithVis3");
             // Prepare the data
             const data = {
                 nodes: new vis.DataSet(nodes.map(node => ({
@@ -3415,7 +3699,7 @@ div.vis-configuration.vis-config-label{
                 })))
 
             };
-
+            console.log("drawReducedGraphWithVis4", data);
             // Configure the options
             const options = {
                 nodes: {
@@ -3635,387 +3919,6 @@ div.vis-configuration.vis-config-label{
                 `;
             container.appendChild(legend);
         }
-/*
-        function drawReducedGraphWithVis(nodes, links, criticalPathSet, outlierTasksSet) {
-            console.log("drawReducedGraphWithVis", "nodes: ", nodes, "links: ", links);
-            console.log("drawReducedGraphWithVis", "criticalPathSet: ", criticalPathSet, "outlierTasksSet: ", outlierTasksSet);
-
-            const container = document.getElementById('dependency_chart');
-            const configContainer = document.getElementById('configuration-container');
-
-
-            // Side panel for node information
-            const infoPanel = document.getElementById('info-panel');
-
-            // Pan and Centering Controls
-            const controlsDiv = document.createElement('div');
-            controlsDiv.style.textAlign = 'center';
-            controlsDiv.style.padding = '10px';
-            controlsDiv.style.backgroundColor = '#f5f5f5'; // Light gray background for better visibility
-
-            const btnLeft = document.createElement('button');
-            btnLeft.textContent = '←';
-            controlsDiv.appendChild(btnLeft);
-
-            const btnUp = document.createElement('button');
-            btnUp.textContent = '↑';
-            controlsDiv.appendChild(btnUp);
-
-            const btnDown = document.createElement('button');
-            btnDown.textContent = '↓';
-            controlsDiv.appendChild(btnDown);
-
-            const btnRight = document.createElement('button');
-            btnRight.textContent = '→';
-            controlsDiv.appendChild(btnRight);
-
-            const btnCenter = document.createElement('button');
-            btnCenter.textContent = 'Center';
-            controlsDiv.appendChild(btnCenter);
-
-            container.appendChild(controlsDiv);
-
-            const clusterByHubSizeButton = document.createElement('button');
-            clusterByHubSizeButton.textContent = 'Cluster by Hub Size';
-            controlsDiv.appendChild(clusterByHubSizeButton);
-
-            const clusterByAttributeButton = document.createElement('button');
-            clusterByAttributeButton.textContent = 'Cluster by Attribute';
-            controlsDiv.appendChild(clusterByAttributeButton);
-
-            const declusterButton = document.createElement('button');
-            declusterButton.textContent = 'De-cluster';
-            controlsDiv.appendChild(declusterButton);
-
-            // Search functionality
-            const searchInput = document.createElement('input');
-            searchInput.setAttribute('placeholder', 'Search for a node...');
-            searchInput.addEventListener('input', function () {
-                const query = this.value;
-                const nodeToFocus = nodes.find(node => node.ID === query || node.Name.includes(query));
-                if (nodeToFocus) {
-                    network.focus(nodeToFocus.ID, {
-                        scale: 1.5,
-                        animation: {
-                            duration: 500,
-                            easingFunction: "easeInOutQuad"
-                        }
-                    });
-                }
-            });
-            container.appendChild(searchInput);
-
-            // Modify nodes based on their type (critical path, outlier path, both, or neither)
-            nodes.forEach(node => {
-                if (criticalPathSet.has(node.ID) && outlierTasksSet.has(node.ID)) {
-                    node.color = { background: 'purple' }; // Both critical and outlier
-                } else if (criticalPathSet.has(node.ID)) {
-                    node.color = { background: 'red' }; // Only critical
-                } else if (outlierTasksSet.has(node.ID)) {
-                    node.color = { background: 'blue' }; // Only outlier
-                } else {
-                    node.color = { background: 'grey' }; // Neither
-                }
-            });
-
-            // Modify edges based on their length
-            links.forEach(edge => {
-                edge.label = `Duration: ${edge.length / 20}`;
-            });
-
-            // Prepare the data
-            const data = {
-                nodes: new vis.DataSet(nodes.map(node => ({
-                    id: node.ID,
-                    label: node.ID,
-                    title: `<strong>ID:</strong> ${node.ID}<br><strong>Name:</strong> ${node.Name}`,  // enhanced tooltip
-                    value: node.degree, // use degree for node size
-                    color: node.degree > 2 ? "#46b9fa" : "#8ce6ff",  // dynamic coloring based on degree
-                    font: {
-                        color: "#ffffff",
-                        size: 24
-                    }
-                }))),
-                edges: new vis.DataSet(links.map(link => ({
-                    from: link.source.ID,  // use the ID attribute of the source node
-                    to: link.target.ID,    // use the ID attribute of the target node
-                    arrows: {
-                        to: {
-                            enabled: true,
-                            scaleFactor: 1.5
-                        }
-                    },
-                    color: {
-                        color: "#a3d1ff",
-                        opacity: 0.8,
-                        inherit: 'from'
-                    },
-                    length: link.duration * 20,
-                    hiddenLabel: `Duration: ${isNaN(link.duration) ? 0 : link.duration}`,
-                    font: { color: 'transparent' }  // hide the label initially
-                })))
-
-            };
-
-            // Configure the options
-            const options = {
-                nodes: {
-                    shape: "circle",
-                    borderWidth: 3,
-                    borderWidthSelected: 5,
-                    scaling: {
-                        min: 20,
-                        max: 100
-                    },
-                    chosen: {
-                        node: function (values, id, selected, hovering) {
-                            if (hovering) {
-                                values.color = '#ffa3a3';  // Color when hovering over the node
-                            } else if (selected) {
-                                values.color = '#ff0000';  // Color when the node is selected
-                            } else {
-                                values.color = values.originalColor || "#5ac8fa";  // Default color
-                            }
-                        }
-                    },
-                },
-                edges: {
-                    width: 2.5,
-                    smooth: {
-                        type: "dynamic"
-                    },
-                    font: {
-                        size: 12,
-                        align: 'middle'
-                    },
-                    chosen: {
-                        edge: function (values, id, selected, hovering) {
-                            values.color = selected ? '#ff0000' : '#a3d1ff';
-                            values.font.color = hovering ? '#000000' : 'transparent'; // Show label on hover
-                        }
-                    }
-                },
-                interaction: {
-                    hover: true,
-                    hoverConnectedEdges: true,
-                    selectConnectedEdges: true
-                },
-                // Physics tweaking options
-                physics: {
-                    maxVelocity: 50,
-                    minVelocity: 0.1,
-                    solver: 'barnesHut',
-                    barnesHut: {
-                        gravitationalConstant: -3000,
-                        centralGravity: 0.5
-                    },
-                    stabilization: {
-                        iterations: 2500
-                    }
-                },
-                configure: {
-                    enabled: true,              // Enable or disable the panel
-                    filter: true,               // The filter function or boolean to determine which options are shown
-                    container: configContainer,       // The DOM element where the configuration UI will be created; if not provided, it will be next to the network.
-                    showButton: true            // Show or hide the generate options button
-                }
-            };
-
-
-            // Initialize the network
-            const network = new vis.Network(container, data, options);
-
-            // Cluster by hub size
-            clusterByHubSizeButton.addEventListener('click', function () {
-                network.clusterByHubsize(undefined, {
-                    clusterNodeProperties: {
-                        shape: 'box',
-                        size: 30,
-                        color: '#FF9999',
-                        borderWidth: 3,
-                        borderWidthSelected: 5,
-                        label: 'Cluster'
-                    }
-                });
-            });
-
-            // Cluster by attribute (for this example, we're clustering nodes with similar degrees)
-            clusterByAttributeButton.addEventListener('click', function () {
-                const clusterOptionsByData = {
-                    joinCondition: function (childOptions) {
-                        return childOptions.degree > 2;
-                    },
-                    clusterNodeProperties: {
-                        id: 'degreeCluster',
-                        borderWidth: 3,
-                        shape: 'star',
-                        size: 40,
-                        color: '#FFFF00',
-                        label: 'Nodes with high degree'
-                    }
-                };
-                network.cluster(clusterOptionsByData);
-            });
-
-            // De-cluster
-            declusterButton.addEventListener('click', function () {
-                network.openCluster('degreeCluster');
-            });
-
-            // Attach event listeners for the controls
-            btnLeft.addEventListener('click', function () {
-                const currentPosition = network.getViewPosition();
-                network.moveTo({
-                    position: { x: currentPosition.x + 100, y: currentPosition.y },
-                    animation: {
-                        duration: 500,
-                        easingFunction: 'easeInOutQuad'
-                    }
-                });
-            });
-
-            // Filtering options
-            const filterBtn = document.createElement('button');
-            filterBtn.textContent = 'Filter Critical & Outlier Nodes';
-            filterBtn.addEventListener('click', function() {
-                network.setData({
-                    nodes: new vis.DataSet(nodes.filter(node => criticalPathSet.has(node.ID) || outlierTasksSet.has(node.ID))),
-                    edges: data.edges
-                });
-            });
-            container.appendChild(filterBtn);
-
-            const resetBtn = document.createElement('button');
-            resetBtn.textContent = 'Reset Filter';
-            resetBtn.addEventListener('click', function() {
-                network.setData(data);
-            });
-            container.appendChild(resetBtn);
-
-            btnUp.addEventListener('click', function () {
-                const currentPosition = network.getViewPosition();
-                network.moveTo({
-                    position: { x: currentPosition.x, y: currentPosition.y + 100 },
-                    animation: {
-                        duration: 500,
-                        easingFunction: 'easeInOutQuad'
-                    }
-                });
-            });
-
-            btnRight.addEventListener('click', function () {
-                const currentPosition = network.getViewPosition();
-                network.moveTo({
-                    position: { x: currentPosition.x - 100, y: currentPosition.y },
-                    animation: {
-                        duration: 500,
-                        easingFunction: 'easeInOutQuad'
-                    }
-                });
-            });
-
-            btnDown.addEventListener('click', function () {
-                const currentPosition = network.getViewPosition();
-                network.moveTo({
-                    position: { x: currentPosition.x, y: currentPosition.y - 100 },
-                    animation: {
-                        duration: 500,
-                        easingFunction: 'easeInOutQuad'
-                    }
-                });
-            });
-
-            btnCenter.addEventListener('click', function () {
-                network.fit({
-                    animation: {
-                        duration: 500,
-                        easingFunction: 'easeInOutQuad'
-                    }
-                });
-            });
-
-            // Focus on a node and its direct neighbors when the node is clicked
-            network.on("click", function (properties) {
-                const selectedNodeId = properties.nodes[0];
-                if (selectedNodeId) {
-                    const selectedNode = nodes.find(node => node.ID === selectedNodeId);
-                    infoPanel.innerHTML = `
-                                            <h3>Node Details</h3>
-                                            <p><strong>ID:</strong> ${selectedNode.ID}</p>
-                                            <p><strong>Name:</strong> ${selectedNode.Name}</p>
-                                            <p><strong>Degree:</strong> ${selectedNode.degree}</p>
-                                        `;
-                } else {
-                    infoPanel.innerHTML = '';
-                }
-            });
-            // Node Dragging Enhancements
-            network.on("dragEnd", function (params) {
-                if (params.nodes.length) {
-                    const draggedNode = data.nodes.get(params.nodes[0]);
-                    draggedNode.fixed = {
-                        x: true,
-                        y: true
-                    };
-                    data.nodes.update(draggedNode);
-                }
-            });
-
-            // List activities sorted by ID
-            const sortedNodes = nodes.sort((a, b) => a.ID - b.ID);
-            const activityList = document.createElement("ul");
-            sortedNodes.forEach(node => {
-                const listItem = document.createElement("li");
-                listItem.textContent = node.ID + ": " + node.Name;
-                activityList.appendChild(listItem);
-            });
-
-            // Append the list to the path-list container
-            document.getElementById("path-list").appendChild(activityList);
-
-            // Hover enhancements
-            network.on("hoverNode", function (properties) {
-                const hoveredNode = nodes.find(node => node.ID === properties.node);
-                let tooltipContent = `
-                                    <strong>ID:</strong> ${hoveredNode.ID}<br>
-                                    <strong>Name:</strong> ${hoveredNode.Name}<br>
-                                    `;
-
-                if (criticalPathSet.has(hoveredNode.ID) && outlierTasksSet.has(hoveredNode.ID)) {
-                    tooltipContent += `<strong>Type:</strong> Both Critical and Outlier`;
-                } else if (criticalPathSet.has(hoveredNode.ID)) {
-                    tooltipContent += `<strong>Type:</strong> Critical`;
-                } else if (outlierTasksSet.has(hoveredNode.ID)) {
-                    tooltipContent += `<strong>Type:</strong> Outlier`;
-                } else {
-                    tooltipContent += `<strong>Type:</strong> Regular`;
-                }
-
-                // Display this content in a tooltip. (Implementation depends on your tooltip library)
-            });
-
-            // Clustering
-            document.getElementById('clusterBtn').addEventListener('click', function () {
-                network.clusterByHubsize();
-            });
-
-            document.getElementById('declusterBtn').addEventListener('click', function () {
-                network.openCluster();
-            });
-
-            // Legend (this is a simple example, you'll want to make it more dynamic)
-            const legend = document.createElement('div');
-            legend.style.marginTop = "20px";
-            legend.innerHTML = `
-                                            <strong>Legend:</strong><br>
-                                            <span style="display:inline-block; width:12px; height:12px; background-color:red;"></span> High Degree Node<br>
-                                            <span style="display:inline-block; width:12px; height:12px; background-color:blue;"></span> Low Degree Node<br>
-                                            <span style="display:inline-block; width:20px; height:2px; background-color:#a3d1ff;"></span> Link (Hover for duration)
-                                        `;
-            container.appendChild(legend);
-        }
-
-        */
 
         function drawArrow(source, target, container) {
             var line = container.append("line")
@@ -4102,29 +4005,22 @@ div.vis-configuration.vis-config-label{
         }
 
         function findOutlierPaths(paths, links) {
+            const MIN_OUTLIER_PATHS = 5;  // Adjust this as needed
+
             console.log("findOutlierPaths: Entry, Initial Paths:", paths, links);
 
             // Calculate the total duration for each path
             const pathDurations = paths.map(path => {
-                let duration = path.reduce((total, node, index, array) => {
-                    if (index < array.length - 1) {
-                        let link = links.find(l => l.source.ID === node.ID && l.target.ID === array[index + 1].ID);
-                        if (!link) {
-                            console.warn(`No link found between ${node.ID} and ${array[index + 1].ID}`);
-                            return total;
+                return {
+                    path,
+                    duration: path.reduce((total, node, index, array) => {
+                        if (index < array.length - 1) {
+                            const link = links.find(l => l.source.ID === node.ID && l.target.ID === array[index + 1].ID);
+                            return link ? total + Number(link.duration) : total;
                         }
-
-                        let linkDuration = Number(link.duration);
-                        if (isNaN(linkDuration)) {
-                            console.warn(`Invalid duration for link between ${link.source.ID} and ${link.target.ID}`);
-                            return total;
-                        }
-
-                        return total + linkDuration;
-                    }
-                    return total;
-                }, 0);
-                return { path, duration };
+                        return total;
+                    }, 0)
+                };
             });
 
             // Remove duplicate paths
@@ -4146,12 +4042,20 @@ div.vis-configuration.vis-config-label{
             // Calculate the interquartile range (IQR)
             const iqr = q3 - q1;
 
-            // Set the lower and upper thresholds
-            const lowerThreshold = q1 - 1.5 * iqr;
-            const upperThreshold = q3 + 1.5 * iqr;
+            let adjustmentFactor = 1.5;  // Starting factor for IQR
+            let outlierPathDurations;
 
-            // Filter the outlier paths based on the thresholds
-            const outlierPathDurations = uniquePathDurations.filter(pathDuration => pathDuration.duration < lowerThreshold || pathDuration.duration > upperThreshold);
+            do {
+                // Set the lower and upper thresholds
+                const lowerThreshold = q1 - adjustmentFactor * iqr;
+                const upperThreshold = q3 + adjustmentFactor * iqr;
+
+                // Filter the outlier paths based on the thresholds
+                outlierPathDurations = uniquePathDurations.filter(pathDuration => pathDuration.duration < lowerThreshold || pathDuration.duration > upperThreshold);
+
+                // Reduce the adjustment factor to lax the bounds and find more outliers
+                adjustmentFactor -= 0.1;
+            } while (outlierPathDurations.length < MIN_OUTLIER_PATHS && adjustmentFactor >= 0);
 
             // Log information
             outlierPathDurations.forEach(pathDuration => {
@@ -4174,12 +4078,11 @@ div.vis-configuration.vis-config-label{
                 });
             });
 
-            return { 
-                paths: outlierPathDurations.map(pd => pd.path), 
-                durations: outlierPathDurations.map(pd => pd.duration) 
+            return {
+                paths: outlierPathDurations.map(pd => pd.path),
+                durations: outlierPathDurations.map(pd => pd.duration)
             };
         }
-
 
 
         // Displaying all paths
@@ -4375,6 +4278,7 @@ div.vis-configuration.vis-config-label{
                 drawRiskMatrix(result.updatedNodes, links);  // Use the updated nodes
                 // Generate the paths table
                 generatePathsTable(result.updatedNodes, links);
+                generateKanbanCards(nodes, links);
 
                 // Generate reduced graph using PageRank with durations, critical path, and outliers
                 console.log("About to Enter drawReducedGraphWithVis");
@@ -4632,7 +4536,11 @@ div.vis-configuration.vis-config-label{
                     textStyle: { color: '#ffffff' }
                 },
                 backgroundColor: '#113464',
-                colors: ['#46b9fa']
+                colors: ['#46b9fa'],
+                chartArea: {
+                    width: '90%',  // Adjust based on your needs
+                    height: '80%'  // Adjust based on your needs
+                }
             };
 
             var chart = new google.visualization.LineChart(document.getElementById('path_distribution_chart'));
@@ -4649,7 +4557,11 @@ div.vis-configuration.vis-config-label{
 
 
         function drawRiskMatrix(nodes, links) {
-            console.log("Entered drawRiskMatrix");
+            console.log("Entered drawRiskMatrix", nodes, links);
+
+            // Check nodes and links length
+            console.log("drawRiskMatrix Number of nodes:", nodes.length);
+            console.log("drawRiskMatrix Number of links:", links.length);
 
             var scores = nodes.map(node => ({
                 id: node.ID,
@@ -4668,7 +4580,7 @@ div.vis-configuration.vis-config-label{
 
             // First, find the min and max combined scores
             // Log the combined scores for validation
-            console.log("Combined scores:", scores.map(s => s.combinedScore));
+            console.log("drawRiskMatrix Combined scores:", scores.map(s => s.combinedScore));
 
             const minCombinedScore = Math.min(...scores.map(s => s.combinedScore));
             const maxCombinedScore = Math.max(...scores.map(s => s.combinedScore));
@@ -4696,18 +4608,39 @@ div.vis-configuration.vis-config-label{
             }
 
             // Function to calculate IQR and identify outliers
+            const MIN_OUTLIERS = 5;  // Adjust this as needed
+
             function identifyOutliers(data) {
                 const values = data.slice().sort((a, b) => a - b);
                 const q1 = values[Math.floor((values.length / 4))];
                 const q3 = values[Math.floor((values.length * 3) / 4)];
                 const iqr = q3 - q1;
-                const lowerBound = q1 - 5 * iqr;
-                const upperBound = q3 + 5 * iqr;
-                return data.map(score => score < lowerBound || score > upperBound);
+
+                let adjustmentFactor = 5; // Start with 5 as the adjustment factor for IQR
+                let outliers;
+
+                do {
+                    const lowerBound = q1 - adjustmentFactor * iqr;
+                    const upperBound = q3 + adjustmentFactor * iqr;
+                    outliers = data.map(score => score < lowerBound || score > upperBound);
+
+                    // Decrease the adjustment factor to lax the bounds and find more outliers
+                    adjustmentFactor -= 0.5;
+                } while (outliers.filter(Boolean).length < MIN_OUTLIERS && adjustmentFactor >= 0);
+
+                return outliers;
             }
 
             const riskOutliers = identifyOutliers(scores.map(s => s.riskScore));
             const importanceOutliers = identifyOutliers(scores.map(s => s.importanceScore));
+
+            nodes.forEach((node, idx) => {
+                node.isRiskOutlier = riskOutliers[idx];
+            });
+            nodes.forEach((node, idx) => {
+                node.isImportanceOutlier = importanceOutliers[idx];
+            });
+
 
             // Filter nodes to only include outliers based on risk or importance
             const outlierScores = scores.filter((_, idx) => riskOutliers[idx] || importanceOutliers[idx]);
@@ -4735,6 +4668,17 @@ div.vis-configuration.vis-config-label{
             const adjustedMinImportance = minImportance - 0.05 * importanceRange;
             const adjustedMaxImportance = maxImportance + 0.05 * importanceRange;
 
+            // Log min and max combined scores
+            console.log("drawRiskMatrix Min combined score:", minCombinedScore);
+            console.log("drawRiskMatrix Max combined score:", maxCombinedScore);
+
+            // Check if there are any outliers
+            console.log("drawRiskMatrix Number of risk outliers:", riskOutliers.filter(Boolean).length);
+            console.log("drawRiskMatrix Number of importance outliers:", importanceOutliers.filter(Boolean).length);
+
+            // Check the size of the scatter data
+            console.log("drawRiskMatrix Scatter data length:", scatterData.length);
+
             var ctx = document.getElementById('riskMatrix').getContext('2d');
             var chart = new Chart(ctx, {
                 type: 'scatter',
@@ -4742,7 +4686,10 @@ div.vis-configuration.vis-config-label{
                     datasets: [{
                         label: 'Risks',
                         data: scatterData,
-                        backgroundColor: context => getColorForCombinedScore(context.dataset.data[context.dataIndex].combinedScore),
+                        backgroundColor: context => {
+                            const dataPoint = context.dataset.data[context.dataIndex];
+                            return dataPoint && dataPoint.combinedScore ? getColorForCombinedScore(dataPoint.combinedScore) : 'rgba(0,0,0,0.1)';
+                        },
                         borderColor: 'white',
                         borderWidth: 1,
                         pointStyle: 'circle',
@@ -4809,6 +4756,7 @@ div.vis-configuration.vis-config-label{
                     }
                 }
             });
+
 
             // Populate the risk table with only outlier nodes
             var riskTableBody = document.getElementById('riskTableBody');
@@ -4927,8 +4875,8 @@ div.vis-configuration.vis-config-label{
             var ctx = document.getElementById('radialChart').getContext('2d');
 
             const themeColors = [
-                "#cdfaff", "#b4f5ff", "#8ce6ff", "#5ac8fa", 
-                "#46b9fa", "#41afeb", "#3292cd", "#287dc8", 
+                "#cdfaff", "#b4f5ff", "#8ce6ff", "#5ac8fa",
+                "#46b9fa", "#41afeb", "#3292cd", "#287dc8",
                 "#1e69aa", "#195a8c"
             ];
 
@@ -5087,7 +5035,7 @@ div.vis-configuration.vis-config-label{
                 .attr("cy", d => y(d.y))
                 .style("fill", "#0077b6");
         }
-        
+
         function drawPathDistributionStackedBarChart(nodes, links) {
             // Compute paths and their durations as before
             var startNode = nodes.find(node => node.ID === "0");
@@ -5194,10 +5142,186 @@ div.vis-configuration.vis-config-label{
             });
         }
 
-        
-        
-        </script>
-<style>
+        function generateKanbanCards(nodes, links) {
+            const container = document.querySelector('.kanban-columns');
+
+            // Clear existing columns
+            container.innerHTML = "";
+
+            const columns = {
+                todo: [],
+                inProgress: [],
+                done: []
+            };
+
+            nodes.forEach(node => {
+                const currentDate = new Date();
+                const startDate = new Date(node.Start);
+                const finishDate = new Date(node.Finish);
+
+                // Calculate days left for deadline
+                const daysLeft = Math.ceil((finishDate - currentDate) / (1000 * 60 * 60 * 24));
+                const daysLeftText = daysLeft > 0 ? `${daysLeft} days left` : daysLeft === 0 ? `Due today` : `Overdue by ${Math.abs(daysLeft)} days`;
+
+                let column = 'todo';
+                if (currentDate >= startDate && currentDate <= finishDate) {
+                    column = 'inProgress';
+                } else if (currentDate > finishDate) {
+                    column = 'done';
+                }
+
+                const pathType = node.isOnCriticalPath ? 'Critical Path' : node.isOnOutlierPath ? 'Outlier Path' : 'Regular Path';
+
+                // Determine risk, importance, and path colors based on their values
+                const riskColor = node.isRiskOutlier ? 'red' : '';
+                const importanceColor = node.isImportanceOutlier ? 'red' : '';
+                const pathColor = node.isOnCriticalPath ? 'red' : node.isOnOutlierPath ? 'orange' : '#8ce6ff';
+
+                // Determine icons only if the task is an outlier
+                const riskIcon = node.isRiskOutlier ? '<span class="icon"><i class="fas fa-bolt" style="color:orange;"></i> Risk Outlier</span>' : '';
+                const importanceIcon = node.isImportanceOutlier ? '<span class="icon"><i class="fas fa-star" style="color:orange;"></i> Importance Outlier</span>' : '';
+                const pathIcon = node.isOnCriticalPath || node.isOnOutlierPath ? `<span class="icon"><i class="fas fa-route" style="color:${pathColor};"></i> ${pathType}</span>` : '';
+
+
+                // Count the number of outliers and generate the alarm icons
+                const outlierCount = [node.isRiskOutlier, node.isImportanceOutlier, node.isOnCriticalPath || node.isOnOutlierPath].filter(Boolean).length;
+                const alarms = '<i class="fas fa-bell" style="color:orange;"></i>'.repeat(outlierCount);
+
+                const cardHTML = `
+                <div class="kanban-card sci-fi-card" data-start-date="${node.Start}" data-due-date="${node.Finish}" data-lateness="0">
+                    <div class="alarm-indicators">${alarms}</div>
+                    <h4>${node.Name} (ID: ${node.ID})</h4>
+                    <ul>
+                        <li style="color:${riskColor}">Risk: ${node.riskScore.toFixed(2)}</li>
+                        <li style="color:${importanceColor}">Importance: ${node.importanceScore.toFixed(2)}</li>
+                        <li style="color:${pathColor}">Path: ${pathType}</li>
+                    </ul>
+                    <p>Expected Start: ${startDate.toLocaleDateString()} | Duration: ${node.Duration} days</p>
+                    <div class="card-icons">
+                        <span class="due-date-icon"><i class="fas fa-calendar-alt"></i> Due: ${finishDate.toLocaleDateString()} (${daysLeftText})</span>
+                        <span class="slack"><i class="fas fa-clock"></i> Slack: ${node.slack} hours</span>
+                
+                    </div>
+                    <div class="outlier-indicators">
+                        ${riskIcon}
+                        ${importanceIcon}
+                        ${pathIcon}
+                    </div>
+                </div>
+            `;
+
+                columns[column].push(cardHTML);
+            });
+
+
+
+            // Create columns
+            Object.keys(columns).forEach(key => {
+                const columnDiv = document.createElement('div');
+                columnDiv.className = 'kanban-column';
+                const columnTitle = {
+                    todo: 'To Do',
+                    inProgress: 'In Progress',
+                    done: 'Done'
+                };
+
+                columnDiv.innerHTML = `<h3 class="kanban-column-title">${columnTitle[key]}</h3>`;
+                columns[key].forEach(cardHTML => {
+                    columnDiv.insertAdjacentHTML('beforeend', cardHTML);
+                });
+
+                container.appendChild(columnDiv);
+            });
+
+            // Create date range picker input
+            const dateRangePicker = document.createElement('input');
+            dateRangePicker.id = 'dateRangePicker';
+            document.body.appendChild(dateRangePicker);
+
+            const dateRangeLabel = document.createElement('span');
+            dateRangeLabel.id = 'dateRangeLabel';
+            document.body.appendChild(dateRangeLabel);
+
+            const dateRangeSlider = document.createElement('input');
+            dateRangeSlider.id = 'dateRangeSlider';
+            dateRangeSlider.type = 'range';
+            dateRangeSlider.min = 0;
+            dateRangeSlider.max = 365; // Assuming a max project duration of one year
+            dateRangeSlider.step = 1;
+            dateRangeSlider.value = 365; // Default to one year
+            document.body.appendChild(dateRangeSlider);
+
+            // Initialize the date range picker
+            flatpickr("#dateRangePicker", {
+                mode: "range",
+                dateFormat: "Y-m-d",
+                onChange: function (selectedDates, dateStr, instance) {
+                    // When the date range changes, filter the Kanban cards
+                    if (selectedDates.length === 2) {
+                        const startDate = selectedDates[0];
+                        const endDate = selectedDates[1];
+                        filterKanbanCards(startDate, endDate);
+                    }
+                }
+            });
+
+            dateRangeSlider.addEventListener('input', function () {
+                const days = parseInt(this.value, 10);
+                const startDate = new Date();
+                const endDate = new Date(startDate);
+                endDate.setDate(startDate.getDate() + days);
+                updateDateRangeLabel([startDate, endDate]);
+                filterKanbanCards(startDate, endDate);
+            });
+
+            function updateDateRangeLabel(selectedDates) {
+                if (selectedDates && selectedDates.length === 2) {
+                    const diff = Math.abs(selectedDates[1] - selectedDates[0]);
+                    const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+                    if (days <= 30) {
+                        dateRangeLabel.textContent = `${days} days`;
+                    } else if (days <= 90) {
+                        dateRangeLabel.textContent = `${Math.ceil(days / 7)} weeks`;
+                    } else {
+                        dateRangeLabel.textContent = `${Math.ceil(days / 30)} months`;
+                    }
+                }
+            }
+
+            // Function to filter the Kanban cards by date range
+            function filterKanbanCards(startDate, endDate) {
+                // Get all of the Kanban cards
+                const cards = document.querySelectorAll('.kanban-card');
+
+                // Hide or show each card based on its start date and due date
+                cards.forEach(card => {
+                    const start = new Date(card.getAttribute('data-start-date'));
+                    const due = new Date(card.getAttribute('data-due-date'));
+                    if (start >= startDate && due <= endDate) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+
+                    // Calculate days to completion
+                    let daysToCompletion = 0;
+                    if (start > currentDate) {
+                        daysToCompletion = (start - currentDate) / (1000 * 60 * 60 * 24);
+                    } else if (due > currentDate) {
+                        daysToCompletion = (due - currentDate) / (1000 * 60 * 60 * 24);
+                    }
+
+                    if (daysToCompletion) {
+                        const daysInfo = document.createElement('p');
+                        daysInfo.innerText = `Days to completion: ${Math.ceil(daysToCompletion)}`;
+                        card.appendChild(daysInfo);
+                    }
+                });
+            }
+        }
+
+    </script>
+    <style>
         #sidebar {
             position: fixed;
             top: 15%;
@@ -5274,7 +5398,7 @@ div.vis-configuration.vis-config-label{
             }
         }
     </style>
-<style>
+    <style>
         /* Sidebar Styles */
         #sidebar {
             transition: width 0.5s; /* Smooth transition for width changes */
@@ -5320,7 +5444,7 @@ div.vis-configuration.vis-config-label{
             z-index: 9999; /* Ensuring the button stays above other elements but doesn't interfere */
         }
     </style>
-<style>
+    <style>
         /* New low-profile toggle button styles */
         #sidebarToggleBtn {
             background-color: #113464; /* Dark blue from the provided palette */
@@ -5356,7 +5480,7 @@ div.vis-configuration.vis-config-label{
             transition: transform 0.3s; /* Smooth transition for icon rotation */
         }
     </style>
-<style>
+    <style>
         /* Distinct sci-fi theme for the container */
         .dashboard-section.introduction-section {
             background: linear-gradient(135deg, #113464, #287dc8);
@@ -5424,9 +5548,9 @@ div.vis-configuration.vis-config-label{
                 transform: translateY(0);
             }
 
-            /* Icon for the custom file upload button */
-            /* .custom-file-upload:before {
-                content: '⬆'; 
+        /* Icon for the custom file upload button */
+        /* .custom-file-upload:before {
+                content: '⬆';
                 font-size: 20px;
                 position: absolute;
                 left: 15px;
@@ -5448,7 +5572,7 @@ div.vis-configuration.vis-config-label{
             font-style: italic;
         }
     </style>
-<style>
+    <style>
         /* General body styling */
         body {
             font-family: 'Arial', sans-serif; /* Modern font */
@@ -5506,7 +5630,7 @@ div.vis-configuration.vis-config-label{
             padding-bottom: 10px;
         }
     </style>
-<style>
+    <style>
         .dashboard-stat .zoom-in-icon,
         .dashboard-stat .zoom-out-icon,
         .dashboard-stat .reset-icon,
@@ -5514,7 +5638,7 @@ div.vis-configuration.vis-config-label{
             font-size: 24px !important; /* Increase font size specifically for these icons */
         }
     </style>
-<style>
+    <style>
         /* Ensuring the progress bar content is visible */
         .dashboard-stat .progress-bar {
             background-color: #5ac8fa; /* Using a color from the provided theme */
@@ -5527,7 +5651,7 @@ div.vis-configuration.vis-config-label{
             width: 150px !important; /* Assigning a fixed width to ensure full visibility */
         }
     </style>
-<style>
+    <style>
         /* Typography */
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&display=swap');
 
@@ -5586,7 +5710,7 @@ div.vis-configuration.vis-config-label{
         }
     </style>
 
-<style>
+    <style>
         .sci-fi-loading-bar-container {
             width: 100%;
             height: 30px;
@@ -5597,18 +5721,18 @@ div.vis-configuration.vis-config-label{
             background: #0d2137;
             overflow: hidden;
             width: 100%;
-    height: 30px;
-    border: 2px solid #5ac8fa;
-    border-radius: 15px;
-    margin-top: 10px;
-    background: #0d2137;
-    overflow: hidden;
-    display: inline-block;
-    box-shadow: 0 0 20px #5ac8fa;
-    position: relative;
-    margin-top: 10px;
-    background: rgba(40, 125, 200, 0.3);
-    border-radius: 8px;
+            height: 30px;
+            border: 2px solid #5ac8fa;
+            border-radius: 15px;
+            margin-top: 10px;
+            background: #0d2137;
+            overflow: hidden;
+            display: inline-block;
+            box-shadow: 0 0 20px #5ac8fa;
+            position: relative;
+            margin-top: 10px;
+            background: rgba(40, 125, 200, 0.3);
+            border-radius: 8px;
         }
 
         .sci-fi-loading-bar {
@@ -5704,21 +5828,20 @@ div.vis-configuration.vis-config-label{
                 background: linear-gradient(90deg, #287dc8, #5ac8fa);
             }
 
-    /* Additional styles for the new elements */
-    .uploading-text {
-        display: none;
-        font-size: 16px;
-        font-weight: bold;
-        color: darkred;
-        margin-left: 15px;
-    }
+        /* Additional styles for the new elements */
+        .uploading-text {
+            display: none;
+            font-size: 16px;
+            font-weight: bold;
+            color: darkred;
+            margin-left: 15px;
+        }
 
-    .sci-fi-loading-bar-container {
-        width: 70%; /* Adjusted to accommodate the "upload in progress" text */
-    }
-
+        .sci-fi-loading-bar-container {
+            width: 70%; /* Adjusted to accommodate the "upload in progress" text */
+        }
     </style>
-<style>
+    <style>
         #xmlFileInput {
             display: none;
         }
@@ -5756,7 +5879,7 @@ div.vis-configuration.vis-config-label{
                 content: "📤";
             }
     </style>
-<style>
+    <style>
         #xmlFileInput {
             display: none;
         }
@@ -5806,6 +5929,7 @@ div.vis-configuration.vis-config-label{
             left: 0;
             box-shadow: 0 0 10px #5ac8fa, 0 0 20px #5ac8fa, 0 0 30px #287dc8, 0 0 40px #5ac8fa;
         }
+
         .upload-container {
             display: flex;
             align-items: center;
@@ -5833,11 +5957,12 @@ div.vis-configuration.vis-config-label{
             cursor: pointer;
         }
 
-        .upload-label:hover {
-            transform: translateY(-3px);
-            background: linear-gradient(90deg, #5ac8fa, #287dc8);
-        }
-        .upload-label::before {
+            .upload-label:hover {
+                transform: translateY(-3px);
+                background: linear-gradient(90deg, #5ac8fa, #287dc8);
+            }
+
+            .upload-label::before {
                 animation: iconBounce 1s infinite alternate;
             }
 
@@ -5922,6 +6047,7 @@ div.vis-configuration.vis-config-label{
             transform: translate(-50%, -50%);
             z-index: 5;
         }
+
         .futuristic-modal {
             display: none;
             position: fixed;
@@ -5946,7 +6072,7 @@ div.vis-configuration.vis-config-label{
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4), 0 0 20px #5ac8fa; /* Glowing border effect */
             border: 1px solid #5ac8fa;
             border-radius: 10px;
-            position: relative; 
+            position: relative;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Sleek font */
         }
 
@@ -5977,25 +6103,25 @@ div.vis-configuration.vis-config-label{
             padding-left: 0;
         }
 
-        .futuristic-list li {
-            position: relative;
-            margin-bottom: 10px;
-            padding-left: 20px;
-        }
+            .futuristic-list li {
+                position: relative;
+                margin-bottom: 10px;
+                padding-left: 20px;
+            }
 
-        .futuristic-list li:before {
-            content: '•';
-            position: absolute;
-            left: 0;
-            top: 0;
-            color: #5ac8fa; /* Glowing bullet points */
-            text-shadow: 0 0 5px #5ac8fa;
-        }
+                .futuristic-list li:before {
+                    content: '•';
+                    position: absolute;
+                    left: 0;
+                    top: 0;
+                    color: #5ac8fa; /* Glowing bullet points */
+                    text-shadow: 0 0 5px #5ac8fa;
+                }
 
-        .futuristic-list li:hover {
-            color: #5ac8fa; /* Hover effect */
-            text-shadow: 0 0 5px #5ac8fa;
-        }
+                .futuristic-list li:hover {
+                    color: #5ac8fa; /* Hover effect */
+                    text-shadow: 0 0 5px #5ac8fa;
+                }
 
         .close-btn {
             color: white;
@@ -6006,14 +6132,16 @@ div.vis-configuration.vis-config-label{
             transition: color 0.3s, text-shadow 0.3s;
         }
 
-        .close-btn:hover {
-            color: red;
-            text-shadow: 0 0 5px #5ac8fa; /* Glowing effect on hover */
-        }
+            .close-btn:hover {
+                color: red;
+                text-shadow: 0 0 5px #5ac8fa; /* Glowing effect on hover */
+            }
+
         .hs-form-9535e8fc-88e8-43f6-b6e9-c06e15d584a2_4dcb79cf-c5fb-40ef-a3b4-02eb8c1f695d .hs-form-field label:not(.hs-error-msg) {
-    color: #e0e0e0;
-}
-.cybereum-logo {
+            color: #e0e0e0;
+        }
+
+        .cybereum-logo {
             position: absolute;
             top: 50%;
             left: 50%;
@@ -6022,11 +6150,10 @@ div.vis-configuration.vis-config-label{
             transform: translate(-50%, -50%);
             z-index: 5;
         }
-
-
     </style>
 
-></head></html>
+    >
+</head></html>
 
 <body>
     <script charset="utf-8" src="//js.hsforms.net/forms/embed/v2.js" type="text/javascript"></script>
@@ -6357,7 +6484,7 @@ div.vis-configuration.vis-config-label{
             </div>
         </div>
         <label class="custom-file-upload">
-          
+
 
             <label class="upload-label" for="xmlFileInput" style="font-weight: bold; font-size: 16px; padding: 12px 25px; box-shadow: inset 0 0 15px rgba(42, 125, 200, 0.6);">
                 Upload File
@@ -6389,6 +6516,7 @@ div.vis-configuration.vis-config-label{
         #graph-container,
         #dash4,
         #RadialRisk,
+        #Kanban,
         #reducedGraph {
             display: none; /* Initially hide the sections */
         }
@@ -6480,7 +6608,7 @@ div.vis-configuration.vis-config-label{
         <div class="control-panel">
             <!-- Search and Highlight Controls -->
             <div class="controls search-controls" style="width: 500px;">
-                <input id="searchInput" placeholder="Search by name or ID" type="text" / >
+                <input id="searchInput" placeholder="Search by name or ID" type="text" />
             </div>
             <div class="highlight-controls">
                 <label><input id="highlightAllConnected" type="checkbox" /> Highlight All Connected Nodes</label>
@@ -6512,7 +6640,7 @@ div.vis-configuration.vis-config-label{
             <g class="container"></g>
         </svg>
     </div>
-   
+
     <div id="sidebar" style="z-index: 1000;">
         <button id="sidebarToggleBtn" onclick="toggleSidebar(event)">
             <svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -6530,6 +6658,7 @@ div.vis-configuration.vis-config-label{
             <li><a href="#pieChart">Pie Chart</a></li>
             <li><a href="#pathsDistributionCurve">Paths Distribution Curve</a></li>
             <li><a href="#radialChart">Radial Chart</a></li>
+            <li><a href="#Kanban">Kanban Project Flow</a></li>
             <li><a href="#reducedGraph">Reduced Graph</a></li>
         </ul>
     </div>
@@ -6574,21 +6703,21 @@ div.vis-configuration.vis-config-label{
                     <div class="charts-row">
                         <div class="dashboard-card2" id="chart-container">
                             <h2>Risk Matrix</h2>
-                            
+
                             <div class="legend">
                                 <h4>Risk Importance Scale:</h4>
                                 <div class="scale low">Low</div>
                                 <div class="scale medium">Medium</div>
                                 <div class="scale high">High</div>
                             </div>
-                                <canvas height="280" id="riskMatrix" width="300"></canvas>
-                        </br>
+                            <canvas height="280" id="riskMatrix" width="300"></canvas>
+                            </br>
                             <button class="learn-more-btn" onclick="openModal('riskMatrixModal')">Learn More</button>
                         </div>
                         <div class="dashboard-card2" id="RadialRisk">
                             <h2>Radial Risk Chart</h2>
                             <canvas height="280" id="radialChart" width="300"></canvas>
-                        </br>
+                            </br>
                             <button class="learn-more-btn" onclick="openModal('radialChartModal')">Learn More</button>
                         </div>
                     </div>
@@ -6612,6 +6741,7 @@ div.vis-configuration.vis-config-label{
                             </thead>
                             <tbody id="riskTableBody"></tbody>
                         </table>
+
                         <!-- Reference Table for Critical & Outlier Paths -->
                         <div class="table-container" id="referenceTable">
                             <h2>Critical & Outlier Paths</h2>
@@ -6631,7 +6761,7 @@ div.vis-configuration.vis-config-label{
                         <div class="dashboard-card2" id="pathsDistributionCurve">
                             <h2>Paths Distribution Curve</h2>
                             <div id="path_distribution_chart" style="width: 300px; height: 280px;"></div>
-                        </br>
+                            </br>
                             <button class="learn-more-btn" onclick="openModal('pathsDistributionCurveModal')">Learn More</button>
                         </div>
                         <div class="dashboard-card2" id="pathDistributionCard">
@@ -6641,63 +6771,96 @@ div.vis-configuration.vis-config-label{
                             <button class="learn-more-btn" onclick="openModal('pathDistributionModal')">Learn More</button>
                         </div>
                     </div>
-                        <!-- Paths Distribution Table -->
-                        <div class="table-container" id="pathsDistributionTableContainer">
-                            <h2>Paths Distribution</h2>
-                            <table class="sortable" id="pathsDistributionTable">
-                                <thead>
-                                    <tr>
-
-                                    </tr>
-                                </thead>
-                                <tbody id="pathsDistributionTableBody"></tbody>
-                            </table>
-                        </div>
+                    <div class="dashboard-card2" id="pathDistributionCard">
+                        <h2>Expected Completion</h2>
+                        <div id="progressBars"></div>
+                    </div>
+                    <!-- Paths Distribution Table -->
+                    <div class="table-container" id="pathsDistributionTableContainer">
+                        <h2>Paths Distribution</h2>
+                        <table class="sortable" id="pathsDistributionTable">
+                            <thead>
+                                <tr>
+                                </tr>
+                            </thead>
+                            <tbody id="pathsDistributionTableBody"></tbody>
+                        </table>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="charts-row">
-            <div class="dashboard-card2" id="SCurve">
-                <h2>S-Curve (Cumulative Distribution Chart)</h2>
-                
-                <div id="scurve_chart" style="width: 300px; height: 280px;"></div>
-            </br>
-                <button class="learn-more-btn" onclick="openModal('SCurveModal')">Learn More</button>
-            </div>
-            <div class="dashboard-card2" id="histogram">
-                <h2>Task Duration Histogram</h2>
-                <canvas height="280" id="histogramChart" width="300"></canvas>
-            </br>
-                <button class="learn-more-btn" onclick="openModal('histogramModal')">Learn More</button>
-            </div>
-            <div class="dashboard-card2" id="pieChart">
-                <h2>Distribution of Task Types (Pie Chart)</h2>
-                <div id="pie_chart" style="width: 300px; height: 280px;"></div>
-            </br>
-                <button class="learn-more-btn" onclick="openModal('pieChartModal')">Learn More</button>
+    </div>
+    <div class="charts-row">
+        <div class="dashboard-card2" id="SCurve">
+            <h2>S-Curve (Cumulative Distribution Chart)</h2>
 
-            </div>
-            <div class="dashboard-card2" id="pathsDistributionCurve">
-                <h2>Paths Distribution Curve</h2>
-                <div id="path_distribution_chart" style="width: 300px; height: 280px;"></div>
+            <div id="scurve_chart" style="width: 300px; height: 280px;"></div>
             </br>
-                <button class="learn-more-btn" onclick="openModal('pathsDistributionCurveModal')">Learn More</button>
-            </div>
-            <div class="dashboard-card2" id="RadialRisk">
-                <h2>Radial Risk Chart</h2>
-                <canvas height="280" id="radialChart" width="300"></canvas>
+            <button class="learn-more-btn" onclick="openModal('SCurveModal')">Learn More</button>
+        </div>
+        <div class="dashboard-card2" id="histogram">
+            <h2>Task Duration Histogram</h2>
+            <canvas height="280" id="histogramChart" width="300"></canvas>
             </br>
-                <button class="learn-more-btn" onclick="openModal('radialChartModal')">Learn More</button>
-            </div>
+            <button class="learn-more-btn" onclick="openModal('histogramModal')">Learn More</button>
+        </div>
+        <div class="dashboard-card2" id="pieChart">
+            <h2>Distribution of Task Types (Pie Chart)</h2>
+            <div id="pie_chart" style="width: 300px; height: 280px;"></div>
+            </br>
+            <button class="learn-more-btn" onclick="openModal('pieChartModal')">Learn More</button>
+
+        </div>
+        <div class="dashboard-card2" id="pathsDistributionCurve">
+            <h2>Paths Distribution Curve</h2>
+            <div id="path_distribution_chart" style="width: 300px; height: 280px;"></div>
+            </br>
+            <button class="learn-more-btn" onclick="openModal('pathsDistributionCurveModal')">Learn More</button>
+        </div>
+        <div class="dashboard-card2" id="RadialRisk">
+            <h2>Radial Risk Chart</h2>
+            <canvas height="280" id="radialChart" width="300"></canvas>
+            </br>
+            <button class="learn-more-btn" onclick="openModal('radialChartModal')">Learn More</button>
         </div>
     </div>
+    </div>
+
+    <section id="Kanban">
+        <!-- Date Range Slider -->
+        <div class="date-slider-container">
+            <input type="text" id="dateRangePicker" placeholder="Select Date Range...">
+        </div>
+
+        <div class="kanban-columns">
+
+            <!-- Column 1: Planned -->
+            <div class="kanban-column" id="plannedColumn">
+                <h3 class="kanban-column-title">Planned</h3>
+                <!-- Cards will be dynamically added here -->
+            </div>
+
+            <!-- Column 2: In Progress -->
+            <div class="kanban-column" id="inProgressColumn">
+                <h3 class="kanban-column-title">In Progress</h3>
+                <!-- Cards will be dynamically added here -->
+            </div>
+
+            <!-- Column 3: Completed -->
+            <div class="kanban-column" id="completedColumn">
+                <h3 class="kanban-column-title">Completed</h3>
+                <!-- Cards will be dynamically added here -->
+            </div>
+
+        </div>
+    </section>
+
     <div class="dashboard-section" id="chart_div_wrapper">
         <h2>GANTT Chart</h2>
         <div id="chart_div"></div>
     </div>
     <div id="error_div"></div>
-    
+
     <div class="dashboard-section" id="reducedGraph">
         <h1>Reduced Graph</h1>
         <!--
@@ -6707,7 +6870,9 @@ div.vis-configuration.vis-config-label{
         <div id="graph-container">
             <div id="tooltip" style="position: absolute; visibility: hidden; background: #8ce6ff; padding: 8px; border: 2px solid #3292cd; border-radius: 3px; "></div>
             <div id="path-list" style="position: absolute; top: 0; left: 0; max-height: 600px; overflow-y: auto;"></div>
-            <div id="dependency_chart" style="width: 90%; height: 600px; margin-left: 10%;"></div>
+            
+            <div id="dependency_chart" style="width: 90%; height: 600px; margin-left: 10%;">Graph will be rendered here.</div>
+
         </div>
         <div id="configuration-container"></div>
     </div>
@@ -6766,6 +6931,7 @@ div.vis-configuration.vis-config-label{
                 document.getElementById('SCurve').style.display = 'block';
                 document.getElementById('graph-container').style.display = 'block';
                 document.getElementById('dash4').style.display = 'block';
+                document.getElementById('Kanban').style.display = 'block';
                 document.getElementById('RadialRisk').style.display = 'block';
             }
             //document.querySelector(".sci-fi-loading-text").innerText = "Loading...";
@@ -6784,31 +6950,13 @@ div.vis-configuration.vis-config-label{
             }, 500);
         });
     </script>
-        <div id="modal0" class="futuristic-modal">
-            <div class="futuristic-modal-content">
-                <span class="close-btn" onclick="closeModal('modal0')">&times;</span>
-                <h2 class="modal-header">Introduction:</h2>
-                <div class="modal-body">
-                    <b>Features & Navigation:</b>
-                    <ul class="futuristic-list">
-                        <li><b>Zoom & Pan:</b> Navigate across the expansive network with ease. Use the mouse wheel to zoom in or out and click-drag to pan.</li>
-                        <li><b>Node Details:</b> Hover over nodes to see detailed insights. Click on them for a deeper dive.</li>
-                        <li><b>Color-coded Paths:</b> Different paths, like 'Critical' or 'Outlier', are represented with distinct colors for better clarity.</li>
-                        <li><b>Interactive Links:</b> The connections between nodes are as informative as the nodes themselves. Hover or click for more details.</li>
-                        <li><b>Dynamic Layout:</b> Add, remove, or modify nodes and watch the network adjust in real-time.</li>
-                    </ul>
-                </div>
-            </div>
-        </div>        
-        
-        <div id="networkVisualizationModal" class="futuristic-modal">
-            <div class="futuristic-modal-content">
-                <span class="close-btn" onclick="closeModal('networkVisualizationModal')">&times;</span>
-                <h2>Introduction:</h2>
-                Dive deep into the interconnections of your project with Cybereum's Network Visualization. This interactive tool offers a graphical representation of nodes and their relationships, making complex data structures understandable at a glance.
-                <br><br>
+    <div id="modal0" class="futuristic-modal">
+        <div class="futuristic-modal-content">
+            <span class="close-btn" onclick="closeModal('modal0')">&times;</span>
+            <h2 class="modal-header">Introduction:</h2>
+            <div class="modal-body">
                 <b>Features & Navigation:</b>
-                <ul>
+                <ul class="futuristic-list">
                     <li><b>Zoom & Pan:</b> Navigate across the expansive network with ease. Use the mouse wheel to zoom in or out and click-drag to pan.</li>
                     <li><b>Node Details:</b> Hover over nodes to see detailed insights. Click on them for a deeper dive.</li>
                     <li><b>Color-coded Paths:</b> Different paths, like 'Critical' or 'Outlier', are represented with distinct colors for better clarity.</li>
@@ -6817,171 +6965,189 @@ div.vis-configuration.vis-config-label{
                 </ul>
             </div>
         </div>
-        
-        <div id="ganttChartModal" class="futuristic-modal">
-            <div class="futuristic-modal-content">
-                <span class="close-btn" onclick="closeModal('ganttChartModal')">&times;</span>
-                <h2>GANTT Chart: A Timeline of Progress</h2>
-                Track project milestones and task progress with the GANTT Chart. This horizontal bar chart gives you a visual timeline of when each task starts, its duration, and when it concludes.
-                <br><br>
-                <b>Features & Navigation:</b>
-                <ul>
-                    <li><b>Resizable Bars:</b> Adjust task durations by dragging the edges of the bars.</li>
-                    <li><b>Dependencies:</b> See how tasks are interlinked with arrows. A delay in one task impacts dependent tasks.</li>
-                    <li><b>Hover Insights:</b> For a quick summary of task details, just hover over its bar.</li>
-                    <li><b>Color-coded Status:</b> Tasks are color-coded based on their progress or status, making it easy to identify pending, ongoing, or completed tasks.</li>
-                </ul>
-            </div>
-        </div>
-        
-        <div id="riskMatrixModal" class="futuristic-modal">
-            <div class="futuristic-modal-content">
-                <span class="close-btn" onclick="closeModal('riskMatrixModal')">&times;</span>
-                <h2>Risk Matrix: Evaluating Potential Pitfalls</h2>
-                The Risk Matrix helps assess and prioritize risks based on their potential impact and likelihood. Understand which risks require immediate attention and which can be monitored over time.
-                <br><br>
-                <b>Features & Navigation:</b>
-                <ul>
-                    <li><b>Quadrant View:</b> Risks are plotted on a 2D matrix, categorizing them into four quadrants based on severity and occurrence probability.</li>
-                    <li><b>Interactive Points:</b> Hover over points to see detailed risk descriptions.</li>
-                    <li><b>Color Indicators:</b> High-priority risks are marked distinctly for quick identification.</li>
-                    <li><b>Adjustable Axes:</b> Customize the matrix's axes to suit your risk evaluation criteria.</li>
-                </ul>
-            </div>
-        </div>
+    </div>
 
-        <div id="histogramModal" class="futuristic-modal">
-            <div class="futuristic-modal-content">
-                <span class="close-btn" onclick="closeModal('histogramModal')">&times;</span>
-                <h2>Histogram: Data Distribution Insights</h2>
-                The Histogram offers a visual representation of the frequency distribution of your data. It helps you understand where most of your data points lie and identify any outliers.
-                <br><br>
-                <b>Features & Navigation:</b>
-                <ul>
-                    <li><b>Bins:</b> The x-axis represents data ranges, while the y-axis shows the frequency of data points within those ranges.</li>
-                    <li><b>Interactive Bars:</b> Hover over bars for exact counts.</li>
-                    <li><b>Customizable Ranges:</b> Adjust the bin width to analyze data distribution at varying levels of granularity.</li>
-                </ul>
-            </div>
+    <div id="networkVisualizationModal" class="futuristic-modal">
+        <div class="futuristic-modal-content">
+            <span class="close-btn" onclick="closeModal('networkVisualizationModal')">&times;</span>
+            <h2>Introduction:</h2>
+            Dive deep into the interconnections of your project with Cybereum's Network Visualization. This interactive tool offers a graphical representation of nodes and their relationships, making complex data structures understandable at a glance.
+            <br><br>
+            <b>Features & Navigation:</b>
+            <ul>
+                <li><b>Zoom & Pan:</b> Navigate across the expansive network with ease. Use the mouse wheel to zoom in or out and click-drag to pan.</li>
+                <li><b>Node Details:</b> Hover over nodes to see detailed insights. Click on them for a deeper dive.</li>
+                <li><b>Color-coded Paths:</b> Different paths, like 'Critical' or 'Outlier', are represented with distinct colors for better clarity.</li>
+                <li><b>Interactive Links:</b> The connections between nodes are as informative as the nodes themselves. Hover or click for more details.</li>
+                <li><b>Dynamic Layout:</b> Add, remove, or modify nodes and watch the network adjust in real-time.</li>
+            </ul>
         </div>
-        
-        <div id="pieChartModal" class="futuristic-modal">
-            <div class="futuristic-modal-content">
-                <span class="close-btn" onclick="closeModal('pieChartModal')">&times;</span>
-                <h2>Pie Chart: A Slice of Your Data</h2>
-                The Pie Chart provides a circular statistical graphic divided into slices to illustrate numerical proportions. It's a visual treat that also offers deep data insights.
-                <br><br>
-                <b>Features & Navigation:</b>
-                <ul>
-                    <li><b>Segmented View:</b> Each segment represents a category, and its size is proportional to its value.</li>
-                    <li><b>Hover Insights:</b> For detailed percentages and values, hover over slices.</li>
-                    <li><b>Color-coded Categories:</b> Each category gets a unique color for easy differentiation.</li>
-                </ul>
-            </div>
-        </div>
-        
-        <div id="pathsDistributionCurveModal" class="futuristic-modal">
-            <div class="futuristic-modal-content">
-                <span class="close-btn" onclick="closeModal('pathsDistributionCurveModal')">&times;</span>
-                <h2>Paths Distribution Curve: Understanding Path Frequencies</h2>
-                The Paths Distribution Curve visualizes how often different paths are taken within your project. It aids in identifying common routes and anomalies.
-                <br><br>
-                <b>Features & Navigation:</b>
-                <ul>
-                    <li><b>Area Under Curve:</b> The shaded region helps understand path frequencies at a glance.</li>
-                    <li><b>Interactive Points:</b> Hover over specific points on the curve for detailed insights.</li>
-                    <li><b>Customizable Axes:</b> Adjust axis scales to focus on specific sections of the distribution.</li>
-                </ul>
-            </div>
-        </div>
+    </div>
 
-        <div id="radialChartModal" class="futuristic-modal">
-            <div class="futuristic-modal-content">
-                <span class="close-btn" onclick="closeModal('radialChartModal')">&times;</span>
-                <h2>Radial Chart: A 360° View of Your Data</h2>
-                The Radial Chart, or Circular Bar Chart, offers a unique twist to traditional bar charts. Data categories are represented in a circular fashion, providing a comprehensive view of your metrics.
-                <br><br>
-                <b>Features & Navigation:</b>
-                <ul>
-                    <li><b>Circular Bars:</b> Each bar's length is proportional to its value.</li>
-                    <li><b>Hover Details:</b> Hover over bars for specific data insights.</li>
-                    <li><b>Segmented Categories:</b> Each category is distinctly color-coded.</li>
-                </ul>
-            </div>
+    <div id="ganttChartModal" class="futuristic-modal">
+        <div class="futuristic-modal-content">
+            <span class="close-btn" onclick="closeModal('ganttChartModal')">&times;</span>
+            <h2>GANTT Chart: A Timeline of Progress</h2>
+            Track project milestones and task progress with the GANTT Chart. This horizontal bar chart gives you a visual timeline of when each task starts, its duration, and when it concludes.
+            <br><br>
+            <b>Features & Navigation:</b>
+            <ul>
+                <li><b>Resizable Bars:</b> Adjust task durations by dragging the edges of the bars.</li>
+                <li><b>Dependencies:</b> See how tasks are interlinked with arrows. A delay in one task impacts dependent tasks.</li>
+                <li><b>Hover Insights:</b> For a quick summary of task details, just hover over its bar.</li>
+                <li><b>Color-coded Status:</b> Tasks are color-coded based on their progress or status, making it easy to identify pending, ongoing, or completed tasks.</li>
+            </ul>
         </div>
-        
-        <div id="reducedGraphModal" class="futuristic-modal">
-            <div class="futuristic-modal-content">
-                <span class="close-btn" onclick="closeModal('reducedGraphModal')">&times;</span>
-                <h2>Reduced Graph: A Simplified Network View</h2>
-                When networks become overwhelmingly complex, the Reduced Graph comes into play. It offers a simplified view, focusing on key nodes and connections.
-                <br><br>
-                <b>Features & Navigation:</b>
-                <ul>
-                    <li><b>Key Nodes:</b> Only the most significant nodes are displayed.</li>
-                    <li><b>Simplified Connections:</b> Redundant or non-critical links are omitted for clarity.</li>
-                    <li><b>Interactive Elements:</b> As with the full Network Visualization, you can zoom, pan, and click for detailed insights.</li>
-                </ul>
-            </div>
-        </div>
-        
+    </div>
 
-        <div id="SCurveModal" class="futuristic-modal">
-            <div class="futuristic-modal-content">
-                <span class="close-btn" onclick="closeModal('SCurveModal')">&times;</span>
-                <h2>S Curve: Cumulative Distribution</h2>
-                When networks become overwhelmingly complex, the Reduced Graph comes into play. It offers a simplified view, focusing on key nodes and connections.
-                <br><br>
-                <b>Features & Navigation:</b>
-                <ul>
-                    <li><b>Key Nodes:</b> Only the most significant nodes are displayed.</li>
-                    <li><b>Simplified Connections:</b> Redundant or non-critical links are omitted for clarity.</li>
-                    <li><b>Interactive Elements:</b> As with the full Network Visualization, you can zoom, pan, and click for detailed insights.</li>
-                </ul>
-            </div>
+    <div id="riskMatrixModal" class="futuristic-modal">
+        <div class="futuristic-modal-content">
+            <span class="close-btn" onclick="closeModal('riskMatrixModal')">&times;</span>
+            <h2>Risk Matrix: Evaluating Potential Pitfalls</h2>
+            The Risk Matrix helps assess and prioritize risks based on their potential impact and likelihood. Understand which risks require immediate attention and which can be monitored over time.
+            <br><br>
+            <b>Features & Navigation:</b>
+            <ul>
+                <li><b>Quadrant View:</b> Risks are plotted on a 2D matrix, categorizing them into four quadrants based on severity and occurrence probability.</li>
+                <li><b>Interactive Points:</b> Hover over points to see detailed risk descriptions.</li>
+                <li><b>Color Indicators:</b> High-priority risks are marked distinctly for quick identification.</li>
+                <li><b>Adjustable Axes:</b> Customize the matrix's axes to suit your risk evaluation criteria.</li>
+            </ul>
         </div>
+    </div>
 
-        <div id="pathDistributionModal" class="futuristic-modal">
-            <div class="futuristic-modal-content">
-                <span class="close-btn" onclick="closeModal('pathDistributionModal')">&times;</span>
-                <h2>Path Distribution Bar Chart: Visualizing Path Durations</h2>
-                The Path Distribution Bar Chart showcases the number of paths based on their durations. It aids in understanding the most frequent path durations and their respective counts within the network.
-                <br><br>
-                <b>Features & Navigation:</b>
-                <ul>
-                    <li><b>Duration Bins:</b> The x-axis showcases various path durations, while the y-axis displays the count of paths for each duration.</li>
-                    <li><b>Interactive Bars:</b> Hover over bars to get the exact count of paths for specific durations.</li>
-                    <li><b>Cumulative Line Overlay:</b> A line overlaying the bars shows the cumulative count of paths, aiding in understanding the growth in path counts as duration increases.</li>
-                </ul>
-            </div>
+    <div id="histogramModal" class="futuristic-modal">
+        <div class="futuristic-modal-content">
+            <span class="close-btn" onclick="closeModal('histogramModal')">&times;</span>
+            <h2>Histogram: Data Distribution Insights</h2>
+            The Histogram offers a visual representation of the frequency distribution of your data. It helps you understand where most of your data points lie and identify any outliers.
+            <br><br>
+            <b>Features & Navigation:</b>
+            <ul>
+                <li><b>Bins:</b> The x-axis represents data ranges, while the y-axis shows the frequency of data points within those ranges.</li>
+                <li><b>Interactive Bars:</b> Hover over bars for exact counts.</li>
+                <li><b>Customizable Ranges:</b> Adjust the bin width to analyze data distribution at varying levels of granularity.</li>
+            </ul>
         </div>
+    </div>
 
-        <div id="riskMatrixModal" class="futuristic-modal">
-            <div class="futuristic-modal-content">
-                <span class="close-btn" onclick="closeModal('riskMatrixModal')">&times;</span>
-                <h2>Risk Matrix: Evaluating Risk Impact vs. Likelihood</h2>
-                The Risk Matrix is a critical tool for risk assessment. By plotting risks based on their impact and likelihood, it helps in prioritizing and strategizing risk management efforts.
-                <br><br>
-                <b>Features & Navigation:</b>
-                <ul>
-                    <li><b>Risk Importance Scale:</b> Risks are color-coded based on their importance. Shades of red, yellow, and green signify high, medium, and low risks respectively.</li>
-                    <li><b>Interactive Cells:</b> Hover over specific cells in the matrix to get detailed insights on the number of risks and their descriptions.</li>
-                    <li><b>Grid Layout:</b> The matrix is divided into a grid where the x-axis represents risk likelihood and the y-axis showcases risk impact.</li>
-                </ul>
-            </div>
+    <div id="pieChartModal" class="futuristic-modal">
+        <div class="futuristic-modal-content">
+            <span class="close-btn" onclick="closeModal('pieChartModal')">&times;</span>
+            <h2>Pie Chart: A Slice of Your Data</h2>
+            The Pie Chart provides a circular statistical graphic divided into slices to illustrate numerical proportions. It's a visual treat that also offers deep data insights.
+            <br><br>
+            <b>Features & Navigation:</b>
+            <ul>
+                <li><b>Segmented View:</b> Each segment represents a category, and its size is proportional to its value.</li>
+                <li><b>Hover Insights:</b> For detailed percentages and values, hover over slices.</li>
+                <li><b>Color-coded Categories:</b> Each category gets a unique color for easy differentiation.</li>
+            </ul>
         </div>
+    </div>
+
+    <div id="pathsDistributionCurveModal" class="futuristic-modal">
+        <div class="futuristic-modal-content">
+            <span class="close-btn" onclick="closeModal('pathsDistributionCurveModal')">&times;</span>
+            <h2>Paths Distribution Curve: Understanding Path Frequencies</h2>
+            The Paths Distribution Curve visualizes how often different paths are taken within your project. It aids in identifying common routes and anomalies.
+            <br><br>
+            <b>Features & Navigation:</b>
+            <ul>
+                <li><b>Area Under Curve:</b> The shaded region helps understand path frequencies at a glance.</li>
+                <li><b>Interactive Points:</b> Hover over specific points on the curve for detailed insights.</li>
+                <li><b>Customizable Axes:</b> Adjust axis scales to focus on specific sections of the distribution.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="radialChartModal" class="futuristic-modal">
+        <div class="futuristic-modal-content">
+            <span class="close-btn" onclick="closeModal('radialChartModal')">&times;</span>
+            <h2>Radial Chart: A 360° View of Your Data</h2>
+            The Radial Chart, or Circular Bar Chart, offers a unique twist to traditional bar charts. Data categories are represented in a circular fashion, providing a comprehensive view of your metrics.
+            <br><br>
+            <b>Features & Navigation:</b>
+            <ul>
+                <li><b>Circular Bars:</b> Each bar's length is proportional to its value.</li>
+                <li><b>Hover Details:</b> Hover over bars for specific data insights.</li>
+                <li><b>Segmented Categories:</b> Each category is distinctly color-coded.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="reducedGraphModal" class="futuristic-modal">
+        <div class="futuristic-modal-content">
+            <span class="close-btn" onclick="closeModal('reducedGraphModal')">&times;</span>
+            <h2>Reduced Graph: A Simplified Network View</h2>
+            When networks become overwhelmingly complex, the Reduced Graph comes into play. It offers a simplified view, focusing on key nodes and connections.
+            <br><br>
+            <b>Features & Navigation:</b>
+            <ul>
+                <li><b>Key Nodes:</b> Only the most significant nodes are displayed.</li>
+                <li><b>Simplified Connections:</b> Redundant or non-critical links are omitted for clarity.</li>
+                <li><b>Interactive Elements:</b> As with the full Network Visualization, you can zoom, pan, and click for detailed insights.</li>
+            </ul>
+        </div>
+    </div>
+
+
+    <div id="SCurveModal" class="futuristic-modal">
+        <div class="futuristic-modal-content">
+            <span class="close-btn" onclick="closeModal('SCurveModal')">&times;</span>
+            <h2>S Curve: Cumulative Distribution</h2>
+            When networks become overwhelmingly complex, the Reduced Graph comes into play. It offers a simplified view, focusing on key nodes and connections.
+            <br><br>
+            <b>Features & Navigation:</b>
+            <ul>
+                <li><b>Key Nodes:</b> Only the most significant nodes are displayed.</li>
+                <li><b>Simplified Connections:</b> Redundant or non-critical links are omitted for clarity.</li>
+                <li><b>Interactive Elements:</b> As with the full Network Visualization, you can zoom, pan, and click for detailed insights.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="pathDistributionModal" class="futuristic-modal">
+        <div class="futuristic-modal-content">
+            <span class="close-btn" onclick="closeModal('pathDistributionModal')">&times;</span>
+            <h2>Path Distribution Bar Chart: Visualizing Path Durations</h2>
+            The Path Distribution Bar Chart showcases the number of paths based on their durations. It aids in understanding the most frequent path durations and their respective counts within the network.
+            <br><br>
+            <b>Features & Navigation:</b>
+            <ul>
+                <li><b>Duration Bins:</b> The x-axis showcases various path durations, while the y-axis displays the count of paths for each duration.</li>
+                <li><b>Interactive Bars:</b> Hover over bars to get the exact count of paths for specific durations.</li>
+                <li><b>Cumulative Line Overlay:</b> A line overlaying the bars shows the cumulative count of paths, aiding in understanding the growth in path counts as duration increases.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="riskMatrixModal" class="futuristic-modal">
+        <div class="futuristic-modal-content">
+            <span class="close-btn" onclick="closeModal('riskMatrixModal')">&times;</span>
+            <h2>Risk Matrix: Evaluating Risk Impact vs. Likelihood</h2>
+            The Risk Matrix is a critical tool for risk assessment. By plotting risks based on their impact and likelihood, it helps in prioritizing and strategizing risk management efforts.
+            <br><br>
+            <b>Features & Navigation:</b>
+            <ul>
+                <li><b>Risk Importance Scale:</b> Risks are color-coded based on their importance. Shades of red, yellow, and green signify high, medium, and low risks respectively.</li>
+                <li><b>Interactive Cells:</b> Hover over specific cells in the matrix to get detailed insights on the number of risks and their descriptions.</li>
+                <li><b>Grid Layout:</b> The matrix is divided into a grid where the x-axis represents risk likelihood and the y-axis showcases risk impact.</li>
+            </ul>
+        </div>
+    </div>
 
     <script>
         // Function to open a modal
         function openModal(modalId) {
             document.getElementById(modalId).style.display = "block";
         }
-    
+
         // Function to close a modal
         function closeModal(modalId) {
             document.getElementById(modalId).style.display = "none";
         }
-    
+
         // Closing modal if clicked outside the modal content
         window.onclick = function(event) {
             if (event.target.classList.contains('futuristic-modal')) {
