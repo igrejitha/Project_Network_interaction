@@ -2126,11 +2126,9 @@
                 var inDegreeThreshold = parseInt(document.getElementById("filterSlider").value);
                 var outDegreeThreshold = parseInt(document.getElementById("outDegreeFilterSlider").value);
                 var degreeThreshold = parseInt(document.getElementById("degreeFilterSlider").value);
-                var riskThreshold = parseFloat(document.getElementById("riskFilterSlider").value);
-                var importanceThreshold = parseFloat(document.getElementById("importanceFilterSlider").value);
 
                 node.style("visibility", function (d) {
-                    return (d.inDegree >= inDegreeThreshold && d.outDegree >= outDegreeThreshold && d.degree >= degreeThreshold && d.riskScore >= riskThreshold && d.importanceScore >= importanceThreshold) ? "visible" : "hidden";
+                    return (d.inDegree >= inDegreeThreshold && d.outDegree >= outDegreeThreshold && d.degree >= degreeThreshold) ? "visible" : "hidden";
                 });
             }
 
@@ -2162,23 +2160,6 @@
                 updateNodeVisibility(); // And here
             });
 
-            var riskFilterSlider = document.getElementById("riskFilterSlider");
-            var riskFilterValue = document.getElementById("riskFilterValue");
-
-            riskFilterSlider.addEventListener("input", function () {
-                var threshold = parseFloat(this.value);
-                riskFilterValue.innerHTML = "> " + threshold.toFixed(1);
-                updateNodeVisibility();
-            });
-
-            var importanceFilterSlider = document.getElementById("importanceFilterSlider");
-            var importanceFilterValue = document.getElementById("importanceFilterValue");
-
-            importanceFilterSlider.addEventListener("input", function () {
-                var threshold = parseFloat(this.value);
-                importanceFilterValue.innerHTML = "> " + threshold.toFixed(1);
-                updateNodeVisibility();
-            });
 
             // Search Functionality
             document.getElementById("searchInput").addEventListener("input", function () {
@@ -2249,22 +2230,13 @@
                                 metricValue = d.inDegree;
                         }
                         console.log("Colors", "Metric Value: ", metricValue)
-                        if (selectedMetric === "risk") {
+                        if (selectedMetric === "risk" || selectedMetric === "importance") {
                             console.log("Colors", "Color: risk importance");
                             switch (true) {
-                                case metricValue > 0.2: return "red";
-                                case metricValue > 0.1: return "orange";
-                                case metricValue > 0.5: return "yellow";
-                                case metricValue > 0.025: return "yellowgreen";
-                                default: return "green";
-                            }
-                        } else if (selectedMetric === "importance") {
-                            console.log("Colors", "Color: risk importance");
-                            switch (true) {
-                                case metricValue > 0.5: return "red";
-                                case metricValue > 0.3: return "orange";
-                                case metricValue > 0.2: return "yellow";
-                                case metricValue > 0.1: return "yellowgreen";
+                                case metricValue > 0.8: return "red";
+                                case metricValue > 0.6: return "orange";
+                                case metricValue > 0.4: return "yellow";
+                                case metricValue > 0.2: return "yellowgreen";
                                 default: return "green";
                             }
                         } else {
@@ -2282,16 +2254,7 @@
             }
 
             document.querySelectorAll('input[name="colorMetric"]').forEach(function (radio) {
-                radio.addEventListener('change', function () {
-                    // Uncheck the "highlightCriticalPath" and "highlightOutliers" checkboxes
-                    document.getElementById("highlightCriticalPath").checked = false;
-                    document.getElementById("highlightOutliers").checked = false;
-                    console.log("highlightCriticalPath unchecked");
-                    clearHighlights(link, node);
-                    hideTooltip();
-                    // Call the function to update node colors
-                    updateNodeColors();
-                });
+                radio.addEventListener('change', updateNodeColors);
             });
 
             // Create the tooltip element
@@ -2323,24 +2286,14 @@
             console.log("Link: ", link);
 
             link.on("mouseover", function (d) {
-                // Make the link thicker
+                // Highlight the link
                 d3.select(this)
                     .style("stroke", "white")
-                    .attr("stroke-width", 10);  // Increase the width to make it thicker
+                    .attr("stroke-width", 5);
 
-                // Enlarge the source node
-                node.filter(n => n.ID === d.source.ID)
-                    .select("circle")
-                    .attr("r", function (d) {
-                        return 40 + d.inDegree * 0.5; // Increase the base radius value
-                    });
-
-                // Enlarge the target node
+                // Highlight the target node
                 node.filter(n => n.ID === d.target.ID)
                     .select("circle")
-                    .attr("r", function (d) {
-                        return 40 + d.inDegree * 0.5;  // Increase the base radius value
-                    })
                     .style("fill", "#113464");
 
                 // Show tooltip with duration
@@ -2350,26 +2303,22 @@
                     .style("top", (d3.event.pageY - 28) + "px");
             })
                 .on("mouseout", function (d) {
-                    // Restore the link to its original thickness
+                    // Restore the link color
                     d3.select(this)
                         .style("stroke", "#cdfaff")
-                        .attr("stroke-width", 2); // Restore to original width
+                        .attr("stroke-width", 2);
 
-                    // Restore the source node size
-                    node.filter(n => n.ID === d.source.ID)
-                        .select("circle")
-                        .attr("r", function (d) {
-                            return 20 + d.inDegree * 0.5; // Restore the original size
-                        });
-
-                    // Restore the target node size and color
+                    // Restore the target node color
                     node.filter(n => n.ID === d.target.ID)
                         .select("circle")
-                        .attr("r", function (d) {
-                            return 20 + d.inDegree * 0.5; // Restore the original size
-                        })
                         .style("fill", function (d) {
-                            return updateNodeColors(d);
+                            switch (true) {
+                                case d.inDegree > 4: return "#41afeb";
+                                case d.inDegree > 3: return "#46b9fa";
+                                case d.inDegree > 2: return "#5ac8fa";
+                                case d.inDegree > 1: return "#8ce6ff";
+                                default: return "#b4f5ff";
+                            }
                         });
 
                     // Hide tooltip
@@ -2484,6 +2433,9 @@
                             }
 
                             var baseColor;
+                            if (d.Milestone === 1) {
+                                return "#FFD700";  // Gold color for milestones
+                            }
                             switch (true) {
                                 case metricValue > 4: baseColor = "#41afeb"; break;
                                 case metricValue > 3: baseColor = "#46b9fa"; break;
@@ -2552,7 +2504,16 @@
                         .duration(500)
                         .attr("r", 20 + d.inDegree * 0.5)
                         .style("fill", function () {
-                            return updateNodeColors(d);
+                            if (d.Milestone === 1) {
+                                return "#FFD700";  // Gold color for milestones
+                            }
+                            switch (true) {
+                                case d.inDegree > 4: return "#41afeb";
+                                case d.inDegree > 3: return "#46b9fa";
+                                case d.inDegree > 2: return "#5ac8fa";
+                                case d.inDegree > 1: return "#8ce6ff";
+                                default: return "#b4f5ff";
+                            }
                         })
                         .style("stroke", null) // Remove the stroke (border) added during mouseover
                         .style("stroke-width", "1px");;
@@ -2573,7 +2534,16 @@
                     node.select("circle")
                         .style("stroke", "#1e69aa ")
                         .style("fill", function (n) {
-                            return updateNodeColors(d);
+                            if (d.Milestone === 1) {
+                                return "#FFD700";  // Gold color for milestones
+                            }
+                            switch (true) {
+                                case n.inDegree > 4: return "#41afeb";
+                                case n.inDegree > 3: return "#46b9fa";
+                                case n.inDegree > 2: return "#5ac8fa";
+                                case n.inDegree > 1: return "#8ce6ff";
+                                default: return "#b4f5ff";
+                            }
                         })
                         .attr("r", function (n) {
                             return 20 + n.inDegree * 0.5;
@@ -2585,38 +2555,9 @@
                     removeArrow(container);
                 })
                 .on("click", function (d) {
-                    // Determine risk, importance, and path colors based on their outlier flags
-                    var riskColor = d.isRiskOutlier ? "red" : "green";
-                    var importanceColor = d.isImportanceOutlier ? "red" : "green";
-                    var pathColor = d.isOnOutlierPath || d.isOnCriticalPath ? "red" : "green";
-                    var pathType = d.isOnCriticalPath ? "Critical" : "Non-Critical";
-                    var startDate = new Date(d.Start);
-                    var finishDate = new Date(d.Finish);
-                    var daysLeft = Math.round((finishDate - new Date()) / (1000 * 60 * 60 * 24));
-                    var daysLeftText = daysLeft >= 0 ? daysLeft + " days left" : -daysLeft + " days overdue";
-
-                    var riskIcon = d.isRiskOutlier ? '<i class="fas fa-exclamation-circle"></i>' : '';
-                    var importanceIcon = d.isImportanceOutlier ? '<i class="fas fa-star"></i>' : '';
-                    var pathIcon = d.isOnOutlierPath ? '<i class="fas fa-route"></i>' : '';
-
-                    var content = `
-                        <div class="kanban-card sci-fi-card">
-                            <div class="alarm-indicators">${riskIcon} ${importanceIcon} ${pathIcon}</div>
-                            <h4>${d.Name} (ID: ${d.ID})</h4>
-                            <ul class="futuristic-list">
-                                <li style="color:${riskColor}">Risk: ${d.riskScore.toFixed(2)}</li>
-                                <li style="color:${importanceColor}">Importance: ${d.importanceScore.toFixed(2)}</li>
-                                <li style="color:${pathColor}">Path: ${pathType}</li>
-                            </ul>
-                            <p>Expected Start: ${startDate.toLocaleDateString()} | Duration: ${d.Duration} hours</p>
-                            <div class="card-icons">
-                                <span class="due-date-icon"><i class="fas fa-calendar-alt"></i> Due: ${finishDate.toLocaleDateString()} (${daysLeftText})</span>
-                                <span class="slack"><i class="fas fa-clock"></i> Slack: ${d.slack} hours</span>
-                            </div>
-                        </div>
-                    `;
-
-                    document.getElementById("taskDetail").innerHTML = content;
+                    // Update the modal content with the task details
+                    document.getElementById("taskDetail").innerHTML = "Name: " + d.Name + "<br>ID: " + d.ID + "<br>Start: " + d.Start + "<br>Finish: " + d.Finish;
+                    // Display the modal
                     document.getElementById("taskModal").style.display = "block";
                 });
 
@@ -2721,29 +2662,21 @@
                     .call(zoom.transform, d3.zoomIdentity.translate(translate[0], translate[1]).scale(scale));
             };
 
-
             document.getElementById("highlightCriticalPath").addEventListener("change", function () {
                 if (this.checked) {
-                    clearHighlights(link, node);
-                    hideTooltip();
                     const criticalPathInfo = findCriticalPath(paths, links);
                     highlightPath(criticalPathInfo.path, 'darkred', link, node, criticalPathInfo.duration);
                     showTooltip(`Critical Path Length: ${criticalPathInfo.duration}`, 'darkred');
                     // Update criticalPathDetails div with the path details
                     document.getElementById('criticalPathDetails').textContent = `Critical Path Length: ${criticalPathInfo.duration}`;
-                    document.getElementById("highlightOutliers").checked = false;
                 } else {
-                    console.log("highlightCriticalPath unchecked");
-                    clearHighlights(link, node);
+                    clearHighlights();
                     hideTooltip();
                 }
             });
 
             document.getElementById("highlightOutliers").addEventListener("change", function () {
                 if (this.checked) {
-                    clearHighlights(link, node);
-                    hideTooltip();
-                    document.getElementById("highlightCriticalPath").checked = false;
                     const outlierPathsInfo = findOutlierPaths(paths, links);
                     // Create a container to hold all the details content
                     let detailsContent = '';
@@ -2773,8 +2706,7 @@
                     // Update outlierPathsDetails div with the details content
                     document.getElementById('outlierPathsDetails').innerHTML = detailsContent;
                 } else {
-                    console.log("highlightPath unchecked");
-                    clearHighlights(link, node);
+                    clearHighlights();
                     hideTooltip();
                 }
             });
@@ -2785,7 +2717,7 @@
                 Finish: node.Finish,
                 duration: node.duration, // Assuming you have a 'duration' property on each node
             }));
-
+            
         }
 
         //Utilty function to calculate node dgrees -  not currently used
@@ -3591,91 +3523,6 @@
             }
         }
 
-        function drawMilestoneTable(nodes, links) {
-            console.log("Drawing Milestone Table");
-            const startNode = nodes.find(node => node.ID === "0"); // Assuming start node has ID 0
-            const milestones = nodes.filter(node => node.Milestone === 1);
-
-            // Extract TimeUnits from the nodes
-            const timeUnits = nodes[0].TimeUnits;
-
-            // Set the column header dynamically
-            const columnHeader = document.querySelector("#milestoneTable th.pathLength");
-            if (columnHeader) {
-                columnHeader.textContent = `Path Length (${timeUnits})`;
-            }
-
-            // Check if there are any milestones. If not, exit the function early.
-            if (milestones.length === 0) {
-                console.log("No milestones found. Exiting...");
-                return;
-            }
-
-            const tableBody = document.getElementById('milestoneTableBody');
-            tableBody.innerHTML = ''; // Clear any previous rows
-
-            milestones.forEach(milestone => {
-                const allPathsToMilestone = findAllPaths(startNode, milestone, links, nodes);
-                console.log(`Checking paths to milestone ID ${milestone.ID}`);
-
-                // Finding the longest path by summing up durations of each path
-                let longestPath = [];
-                let longestDuration = 0;
-                allPathsToMilestone.forEach(path => {
-                    const pathDuration = path.reduce((sum, node) => sum + node.AdjustedDuration, 0);
-                    console.log(`Path: [${path.map(p => p.ID).join(", ")}] - Duration: ${pathDuration}`);
-                    if (pathDuration > longestDuration) {
-                        longestDuration = pathDuration;
-                        longestPath = path;
-                    }
-                });
-
-                console.log(`Longest path to milestone ID ${milestone.ID}: [${longestPath.map(p => p.ID).join(", ")}] - Duration: ${longestDuration}`);
-
-                // Creating a row for each milestone
-                const row = document.createElement('tr');
-
-                // Add cells to the row
-                ['ID', 'Name', 'riskScore', 'importanceScore', 'pageRank', 'Start', 'Finish', 'slack', 'overrun_probability'].forEach(key => {
-                    const cell = document.createElement('td');
-                    if (key === 'pageRank') {
-                        cell.textContent = milestone[key].toFixed(5);
-                    } else if (key === 'slack') {
-                        cell.textContent = Math.round(milestone[key]); // Rounding off the decimal for slack
-                    } else if (key === 'riskScore' || key === 'importanceScore' || key === 'overrun_probability') {
-                        cell.textContent = milestone[key].toFixed(2);
-                    } else if (key === 'Start' || key === 'Finish') { // Use formatDate for Start and Finish dates
-                        cell.textContent = formatDate(milestone[key]);
-                    } else {
-                        cell.textContent = milestone[key];
-                    }
-                    row.appendChild(cell);
-                });
-
-                // Adding a cell for the path
-                const pathCell = document.createElement('td');
-                pathCell.textContent = longestPath.map(node => node.ID).join(' -> ');
-                pathCell.style.width = '300px';  // Set the width of the path column to 300 pixels or any desired value
-                row.appendChild(pathCell);
-
-                // Adding a cell for the length of the path
-                const lengthCell = document.createElement('td');
-                lengthCell.textContent = Math.round(longestDuration); // Rounding off the decimal
-                row.appendChild(lengthCell);
-
-                // Add progress bar for PercentComplete
-                const progressCell = document.createElement('td');
-                const progressBar = document.createElement('div');
-                progressBar.style.width = milestone.PercentComplete + '%';
-                progressBar.style.backgroundColor = 'green';
-                progressBar.style.height = '20px';
-                progressCell.appendChild(progressBar);
-                row.appendChild(progressCell);
-
-                tableBody.appendChild(row);
-            });
-        }
-
         function generatePathsTable(nodes, links) {
             // Assuming paths and links are available
             console.log("generatePathsTable", nodes, links)
@@ -3893,9 +3740,8 @@
 
         function calculateExpectedOverrunDurationForPath(path) {
             return path.reduce((sum, node) => {
-                const overrun = node.overrun_probability > 0 ? node.Duration * node.overrun_probability : 0;
-                const adjustedDuration = node.Duration + overrun;
-                return sum + adjustedDuration;
+                const adjustedDuration = node.Duration * (1 + node.overrun_probability);
+                return sum + Math.max(adjustedDuration, node.Duration);
             }, 0);
         }
 
@@ -4557,65 +4403,34 @@
         }
 
 
-        function clearHighlights(link, node) {
+        function clearHighlights() {
             link.style("stroke", null)
                 .attr("stroke-width", 2);
 
-            node.select("circle").style("fill", function (d) {
+            node.select("circle").style("fill", function (n) {
                 var selectedMetric = document.querySelector('input[name="colorMetric"]:checked').value;
                 var metricValue;
 
-                console.log("Colors", "Selected Metric: ", selectedMetric);
-
                 switch (selectedMetric) {
                     case "inDegree":
-                        metricValue = d.inDegree;
+                        metricValue = n.inDegree;
                         break;
                     case "outDegree":
-                        metricValue = d.outDegree;
+                        metricValue = n.outDegree;
                         break;
                     case "degree":
-                        metricValue = d.degree;
-                        break;
-                    case "risk":
-                        metricValue = d.riskScore;
-                        break;
-                    case "importance":
-                        metricValue = d.importanceScore;
+                        metricValue = n.degree;
                         break;
                     default:
-                        metricValue = d.inDegree; // default to in-degree if something goes wrong
+                        metricValue = n.inDegree; // default to in-degree if something goes wrong
                 }
 
-                console.log("Colors", "Metric Value: ", metricValue);
-
-                if (selectedMetric === "risk") {
-                    console.log("Colors", "Color: risk importance");
-                    switch (true) {
-                        case metricValue > 0.2: return "red";
-                        case metricValue > 0.1: return "orange";
-                        case metricValue > 0.05: return "yellow"; // Adjusted based on logical progression
-                        case metricValue > 0.025: return "yellowgreen";
-                        default: return "green";
-                    }
-                } else if (selectedMetric === "importance") {
-                    console.log("Colors", "Color: risk importance");
-                    switch (true) {
-                        case metricValue > 0.5: return "red";
-                        case metricValue > 0.3: return "orange";
-                        case metricValue > 0.2: return "yellow";
-                        case metricValue > 0.1: return "yellowgreen";
-                        default: return "green";
-                    }
-                } else {
-                    console.log("Colors", "Color: degree");
-                    switch (true) {
-                        case metricValue > 4: return "#41afeb";
-                        case metricValue > 3: return "#46b9fa";
-                        case metricValue > 2: return "#5ac8fa";
-                        case metricValue > 1: return "#8ce6ff";
-                        default: return "#b4f5ff";
-                    }
+                switch (true) {
+                    case metricValue > 4: return "#41afeb";
+                    case metricValue > 3: return "#46b9fa";
+                    case metricValue > 2: return "#5ac8fa";
+                    case metricValue > 1: return "#8ce6ff";
+                    default: return "#b4f5ff";
                 }
             });
         }
@@ -4676,14 +4491,6 @@
                 .style("color", color);
         }
 
-        function hideTooltip() {
-            console.log("highlight hideTooltip called");
-            const tooltip = d3.select("#tooltip");
-            tooltip.transition()
-                .duration(500)
-                .style("visibility", "hidden");
-        }
-
         // Add event listener to the radio buttons to update the legend when the metric changes
         var radios = document.querySelectorAll('input[name="colorMetric"]');
         radios.forEach(radio => {
@@ -4722,7 +4529,6 @@
                 // Generate the paths table
                 generatePathsTable(result.updatedNodes, links);
                 generateKanbanCards(nodes, links);
-                drawMilestoneTable(nodes, links);
 
                 // Generate reduced graph using PageRank with durations, critical path, and outliers
                 console.log("About to Enter drawReducedGraphWithVis");
@@ -5223,19 +5029,8 @@
                 pageRankCell.textContent = (score.pageRank || 0).toFixed(5);
                 var slackCell = document.createElement('td');
                 slackCell.textContent = score.slack.toFixed(2); // Assuming slack is a number
-                var overrunProbabilityCell = document.createElement('td');  
+                var overrunProbabilityCell = document.createElement('td');  // Added this block
                 overrunProbabilityCell.textContent = score.overrunProbability.toFixed(2);
-                // Check if overrunProbability is a string and try to convert it to a number
-                if (typeof score.overrunProbability === "string") {
-                    let parsedValue = parseFloat(score.overrunProbability);
-                    if (!isNaN(parsedValue)) {
-                        overrunProbabilityCell.textContent = (parsedValue * 100).toFixed(2) + "%";
-                    } else {
-                        overrunProbabilityCell.textContent = score.overrunProbability;
-                    }
-                } else {
-                    overrunProbabilityCell.textContent = (score.overrunProbability * 100).toFixed(2) + "%";
-                }
 
                 idCell.textContent = score.id;
                 nameCell.textContent = score.name;
@@ -5667,6 +5462,8 @@
 
                 columns[column].push(cardHTML);
             });
+
+
 
             // Create columns
             Object.keys(columns).forEach(key => {
@@ -7027,21 +6824,20 @@
             <!-- Rotate Controls -->
             <!-- Node Color Legend -->
             <div class="dashboard-stat">
-                <h2>Node Colors</h2>
                 <div id="legend">
-                    <h3><span id="legendMetric">In-degree</span>:</h3>
-                    <label><input checked="" name="colorMetric" type="radio" value="degree" /> Degree</label>
-                    <label><input name="colorMetric" type="radio" value="inDegree" /> In-degree</label>
+                    <h3>Node Colors by <span id="legendMetric">In-degree</span>:</h3>
+                    <label><input checked="" name="colorMetric" type="radio" value="inDegree" /> In-degree</label>
                     <label><input name="colorMetric" type="radio" value="outDegree" /> Out-degree</label>
+                    <label><input name="colorMetric" type="radio" value="degree" /> Degree</label>
                     <div class="legend-item"><span class="color-box" style="background-color: #b4f5ff;"></span> &gt; 0</div>
                     <div class="legend-item"><span class="color-box" style="background-color: #8ce6ff;"></span> &gt; 1</div>
                     <div class="legend-item"><span class="color-box" style="background-color: #5ac8fa;"></span> &gt; 2</div>
                     <div class="legend-item"><span class="color-box" style="background-color: #46b9fa;"></span> &gt; 3</div>
                     <div class="legend-item"><span class="color-box" style="background-color: #41afeb;"></span> &gt; 4</div>
                 </div>
-                <div id="legend">
-                    <h3><span id="riskImportanceLegendMetric">Risk/Importance</span>:</h3>
-                    <label><input name="colorMetric" type="radio" value="risk" /> Risk</label>
+                <div id="riskImportanceLegend">
+                    <h3>Node Colors by <span id="riskImportanceLegendMetric">Risk/Importance</span>:</h3>
+                    <label><input checked="" name="colorMetric" type="radio" value="risk" /> Risk</label>
                     <label><input name="colorMetric" type="radio" value="importance" /> Importance</label>
                     <div class="legend-item"><span class="color-box" style="background-color: green;"></span> Low</div>
                     <div class="legend-item"><span class="color-box" style="background-color: yellowgreen;"></span> Low-Medium</div>
@@ -7056,39 +6852,22 @@
                 <div class="= dashboard-card2">
                     <label class="control-label">Filter Nodes (in-degree):</label>
                     <span id="filterValue">&gt; 0</span>
-                    <input class="slider" id="filterSlider" max="5" min="0" step="1" type="range" value="0" />
+                    <input class="slider" id="filterSlider" max="5" min="0" step="1" type="range" />
                 </div>
                 <div class="= dashboard-card2">
                     <div class="label-container">
                         <label class="control-label">Filter Nodes (out-degree):</label>
                         <span id="outDegreeFilterValue">&gt; 0</span>
                     </div>
-                    <input class="slider" id="outDegreeFilterSlider" max="5" min="0" step="1" type="range" value="0" />
+                    <input class="slider" id="outDegreeFilterSlider" max="5" min="0" step="1" type="range" />
                 </div>
                 <div class="= dashboard-card2">
                     <div class="label-container">
-                        <!-- section for degree -->
+                        <!-- New section for degree -->
                         <label class="control-label">Filter Nodes (degree):</label>
                         <span id="degreeFilterValue">&gt; 0</span>
                     </div>
-                    <input class="slider" id="degreeFilterSlider" max="10" min="0" step="1" type="range" value="0" />
-                </div>
-                <!-- section for risk -->
-                <div class="= dashboard-card2">
-                    <div class="label-container">
-                        <label class="control-label">Filter Nodes (risk):</label>
-                        <span id="riskFilterValue">&gt; 0</span>
-                    </div>
-                    <input class="slider" id="riskFilterSlider" max="1" min="0" step="0.1" type="range" value="0" />
-                </div>
-
-                <!-- section for importance -->
-                <div class="= dashboard-card2">
-                    <div class="label-container">
-                        <label class="control-label">Filter Nodes (importance):</label>
-                        <span id="importanceFilterValue">&gt; 0</span>
-                    </div>
-                    <input class="slider" id="importanceFilterSlider" max="1" min="0" step="0.1" type="range" value="0" />
+                    <input class="slider" id="degreeFilterSlider" max="10" min="0" step="1" type="range" />
                 </div>
             </div>
             <!-- Accordion for Path Details -->
@@ -7243,8 +7022,22 @@
                             </thead>
                             <tbody id="riskTableBody"></tbody>
                         </table>
-                    </div>
 
+                        <!-- Reference Table for Critical & Outlier Paths -->
+                        <div class="table-container" id="referenceTable">
+                            <h2>Critical & Outlier Paths</h2>
+                            <table class="sortable">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Name</th>
+                                        <th>Path</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="referenceTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
                     <div class="charts-row">
                         <div class="dashboard-card2" id="pathsDistributionCurve">
                             <h2>Paths Distribution Curve</h2>
@@ -7259,6 +7052,10 @@
                             <button class="learn-more-btn" onclick="openModal('pathDistributionModal')">Learn More</button>
                         </div>
                     </div>
+                    <div class="dashboard-card2" id="pathDistributionCard">
+                        <h2>Expected Completion</h2>
+                        <div id="progressBars"></div>
+                    </div>
                     <!-- Paths Distribution Table -->
                     <div class="table-container" id="pathsDistributionTableContainer">
                         <h2>Paths Distribution</h2>
@@ -7270,51 +7067,6 @@
                             <tbody id="pathsDistributionTableBody"></tbody>
                         </table>
                     </div>
-
-                    <!-- Reference Table for Critical & Outlier Paths -->
-                    <div class="table-container" id="referenceTable">
-                        <h2>Critical & Outlier Paths</h2>
-                        <table class="sortable">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Name</th>
-                                    <th>Path</th>
-                                </tr>
-                            </thead>
-                            <tbody id="referenceTableBody"></tbody>
-                        </table>
-                    </div>
-
-                    <div class="dashboard-card2" id="pathDistributionCard">
-                        <h2>Expected Completion</h2>
-                        <div id="progressBars"></div>
-                    </div>
-
-                    <div class="table-container" id="pathMetrics">
-                        <!-- Milestone Path Table -->
-                        <h2>Milestone Paths</h2>
-                        <table class="sortable" id="milestoneTable">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Name</th>
-                                    <th>Risk</th>
-                                    <th>Importance</th>
-                                    <th>PageRank Centrality</th>
-                                    <th>Start Date</th>
-                                    <th>End Date</th>
-                                    <th>Slack</th>
-                                    <th>Overrun</th>
-                                    <th>Path</th>
-                                    <th class="pathLength">Path Length</th>
-                                    <th>Progress</th>
-                                </tr>
-                            </thead>
-                            <tbody id="milestoneTableBody"></tbody>
-                        </table>
-                    </div>
-
                 </div>
             </div>
         </div>
