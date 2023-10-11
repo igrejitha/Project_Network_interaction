@@ -16,6 +16,8 @@
     <script src="https://d3js.org/d3.v5.min.js"></script>
     <!-- Scripts for Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@1.0.0"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://unpkg.com/vis-network@7.6.2/dist/vis-network.min.css" rel="stylesheet" type="text/css" />
@@ -26,6 +28,15 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.css" type="text/css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+
+    <!-- Include the Materialize CSS library -->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-doughnutlabel@0.1.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.5.1"></script>
 
     <!-- Include Flatpickr CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
@@ -33,27 +44,27 @@
     <!-- Include Flatpickr JS -->
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script>
-    const centerTextPlugin = {
-        afterDraw: (chart) => {
-            let width = chart.chart.width,
-                height = chart.chart.height,
-                ctx = chart.chart.ctx;
+        const centerTextPlugin = {
+            afterDraw: (chart) => {
+                let width = chart.chart.width,
+                    height = chart.chart.height,
+                    ctx = chart.chart.ctx;
 
-            ctx.restore();
-            let fontSize = (height / 114).toFixed(2);
-            ctx.font = fontSize + "em Orbitron";
-            ctx.textBaseline = "middle";
+                ctx.restore();
+                let fontSize = (height / 114).toFixed(2);
+                ctx.font = fontSize + "em Orbitron";
+                ctx.textBaseline = "middle";
 
-            let sum = chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
-            let text = `Total: ${sum} days`,
-                textX = Math.round((width - ctx.measureText(text).width) / 2),
-                textY = height / 2;
+                let sum = chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                let text = `Total: ${sum} days`,
+                    textX = Math.round((width - ctx.measureText(text).width) / 2),
+                    textY = height / 2;
 
-            ctx.fillText(text, textX, textY);
-            ctx.save();
-        }
-    };
-    Chart.plugins.register(centerTextPlugin);
+                ctx.fillText(text, textX, textY);
+                ctx.save();
+            }
+        };
+        Chart.plugins.register(centerTextPlugin);
 
     </script>
     <style>
@@ -680,6 +691,7 @@
         .progress-bar-container {
             width: 100%;
             height: 20px;
+            position: relative;
             background-color: #f3f3f3;
             border-radius: 5px;
             box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
@@ -696,6 +708,14 @@
             width: 0%; /* Default to 0% completion */
             border-radius: 5px 0 0 5px;
             animation: progressBarFillAnimation 1s ease-in-out;
+        }
+
+        .progress-label {
+            position: absolute;
+            right: 5px; /* adjust as needed for padding */
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.9em; /* adjust as needed for font size */
         }
 
         @keyframes progressBarFillAnimation {
@@ -1035,6 +1055,7 @@
             #projectSectorDropdown:hover {
                 background-color: rgba(205, 250, 255, 0.2);
             }
+
         .bar-chart-tooltip {
             position: absolute;
             padding: 8px;
@@ -1123,7 +1144,65 @@
                         text-shadow: 0 0 5px #5ac8fa;
                     }
 
+        /* Add the Materialize grid classes to the containers */
 
+        #container {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+            /* Add the Materialize grid class */
+            class ="container";
+        }
+
+        .chart-size {
+            width: 20px;
+            height: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px; /* Adjust this value as needed */
+        }
+
+        .progressBarContainer {
+            width: 100%;
+            background-color: #f3f3f3;
+            height: 30px;
+            margin: 10px 0;
+        }
+
+        .progressBar {
+            height: 100%;
+            background-color: #4CAF50;
+            width: 0%; /* Initial width, will be set by JavaScript */
+        }
+
+        .main-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .flex-container {
+            display: flex; /* This will turn on flex mode for the container */
+            justify-content: space-between; /* This will put space between your columns */
+            flex-wrap: nowrap; /* This will prevent wrapping of columns */
+        }
+
+        .left-container, .right-container {
+            flex: 1; /* This allows both the left and right containers to grow or shrink equally */
+            max-width: calc(25% - 10px); /* This limits their width to 25% of the flex-container width, minus 10px for margin */
+            margin-right: 10px; /* Margin for spacing */
+            width: 25%;
+        }
+
+        .table-container {
+            flex: 2; /* This allows the center column to take up twice as much space as the side columns */
+            max-width: calc(50% - 20px); /* This limits its width to 50% of the flex-container width, minus 20px for margin */
+            margin-right: 10px; /* Margin for spacing */
+            width: 50%;
+        }
     </style>
     <script type="text/javascript">
         google.charts.load('current', { 'packages': ['gantt'] });
@@ -1292,11 +1371,11 @@
                         var taskDuration = data.getValue(i, data.getColumnIndex('Duration'));
                         var barLengthPercentage = (taskDuration / maxTaskDuration) * 100;
                         td.innerHTML = `
-                                                        <div class="progress-bar-container" style="width: 100%;">
-                                                            <div class="progress-bar" style="width: ${barLengthPercentage}%;">
-                                                                <div class="progress-bar-fill" style="width: 0%;"></div>
-                                                            </div>
-                                                        </div>`;
+                                                            <div class="progress-bar-container" style="width: 100%;">
+                                                                <div class="progress-bar" style="width: ${barLengthPercentage}%;">
+                                                                    <div class="progress-bar-fill" style="width: 0%;"></div>
+                                                                </div>
+                                                            </div>`;
                     } else {
                         td.innerText = data.getFormattedValue(i, j);
                         td.contentEditable = 'true';
@@ -1367,6 +1446,9 @@
                 data.addRow([milestoneID, 'End Milestone', '', date, date, 0, 0, dependencies, null]);
                 taskIDs[milestoneID] = true;
                 //nodes.push({ ID: milestoneID, Name: 'End Milestone', Duration: '0'; Start: date.toISOString(), Finish: date.toISOString() }); // Add the End Node to the nodes array
+                //EndMilestone_Date = date.toISOString();
+                var EndMilestone_Date = date;
+                console.log("CHART_DEBUG EndMilestone_Date", EndMilestone_Date);
             }
         }
 
@@ -1456,6 +1538,9 @@
 
             //Determine the Maximum ID:
             var maxID = -1;
+            var maxEndDate = new Date(0); // This is set to the earliest possible date for initialization
+            var secondMaxEndDate = new Date(0); // This will store the second maximum end date
+
             for (var i = 0; i < tasks.length; i++) {
                 var taskIDElement = tasks[i].getElementsByTagName("ID")[0];
                 if (taskIDElement && taskIDElement.childNodes[0]) {
@@ -1465,12 +1550,26 @@
                     }
                     maxID = Math.max(maxID, taskID);
                 }
+
+                var taskFinishElement = tasks[i].getElementsByTagName("Finish")[0];
+                if (taskFinishElement && taskFinishElement.childNodes[0]) {
+                    var taskFinishDate = new Date(taskFinishElement.childNodes[0].nodeValue.trim());
+                    if (taskFinishDate > maxEndDate) {
+                        secondMaxEndDate = maxEndDate;
+                        maxEndDate = taskFinishDate;
+                    } else if (taskFinishDate > secondMaxEndDate) {
+                        secondMaxEndDate = taskFinishDate;
+                    }
+                }
             }
 
             //Create the End Milestone:
             var endMilestoneID = maxID + 1;
-            //nodes.push({ ID: endMilestoneID, Name: 'End Milestone', Start: 'someStartDate', Finish: 'someEndDate' });
-            nodes.push({ ID: endMilestoneID, Name: 'End Milestone', Duration: '0', Start: maxEndDate, Finish: maxEndDate });
+            //nodes.push({ ID: endMilestoneID, Name: 'End Milestone', Duration: '0', Start: secondMaxEndDate, Finish: maxEndDate });
+            console.log("CHART_DEBUG EndMilestone_Date", endMilestoneID, "Start: ", secondMaxEndDate, "Finish: ", maxEndDate);
+
+            //nodes.push({ ID: endMilestoneID, Name: 'End Milestone', Duration: '0', Start: EndMilestone_Date, Finish: EndMilestone_Date });
+            //console.log("CHART_DEBUG EndMilestone_Date2");
             //data.addRow([endMilestoneID, 'End Milestone', '', 'someStartDate', 'someEndDate', null, 100, null]);
 
             var projectTitle = "";
@@ -1494,10 +1593,33 @@
                 var startDate = task.getElementsByTagName("Start")[0].childNodes[0].nodeValue.trim();
                 var endDate = task.getElementsByTagName("Finish")[0].childNodes[0].nodeValue.trim();
                 var duration = parsedTask.duration;
+                // Extracting "Percentage Complete" and "Time Units"
+                var percentCompleteNode = task.getElementsByTagName("PercentComplete")[0];
+                var percentComplete = percentCompleteNode ? percentCompleteNode.childNodes[0].nodeValue.trim() : "0";
+
+                var timeUnitsNode = task.getElementsByTagName("TimeUnits")[0]; // Assuming the XML tag is "TimeUnits"
+                var timeUnits = timeUnitsNode ? timeUnitsNode.childNodes[0].nodeValue.trim() : "Hours"; // Defaulting to "Hours" if not found
 
                 // Update minStartDate and maxEndDate
                 var parsedStartDate = new Date(startDate);
-                var parsedEndDate = new Date(endDate);
+                // If endDate is missing or invalid
+                if (!endDate || new Date(endDate) == "Invalid Date") {
+                    switch (timeUnits) {
+                        case "Hours":
+                            parsedEndDate = new Date(parsedStartDate);
+                            parsedEndDate.setHours(parsedEndDate.getHours() + parseInt(duration));
+                            break;
+                        case "Days":
+                            parsedEndDate = new Date(parsedStartDate);
+                            parsedEndDate.setDate(parsedEndDate.getDate() + parseInt(duration));
+                            break;
+                        // ... handle other time units similarly if needed
+                        default:
+                            parsedEndDate = new Date(parsedStartDate); // default behavior if timeUnits is unrecognized
+                    }
+                } else {
+                    parsedEndDate = new Date(endDate);
+                }
                 if (parsedStartDate < minStartDate) {
                     minStartDate = parsedStartDate;
                 }
@@ -1510,12 +1632,7 @@
                 if (MilestoneElement && MilestoneElement.childNodes[0].nodeValue.trim() === "1") {
                     Milestone_Val = 1;
                 }
-                // Extracting "Percentage Complete" and "Time Units"
-                var percentCompleteNode = task.getElementsByTagName("PercentComplete")[0];
-                var percentComplete = percentCompleteNode ? percentCompleteNode.childNodes[0].nodeValue.trim() : "0";
 
-                var timeUnitsNode = task.getElementsByTagName("TimeUnits")[0]; // Assuming the XML tag is "TimeUnits"
-                var timeUnits = timeUnitsNode ? timeUnitsNode.childNodes[0].nodeValue.trim() : "Hours"; // Defaulting to "Hours" if not found
 
                 // Check if the OutlineLevel is 0
                 if (outlineLevelElement && outlineLevelElement.childNodes[0].nodeValue.trim() === "0") {
@@ -1565,23 +1682,23 @@
                     });
                 }
                 else {
-                        nodes.push({
-                            ID: taskID,
-                            Name: taskName,
-                            Duration: duration,
-                            Start: startDate,
-                            Finish: endDate,
-                            PercentComplete: percentComplete,
-                            Milestone: Milestone_Val,
-                            TimeUnits: timeUnits
-                        });
+                    nodes.push({
+                        ID: taskID,
+                        Name: taskName,
+                        Duration: duration,
+                        Start: startDate,
+                        Finish: endDate,
+                        PercentComplete: percentComplete,
+                        Milestone: Milestone_Val,
+                        TimeUnits: timeUnits
+                    });
                     //console.log("Project Title: AAAA", taskID);
-                    }
+                }
 
                 // Add the task to the nodes array
                 //nodes.push({ UID: taskID, Name: taskName, Start: startDate, Finish: endDate });
-    
-                console.log('Nodes', nodes)
+
+                console.log('CHART_DEBUG Nodes', nodes)
 
                 taskIDs[taskID] = true;
                 var dependenciesNodeList = tasks[i].getElementsByTagName("PredecessorLink");
@@ -1660,6 +1777,22 @@
                     tasksWithoutSuccessors.push(taskID);
                 }
             }
+            //print the name and dates and duration of the end milestone to the console from its node properties. the end milestone is the one with the largest ID
+            console.log("CHART_DEBUG EndMilestoneeeeeeeeeeeee", nodes[nodes.length - 1].ID, nodes[nodes.length - 1].Name, nodes[nodes.length - 1].Start, nodes[nodes.length - 1].Finish, nodes[nodes.length - 1].Duration);
+            console.log("CHART_DEBUG EndMilestone_Date", endMilestoneID, "Start: ", secondMaxEndDate, "Finish: ", maxEndDate);
+            //nodes.push({ ID: endMilestoneID, Name: 'End Milestone', Duration: '0', Start: secondMaxEndDate, Finish: maxEndDate });
+            nodes.push({
+                ID: endMilestoneID,
+                Name: 'End Milestone',
+                //outline_duration: duration,
+                Duration: "0",
+                Start: secondMaxEndDate,
+                Finish: maxEndDate,
+                PercentComplete: 0,
+                Milestone: 1,
+                //pageRank: 0,
+                TimeUnits: timeUnits
+            });
 
             console.log('Links', links);
             // Insert Start and End Milestones
@@ -2048,9 +2181,9 @@
                 console.error(err);
             }
         }
-    // Completion of all computations and renderings
-    updateProgressBar(100);
-    document.querySelector(".sci-fi-loading-text").innerText = "";
+        // Completion of all computations and renderings
+        updateProgressBar(100);
+        document.querySelector(".sci-fi-loading-text").innerText = "";
     </script>
     <script src="https://d3js.org/d3.v5.min.js"></script>
     <script>
@@ -2600,21 +2733,21 @@
                     var pathIcon = d.isOnOutlierPath ? '<i class="fas fa-route"></i>' : '';
 
                     var content = `
-                        <div class="kanban-card sci-fi-card">
-                            <div class="alarm-indicators">${riskIcon} ${importanceIcon} ${pathIcon}</div>
-                            <h4>${d.Name} (ID: ${d.ID})</h4>
-                            <ul class="futuristic-list">
-                                <li style="color:${riskColor}">Risk: ${d.riskScore.toFixed(2)}</li>
-                                <li style="color:${importanceColor}">Importance: ${d.importanceScore.toFixed(2)}</li>
-                                <li style="color:${pathColor}">Path: ${pathType}</li>
-                            </ul>
-                            <p>Expected Start: ${startDate.toLocaleDateString()} | Duration: ${d.Duration} hours</p>
-                            <div class="card-icons">
-                                <span class="due-date-icon"><i class="fas fa-calendar-alt"></i> Due: ${finishDate.toLocaleDateString()} (${daysLeftText})</span>
-                                <span class="slack"><i class="fas fa-clock"></i> Slack: ${d.slack} hours</span>
+                            <div class="kanban-card sci-fi-card">
+                                <div class="alarm-indicators">${riskIcon} ${importanceIcon} ${pathIcon}</div>
+                                <h4>${d.Name} (ID: ${d.ID})</h4>
+                                <ul class="futuristic-list">
+                                    <li style="color:${riskColor}">Risk: ${d.riskScore.toFixed(2)}</li>
+                                    <li style="color:${importanceColor}">Importance: ${d.importanceScore.toFixed(2)}</li>
+                                    <li style="color:${pathColor}">Path: ${pathType}</li>
+                                </ul>
+                                <p>Expected Start: ${startDate.toLocaleDateString()} | Duration: ${d.Duration} hours</p>
+                                <div class="card-icons">
+                                    <span class="due-date-icon"><i class="fas fa-calendar-alt"></i> Due: ${finishDate.toLocaleDateString()} (${daysLeftText})</span>
+                                    <span class="slack"><i class="fas fa-clock"></i> Slack: ${d.slack} hours</span>
+                                </div>
                             </div>
-                        </div>
-                    `;
+                        `;
 
                     document.getElementById("taskDetail").innerHTML = content;
                     document.getElementById("taskModal").style.display = "block";
@@ -3462,7 +3595,69 @@
             }
         }
 
+        function adjustTaskTimesWithDependencies(nodes, links) {
+            const nodeById = {};
+            nodes.forEach(node => {
+                nodeById[node.ID] = node;
+            });
+
+            function adjustStartTime(node) {
+                if (node.adjusted) return;
+                const predecessors = links.filter(link => link.target.ID === node.ID).map(link => link.source);
+                let maxFinishTime = new Date(node.Start);
+                predecessors.forEach(predecessor => {
+                    adjustStartTime(predecessor);
+                    const overrunFactor = 1 + parseFloat(predecessor.overrun_probability);
+                    const adjustedFinish = new Date(predecessor.Finish);
+                    adjustedFinish.setTime(adjustedFinish.getTime() + (parseFloat(predecessor.Duration) * 60 * 60 * 1000 * (overrunFactor - 1)));
+                    if (adjustedFinish > maxFinishTime) {
+                        maxFinishTime = adjustedFinish;
+                    }
+                });
+                node.Start = maxFinishTime.toISOString();
+                const taskDurationMillis = parseFloat(node.Duration) * 60 * 60 * 1000;
+                const taskEndTime = new Date(maxFinishTime.getTime() + taskDurationMillis);
+                node.Finish = taskEndTime.toISOString();
+                node.adjusted = true;
+            }
+
+            nodes.forEach(node => {
+                if (!node.adjusted) {
+                    adjustStartTime(node);
+                }
+            });
+        }
+
+        function distributeOverrunForPath(path, nodes, links, A, B) {
+            path.forEach(node => {
+                let risk = parseFloat(node.riskScore);
+                if (isNaN(risk)) {
+                    console.warn(`Node ID ${node.ID} has invalid risk: ${node.riskScore}`);
+                    node.overrun_probability = 0;
+                    return;
+                }
+                node.overrun_probability = A + B * risk;
+                //console.log("distributeOverrunProbability: Risk:", node, node.overrun_probability);
+                if (isNaN(node.overrun_probability) || !isFinite(node.overrun_probability)) {
+                    console.warn(`Invalid overrun_probability for Node ID ${node.ID}. Setting to 0.`);
+                    node.overrun_probability = 0;
+                }
+            });
+        }
+
+        function findLongestAdjustedPathDuration(allPaths) {
+            let longestDuration = 0;
+            allPaths.forEach(path => {
+                let adjustedDuration = path.reduce((sum, node) => sum + parseFloat(node.Duration) * (1 + node.overrun_probability), 0);
+                if (adjustedDuration > longestDuration) {
+                    longestDuration = adjustedDuration;
+                }
+            });
+            return longestDuration;
+        }
+
         function distributeOverrunProbability(nodes, links, totalProjectOverrunProbability) {
+
             console.log("distributeOverrunProbability: Entry");
             if (!nodes || !links) {
                 console.error("distributeOverrunProbability: Missing nodes or links.");
@@ -3477,118 +3672,97 @@
                 }
             });
 
+            const MAX_ITERATIONS = 1000;
+            const TOLERANCE = 1e-4;
+            const CAP_A_AT = 0.20 * totalProjectOverrunProbability; // Capping A at 10% of totalProjectOverrunProbability
+            let A = 0.05 * totalProjectOverrunProbability;
+            let B = totalProjectOverrunProbability - A;
+            let iterationCount = 0;
+            console.log("distributeOverrunProbability: initial:", totalProjectOverrunProbability, iterationCount, A, B);
+
+
             const startNode = nodes.find(node => node.ID === "0");
             const endNode = nodes.reduce((a, b) => (a.ID > b.ID) ? a : b);
 
-            console.log("distributeOverrunProbability: Initial Nodes:", nodes);
+            console.log("distributeOverrunProbability: Start & End Nodes:", startNode, endNode);
+
             let allPaths = findAllPaths(startNode, endNode, links, nodes);
-            console.log("distributeOverrunProbability: All Paths:", allPaths);
+            let targetDuration = findLongestAdjustedPathDuration(allPaths) * (1 + totalProjectOverrunProbability);
+            console.log("distributeOverrunProbability: targetDuration:", targetDuration, targetDuration / (1 + totalProjectOverrunProbability));
 
-            let criticalPathInfo = findCriticalPath(allPaths, links);
-            console.log("distributeOverrunProbability: Initial Critical Path Info:", criticalPathInfo);
-
-            let targetDuration = criticalPathInfo.duration * (1 + totalProjectOverrunProbability);
-            let currentLongestDuration = criticalPathInfo.duration;
-
-            // Convergence and iteration control
-            let iterationCount = 0;
-            const MAX_ITERATIONS = 1000;
-            const EPSILON = 1e-6;
-            let previousDifference = Infinity;
             while (iterationCount < MAX_ITERATIONS) {
                 allPaths.forEach(path => {
-                    distributeOverrunForPath(path, nodes, links, totalProjectOverrunProbability);
-                    const originalPathLength = path.reduce((sum, node) => sum + parseFloat(node.Duration), 0);
-                    const adjustedPathLength = path.reduce((sum, node) => sum + parseFloat(node.Duration) * (1 + node.overrun_probability), 0);
-                    console.log("distributeOverrunProbability: probalilityyyyyyyyyyyy", originalPathLength, adjustedPathLength);
-                    path.forEach(node => {
-                        console.log("distributeOverrunProbability: probalility", node.Duration, node.overrun_probability);
-                    });
-                    if (adjustedPathLength < originalPathLength) {
-                        console.warn(`Adjusted path length ${adjustedPathLength} is less than original path length ${originalPathLength} for path:`, path);
-                    }
+                    distributeOverrunForPath(path, nodes, links, A, B);
                 });
 
-                let updatedCriticalPathInfo = findCriticalPath(allPaths, links);
-                console.log("distributeOverrunProbability: Updated Critical Path Info:", updatedCriticalPathInfo);
+                let longestAdjustedPathDuration = findLongestAdjustedPathDuration(allPaths);
+                let difference = Math.abs(targetDuration - longestAdjustedPathDuration);
+                console.log("distributeOverrunProbability: targetDuration, longestAdjustedPathDuration:", targetDuration, longestAdjustedPathDuration);
 
-                currentLongestDuration = updatedCriticalPathInfo.duration;
 
-                let currentDifference = Math.abs(currentLongestDuration - targetDuration);
-                if (currentDifference < EPSILON || Math.abs(currentDifference - previousDifference) < EPSILON) {
+                if (difference <= TOLERANCE) {
                     break;
                 }
 
-                previousDifference = currentDifference;
+                let adjustmentFactor = (targetDuration - longestAdjustedPathDuration) / longestAdjustedPathDuration;
+                A += 0.05 * adjustmentFactor * A;
+                B += adjustmentFactor * B;
+                // Capping A
+                if (A > CAP_A_AT) {
+                    A = CAP_A_AT;
+                }
+                console.log("distributeOverrunProbability: targetDuration:", iterationCount, A, B, difference);
+
                 iterationCount++;
 
-                console.log("distributeOverrunProbability: Iteration:", iterationCount, "Current Longest Duration:", currentLongestDuration, "Target Duration:", targetDuration);
             }
-            if (iterationCount >= MAX_ITERATIONS) {
-                console.warn("Max iterations reached. Results might not be fully converged.");
-            }
-
-            allPaths.forEach(path => {
-                const originalPathLength = path.reduce((sum, node) => sum + parseFloat(node.Duration), 0);
-                const adjustedPathLength = path.reduce((sum, node) => sum + parseFloat(node.Duration) * (1 + node.overrun_probability), 0);
-
-                console.log("distributeOverrunProbability: Path:", path, "Original Length:", originalPathLength, "Adjusted Length:", adjustedPathLength);
-
-                if (adjustedPathLength < originalPathLength) {
-                    console.warn(`Adjusted path length ${adjustedPathLength} is less than original path length ${originalPathLength} for path:`, path);
-                }
-            });
 
             return nodes;
         }
 
+        function populateInternalMilestones(nodes) {
+            // Select the block-content element for KEY INTERNAL MILESTONES
+            const milestonesContainer = document.querySelector('.block-content.block-content-full.overflow-hidden');
 
-        function distributeOverrunForPath(path, nodes, links, totalProjectOverrunProbability) {
-            let totalPathWeight = path.reduce((sum, node) => {
-                let risk = parseFloat(node.riskScore);
-                let importance = parseFloat(node.importanceScore);
-                if (isNaN(risk) || isNaN(importance)) {
-                    console.warn(`Node ID ${node.ID} has invalid risk or importance: ${node.riskScore}, ${node.importanceScore}`);
-                    return sum;
+            // Clear existing content
+            milestonesContainer.innerHTML = '';
+
+            let timeout = 100; // Initial timeout for animations
+
+            nodes.forEach(node => {
+                if (node.Milestone === 1) { // Ensure only milestones are processed
+                    // Milestone title
+                    const milestoneTitleDiv = document.createElement('div');
+                    milestoneTitleDiv.className = 'font-w600 text-white-op push-5 visibility-hidden';
+                    milestoneTitleDiv.setAttribute('data-toggle', 'appear');
+                    milestoneTitleDiv.setAttribute('data-class', 'animated fadeInRight');
+                    milestoneTitleDiv.setAttribute('data-timeout', timeout);
+                    milestoneTitleDiv.textContent = `${node.Name}: ${node.PercentComplete}%`;
+
+                    // Progress bar
+                    const progressBarDiv = document.createElement('div');
+                    progressBarDiv.className = 'progress visibility-hidden';
+                    progressBarDiv.setAttribute('data-toggle', 'appear');
+                    progressBarDiv.setAttribute('data-class', 'animated fadeInLeft');
+                    progressBarDiv.setAttribute('data-timeout', timeout + 200); // Slight delay for the bar animation
+
+                    const progressBarInnerDiv = document.createElement('div');
+                    progressBarInnerDiv.className = 'progress-bar progress-bar-sf progress-bar-striped active';
+                    progressBarInnerDiv.setAttribute('role', 'progressbar');
+                    progressBarInnerDiv.setAttribute('aria-valuenow', node.PercentComplete);
+                    progressBarInnerDiv.setAttribute('aria-valuemin', 0);
+                    progressBarInnerDiv.setAttribute('aria-valuemax', 100);
+                    progressBarInnerDiv.style.width = `${node.PercentComplete}%`;
+                    progressBarInnerDiv.style.height = '30px'; // Default height
+
+                    progressBarDiv.appendChild(progressBarInnerDiv);
+
+                    milestonesContainer.appendChild(milestoneTitleDiv);
+                    milestonesContainer.appendChild(progressBarDiv);
+
+                    timeout += 200; // Increase the timeout for the next milestone animation
                 }
-                return sum + (risk * importance);
-            }, 0);
-
-            if (totalPathWeight === 0) {
-                console.warn("Total path weight is 0 for path:", path);
-                return;
-            }
-
-            console.log("distributeOverrunProbability: Total Path Weight:", totalPathWeight);
-            for (let node of path) {
-                let risk = parseFloat(node.riskScore);
-                let importance = parseFloat(node.importanceScore);
-                let duration = parseFloat(node.Duration);
-
-                if (isNaN(risk) || isNaN(importance) || isNaN(duration)) {
-                    console.warn(`Node ID ${node.ID} has invalid values. Risk: ${node.riskScore}, Importance: ${node.importanceScore}, Duration: ${node.Duration}`);
-                    node.overrun_probability = 0;
-                    continue;
-                }
-
-                // Calculate node overrun probability ensuring it's never negative
-                let nodeWeight = risk * importance;
-                let probability = (nodeWeight / totalPathWeight) * totalProjectOverrunProbability;
-                node.overrun_probability = Math.min(1, Math.max(0, probability));
-
-                // Ensure the overrun probability is never such that the adjusted duration is less than the original duration
-                const adjustedDuration = parseFloat(node.Duration) * (1 + node.overrun_probability);
-                console.log("distributeOverrunProbability: Node:", node.ID, "Duration:", node.Duration, "Overrun Probability:", node.overrun_probability, "Adjusted Duration:", adjustedDuration);
-
-                if (adjustedDuration < parseFloat(node.Duration)) {
-                    node.overrun_probability = 0;
-                    console.warn(`Adjusted duration ${adjustedDuration} is less than original duration ${node.Duration} for Node ID ${node.ID}. Setting overrun_probability to 0.`);
-                }
-                if (isNaN(node.overrun_probability) || !isFinite(node.overrun_probability)) {
-                    console.warn(`Invalid overrun_probability for Node ID ${node.ID}. Setting to 0.`);
-                    node.overrun_probability = 0;
-                }
-            }
+            });
         }
 
         function drawMilestoneTable(nodes, links) {
@@ -3600,9 +3774,9 @@
             const timeUnits = nodes[0].TimeUnits;
 
             // Set the column header dynamically
-            const columnHeader = document.querySelector("#milestoneTable th.pathLength");
+            const columnHeader = document.querySelector('#milestoneTable thead th:last-child');
             if (columnHeader) {
-                columnHeader.textContent = `Path Length (${timeUnits})`;
+                columnHeader.textContent = 'Path';
             }
 
             // Check if there are any milestones. If not, exit the function early.
@@ -3614,15 +3788,28 @@
             const tableBody = document.getElementById('milestoneTableBody');
             tableBody.innerHTML = ''; // Clear any previous rows
 
+            // Calculate the maximum path length among all milestones
+            let maxPathLength = 0;
             milestones.forEach(milestone => {
                 const allPathsToMilestone = findAllPaths(startNode, milestone, links, nodes);
-                console.log(`Checking paths to milestone ID ${milestone.ID}`);
+                const longestDuration = allPathsToMilestone.reduce((max, path) => {
+                    const pathDuration = path.reduce((sum, node) => sum + node.Duration, 0);
+                    return Math.max(max, pathDuration);
+                }, 0);
+                maxPathLength = Math.max(maxPathLength, longestDuration);
+            });
+
+            milestones.forEach(milestone => {
+                const allPathsToMilestone = findAllPaths(startNode, milestone, links, nodes);
+                console.log(`drawMilestoneTable Checking paths to milestone ID ${milestone.ID}`);
 
                 // Finding the longest path by summing up durations of each path
                 let longestPath = [];
                 let longestDuration = 0;
                 allPathsToMilestone.forEach(path => {
-                    const pathDuration = path.reduce((sum, node) => sum + node.AdjustedDuration, 0);
+                    //const pathDuration = path.reduce((sum, node) => sum + node.AdjustedDuration, 0);
+                    const pathDuration = path.reduce((sum, node) => sum + node.Duration, 0);
+
                     console.log(`Path: [${path.map(p => p.ID).join(", ")}] - Duration: ${pathDuration}`);
                     if (pathDuration > longestDuration) {
                         longestDuration = pathDuration;
@@ -3630,50 +3817,312 @@
                     }
                 });
 
-                console.log(`Longest path to milestone ID ${milestone.ID}: [${longestPath.map(p => p.ID).join(", ")}] - Duration: ${longestDuration}`);
+                // Calculate risk-adjusted duration for the longest path
+                const riskAdjustedDuration = calculateExpectedOverrunDurationForPath(longestPath);
+                console.log(`drawMilestoneTable Longest path to milestone ID ${milestone.ID}: [${longestPath.map(p => p.ID).join(", ")}] - Duration: ${longestDuration}`);
+
+                // Log durations and risk-adjusted durations of each activity along the path for debugging purposes
+                console.log("drawMilestoneTable Activity Durations and Risk-adjusted Durations for the Longest Path:");
+                longestPath.forEach(node => {
+                    const nodeRiskAdjustedDuration = node.Duration + (node.Duration * node.overrun_probability);
+                    console.log(` drawMilestoneTable Node ID: ${node.ID}, Duration: ${node.Duration}, Risk-adjusted Duration: ${nodeRiskAdjustedDuration}`);
+                });
 
                 // Creating a row for each milestone
                 const row = document.createElement('tr');
 
                 // Add cells to the row
-                ['ID', 'Name', 'riskScore', 'importanceScore', 'pageRank', 'Start', 'Finish', 'slack', 'overrun_probability'].forEach(key => {
+                ['ID', 'Name', 'riskScore', 'importanceScore', 'Start', 'Finish', 'slack', 'overrun_probability'].forEach(key => {
                     const cell = document.createElement('td');
-                    if (key === 'pageRank') {
-                        cell.textContent = milestone[key].toFixed(5);
-                    } else if (key === 'slack') {
+                    if (key === 'slack') {
                         cell.textContent = Math.round(milestone[key]); // Rounding off the decimal for slack
                     } else if (key === 'riskScore' || key === 'importanceScore' || key === 'overrun_probability') {
                         cell.textContent = milestone[key].toFixed(2);
-                    } else if (key === 'Start' || key === 'Finish') { // Use formatDate for Start and Finish dates
-                        cell.textContent = formatDate(milestone[key]);
+                    } else if (key === 'Start') {
+                        cell.textContent = formatDate(startNode.Start);  // Use start date of the startNode
+                    } else if (key === 'Finish') {
+                        cell.textContent = formatDate(milestone.Finish);  // Use finish date of the milestone
                     } else {
                         cell.textContent = milestone[key];
                     }
                     row.appendChild(cell);
                 });
 
+                const MIN_BAR_WIDTH = 15; // Minimum width in pixels
+
                 // Adding a cell for the path
                 const pathCell = document.createElement('td');
                 pathCell.textContent = longestPath.map(node => node.ID).join(' -> ');
-                pathCell.style.width = '300px';  // Set the width of the path column to 300 pixels or any desired value
+                pathCell.style.width = '400px';  // Set the width of the path column to 300 pixels or any desired value
                 row.appendChild(pathCell);
 
                 // Adding a cell for the length of the path
-                const lengthCell = document.createElement('td');
-                lengthCell.textContent = Math.round(longestDuration); // Rounding off the decimal
-                row.appendChild(lengthCell);
+                //const lengthCell = document.createElement('td');
+                //lengthCell.textContent = Math.round(longestDuration); // Rounding off the decimal
+                //row.appendChild(lengthCell);
 
                 // Add progress bar for PercentComplete
-                const progressCell = document.createElement('td');
-                const progressBar = document.createElement('div');
-                progressBar.style.width = milestone.PercentComplete + '%';
-                progressBar.style.backgroundColor = 'green';
-                progressBar.style.height = '20px';
-                progressCell.appendChild(progressBar);
-                row.appendChild(progressCell);
+                //const progressCell = document.createElement('td');
+                //const progressBar = document.createElement('div');
+                // progressBar.style.width = milestone.PercentComplete + '%';
+                //progressBar.style.backgroundColor = 'green';
+                //progressBar.style.height = '20px';
+                //progressCell.appendChild(progressBar);
+                //row.appendChild(progressCell);
 
                 tableBody.appendChild(row);
+
+                // Calculate overall progress for the milestone
+                const totalCompletedDuration = longestPath.reduce((sum, node) => {
+                    let percentComplete = parseFloat(node.PercentComplete);
+                    if (isNaN(percentComplete)) { // If conversion to number fails
+                        percentComplete = 0; // Default to 0
+                    }
+                    return sum + node.AdjustedDuration * (percentComplete / 100);
+                }, 0);
+
+                const totalProgress = (totalCompletedDuration / longestDuration) * 100; // As a percentage
+
+                // Calculate the planned completion percentage
+                const plannedCompletion = longestDuration / nodes.reduce((sum, node) => sum + node.AdjustedDuration, 0);
+
+                // Add progress bars
+                const progressBarRow = document.createElement('tr');
+                const progressBarCell = document.createElement('td');
+                progressBarCell.setAttribute('colspan', '10'); // Span across all columns
+
+                const progressBarWrapper = document.createElement('div');
+                progressBarWrapper.style.display = 'flex';
+                progressBarWrapper.style.flexDirection = 'column';
+                progressBarWrapper.style.alignItems = 'flex-start'; // Align to the start
+
+                // Assuming progressBarCell is already attached to the DOM
+                const singleCellWidth = progressBarCell.offsetWidth / 10;
+                const availableSpace = singleCellWidth * 10;
+
+                // Adjust the width of the bars to fit within the available space
+                //durationDiv.style.maxWidth = availableSpace + 'px';
+                //riskAdjustedDurationDiv.style.maxWidth = availableSpace + 'px';
+
+                // Overall Duration Bar (Background Bar)
+                const durationDiv = document.createElement('div');
+                //durationDiv.style.width = '100%'; // Full width to represent the entire duration
+                // Set the width of the durationDiv proportional to its longestDuration
+                //durationDiv.style.width = ((longestDuration / maxPathLength) * 100) + MIN_BAR_WIDTH + '%';
+                durationDiv.style.width = Math.min(((longestDuration / maxPathLength) * 100) + MIN_BAR_WIDTH, 100) + '%';
+                durationDiv.style.background = '#287dc8';
+                durationDiv.style.height = '20px';
+                durationDiv.style.borderRadius = '10px';
+                durationDiv.style.position = 'relative';
+                durationDiv.title = `Path Duration: ${longestDuration.toFixed(0)} ${timeUnits}`;
+
+                // Actual Progress Bar (Foreground Bar)
+                const progressDiv = document.createElement('div');
+                progressDiv.style.width = totalProgress * 100 + '%';
+                progressDiv.style.background = 'linear-gradient(to right, #5ac8fa, #1e69aa)';
+                progressDiv.style.height = '20px';
+                progressDiv.style.borderRadius = '10px';
+                progressDiv.style.boxShadow = '0 0 10px #5ac8fa';
+                //progressDiv.title = 'Overall Progress: ' + (totalProgress * 100).toFixed(2) + '%';
+                progressDiv.title = `Overall Progress: ${totalProgress.toFixed(2)}% of the path completed`;
+
+
+                // Text Displaying the Path Length and Completion
+                const pathLengthDiv = document.createElement('div');
+                pathLengthDiv.textContent = longestDuration.toFixed(0) + ' ' + timeUnits;
+                pathLengthDiv.style.position = 'absolute';
+                pathLengthDiv.style.left = '10px';
+                pathLengthDiv.style.top = '50%';
+                pathLengthDiv.style.transform = 'translateY(-50%)';
+                pathLengthDiv.style.color = '#cdfaff';
+
+                const completionDiv = document.createElement('div');
+                completionDiv.textContent = (totalProgress * 100).toFixed(0) + '% Completed';
+                completionDiv.style.position = 'absolute';
+                completionDiv.style.right = '10px';
+                completionDiv.style.top = '50%';
+                completionDiv.style.transform = 'translateY(-50%)';
+                completionDiv.style.color = '#cdfaff';
+
+
+                // Risk-Adjusted Duration Bar (Background Bar)
+                const riskAdjustedDurationDiv = document.createElement('div');
+                //riskAdjustedDurationDiv.style.width = ((riskAdjustedDuration / maxPathLength) * 100) + MIN_BAR_WIDTH + '%';
+                riskAdjustedDurationDiv.style.width = Math.min(((riskAdjustedDuration / maxPathLength) * 100) + MIN_BAR_WIDTH, 100) + '%';
+                riskAdjustedDurationDiv.style.background = '#113464';  // Darker color
+                riskAdjustedDurationDiv.style.height = '20px';
+                riskAdjustedDurationDiv.style.borderRadius = '10px';
+                riskAdjustedDurationDiv.style.position = 'relative';
+                riskAdjustedDurationDiv.style.marginTop = '10px';
+                riskAdjustedDurationDiv.title = `Risk-Adjusted Path Duration: ${riskAdjustedDuration.toFixed(0)} ${timeUnits}`;
+
+                // Text Displaying the Risk-Adjusted Path Length
+                const riskAdjustedPathLengthDiv = document.createElement('div');
+                riskAdjustedPathLengthDiv.textContent = riskAdjustedDuration.toFixed(0) + ' ' + timeUnits;
+                riskAdjustedPathLengthDiv.style.position = 'absolute';
+                riskAdjustedPathLengthDiv.style.left = '10px';
+                riskAdjustedPathLengthDiv.style.top = '50%';
+                riskAdjustedPathLengthDiv.style.transform = 'translateY(-50%)';
+                riskAdjustedPathLengthDiv.style.color = '#cdfaff';
+
+                durationDiv.appendChild(progressDiv);
+                durationDiv.appendChild(pathLengthDiv);
+                durationDiv.appendChild(completionDiv);
+                riskAdjustedDurationDiv.appendChild(riskAdjustedPathLengthDiv);
+                progressBarWrapper.appendChild(riskAdjustedDurationDiv);
+                progressBarWrapper.appendChild(durationDiv);
+                progressBarCell.appendChild(progressBarWrapper);
+                progressBarRow.appendChild(progressBarCell);
+                tableBody.appendChild(progressBarRow);
             });
+        }
+        function initializeTaskCompletionChart(nodes) {
+            function computeTaskCompletionCounts() {
+                let completed = 0;
+                let inProgress = 0;
+                let notStarted = 0;
+
+                nodes.forEach(node => {
+                    const percentComplete = parseFloat(node.PercentComplete);
+                    if (percentComplete === 100) {
+                        completed++;
+                    } else if (percentComplete > 0) {
+                        inProgress++;
+                    } else {
+                        notStarted++;
+                    }
+                });
+
+                return [completed, inProgress, notStarted];
+            }
+
+            var ctx = document.getElementById('taskCompletion').getContext('2d');
+
+            // Calculate task counts
+            const taskCounts = computeTaskCompletionCounts();
+
+            var chart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Completed', 'In Progress', 'Not Started'],
+                    datasets: [{
+                        data: taskCounts,
+                        backgroundColor: ['#1cc88a', '#f6c23e', '#e74a3b']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    legend: {
+                        labels: {
+                            fontColor: "white",
+                            boxWidth: 15
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateKeyDeliverables(nodes, initialNumTasks) {
+            const slider = document.getElementById('numTasksSlider');
+            const numTasksLabel = document.getElementById('numTasksLabel');
+
+            function renderTasks(numTasks) {
+                // Get current date
+                const today = new Date();
+                const twoWeeksFromNow = new Date(today);
+                twoWeeksFromNow.setDate(today.getDate() + 14);
+                const twoMonthsFromNow = new Date(today);
+                twoMonthsFromNow.setMonth(today.getMonth() + 2);
+
+                // Identify nodes/tasks that fall within the next 2 weeks to 2 months
+                let upcomingTasks = nodes.filter(node => {
+                    const taskEndDate = new Date(node.Finish);
+                    return taskEndDate >= today && taskEndDate <= twoMonthsFromNow;
+                });
+
+                // Sort the tasks based on their risk and importance scores
+                upcomingTasks.sort((a, b) => {
+                    return (b.riskScore + b.importanceScore) - (a.riskScore + a.importanceScore);
+                });
+
+                // Take top 'numTasks' tasks
+                upcomingTasks = upcomingTasks.slice(0, numTasks);
+
+                if (upcomingTasks.length === 0) {
+                    document.getElementById('keyDeliverablesTasksContainer').innerHTML = '<div>No upcoming tasks within the timeframe.</div>';
+                    return;
+                }
+
+                let html = '';
+                upcomingTasks.forEach((task, index) => {
+                    const daysToDue = Math.ceil((new Date(task.Finish) - today) / (1000 * 60 * 60 * 24));
+
+                    let dueText;
+                    let textColor;
+                    if (daysToDue === 1) {
+                        dueText = 'Due Tomorrow';
+                        textColor = 'text-danger';
+                    } else if (daysToDue <= 7) {
+                        dueText = `Due in ${daysToDue} days`;
+                        textColor = 'text-warning';
+                    } else if (daysToDue <= 30) {
+                        dueText = `Due in ${daysToDue} days`;
+                        textColor = 'text-success';
+                    } else {
+                        dueText = `Due in ${daysToDue} days`;
+                        textColor = 'text-primary';
+                    }
+
+                    html += `
+                        <div class="row items-push overflow-hidden">
+                            <div class="col-xs-2 text-center visibility-hidden" data-toggle="appear" data-class="animated fadeInRight" data-timeout="${(index + 1) * 300}">
+                                <canvas id="pieChart${index + 1}" style="max-height: 50px;" class="chart-size"></canvas>
+                            </div>
+                            <div class="col-xs-10 visibility-hidden" data-toggle="appear" data-class="animated fadeInLeft" data-timeout="${(index + 1) * 100}">
+                                <div class="text-uppercase font-w600 text-white-op"><i class="fas fa-tasks"></i> ${task.Name}</div>
+                                <div class="font-s36 font-w300 ${textColor}">${dueText}</div>
+                            </div>
+                        </div>
+                        <div class="col-xs-12" style="height: 1px; background-color: #ddd; margin: 10px 0;"></div>`;
+                });
+
+                document.getElementById('keyDeliverablesTasksContainer').innerHTML = html;
+
+                // Render pie charts for each task
+                upcomingTasks.forEach((task, index) => {
+                    const ctx = document.getElementById(`pieChart${index + 1}`).getContext('2d');
+                    new Chart(ctx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Completed', 'Remaining'],
+                            datasets: [{
+                                data: [parseInt(task.PercentComplete), 100 - parseInt(task.PercentComplete)],
+                                backgroundColor: ['#1cc88a', '#e74a3b']
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: true,
+                            legend: {
+                                display: false
+                            },
+                            tooltips: {
+                                enabled: false
+                            },
+                            cutoutPercentage: 70
+                        }
+                    });
+                });
+            }
+
+            // Attach an event listener to the slider to update the tasks when it changes
+            slider.addEventListener('input', function () {
+                numTasksLabel.textContent = this.value;
+                renderTasks(parseInt(this.value));
+            });
+
+            // Initial rendering
+            renderTasks(initialNumTasks);
         }
 
         function generatePathsTable(nodes, links) {
@@ -3898,6 +4347,385 @@
                 return sum + adjustedDuration;
             }, 0);
         }
+
+        function getDurationInHours(node) {
+            return node.TimeUnits === "Hours" ? parseFloat(node.Duration) : parseFloat(node.Duration) * 24;
+        }
+
+        function getAdjustedDurationInHours(node) {
+            const overrunFactor = 1 + parseFloat(node.overrun_probability);
+            return getDurationInHours(node) * overrunFactor;
+        }
+
+        // Adjust the Start and Finish times of tasks based on their dependencies and the overrun in their predecessor tasks.
+        function adjustTaskTimesWithDependencies(nodes, links) {
+            const nodeById = {};
+            nodes.forEach(node => {
+                nodeById[node.ID] = node;
+            });
+
+            function adjustStartTime(node) {
+                if (node.adjusted) return;
+                const predecessors = links.filter(link => link.target.ID === node.ID).map(link => link.source);
+                let maxFinishTime = new Date(node.Start);
+
+                predecessors.forEach(predecessor => {
+                    adjustStartTime(predecessor);
+                    const adjustedFinish = new Date(predecessor.Finish);
+                    adjustedFinish.setTime(adjustedFinish.getTime() + getAdjustedDurationInHours(predecessor) * 3600000 - getDurationInHours(predecessor) * 3600000);
+                    if (adjustedFinish > maxFinishTime) {
+                        maxFinishTime = adjustedFinish;
+                    }
+                });
+
+                node.Start = maxFinishTime.toISOString();
+                const taskEndTime = new Date(maxFinishTime.getTime() + getDurationInHours(node) * 3600000);
+                node.Finish = taskEndTime.toISOString();
+                node.adjusted = true;
+            }
+
+            nodes.forEach(node => {
+                if (!node.adjusted) {
+                    adjustStartTime(node);
+                }
+            });
+        }
+
+        function adjustTaskTimesForOverrun(nodes) {
+            nodes.forEach(node => {
+                const difference = getAdjustedDurationInHours(node) - getDurationInHours(node);
+                const taskEnd = new Date(node.Finish);
+                taskEnd.setTime(taskEnd.getTime() + difference * 3600000);
+                node.AdjustedFinish = taskEnd.toISOString();
+            });
+        }
+
+        //cumulativeHoursChart
+        function getCumulativeDistribution(nodes, links) {
+            console.log("CHART_DEBUG: Entering function");
+            adjustTaskTimesWithDependencies(nodes, links);
+
+            // Sort nodes by ID to get the start and end dates
+            nodes.sort((a, b) => parseInt(a.ID) - parseInt(b.ID));
+            const startDate = new Date(nodes[0].Start);
+            const endDate = new Date(nodes[nodes.length - 1].Finish);
+
+            const totalOverrunHours = nodes.reduce((sum, node) => {
+                const overrunFactor = 1 + parseFloat(node.overrun_probability);
+                let duration;
+                if (node.TimeUnits === "Hours") {
+                    duration = parseFloat(node.Duration);
+                } else {
+                    duration = parseFloat(node.Duration) * 24;
+                }
+                return sum + (duration * overrunFactor - duration);
+            }, 0);
+
+            const overrunEndDate = new Date(endDate.getTime() + totalOverrunHours * 3600000); // 3600000 is milliseconds in an hour
+
+            let currentDate = startDate;
+            const distribution = [];
+            let cumulativeHours = 0;
+            let cumulativeHoursWithOverrun = 0;
+
+            const distributionWithoutOverrun = [];
+            const distributionWithOverrun = [];
+            while (currentDate <= endDate) {
+                nodes.forEach(node => {
+                    const taskStart = new Date(node.Start);
+                    const taskEnd = new Date(node.Finish);
+                    const adjustedTaskEnd = new Date(node.AdjustedFinish);  // <-- Add this line
+                    const overrunFactor = 1 + parseFloat(node.overrun_probability);
+                    let dailyDuration = 0;  // Duration for this node on this day
+
+                    const latestTaskEnd = (adjustedTaskEnd > taskEnd) ? adjustedTaskEnd : taskEnd;
+                    if (taskStart <= currentDate && currentDate <= latestTaskEnd) {
+
+                        if (taskStart.getTime() === taskEnd.getTime()) {
+                            if (node.TimeUnits === "Hours") {
+                                dailyDuration = parseFloat(node.Duration);
+                            } else {
+                                dailyDuration = parseFloat(node.Duration) * 24;
+                            }
+                        } else {
+                            const daysDuration = (taskEnd.getTime() - taskStart.getTime()) / (1000 * 60 * 60 * 24) + 1;
+                            if (node.TimeUnits === "Hours") {
+                                dailyDuration = parseFloat(node.Duration) / daysDuration;
+                            } else {
+                                dailyDuration = parseFloat(node.Duration) * 24 / daysDuration;
+                            }
+                        }
+
+                        cumulativeHours += dailyDuration;
+                        cumulativeHoursWithOverrun += dailyDuration * overrunFactor;
+
+                        //console.log(`CHART_DEBUG: Node ${node.ID} - ${node.Name} - ${overrunFactor} - ${node.overrun_probability}- ${adjustedDuration} hrs`);
+                    }
+                });
+
+                distribution.push({
+                    date: currentDate.toISOString().split('T')[0],
+                    hours: cumulativeHours,
+                    hoursWithOverrun: cumulativeHoursWithOverrun
+                });
+                distributionWithoutOverrun.push({
+                    date: currentDate.toISOString().split('T')[0],
+                    hours: cumulativeHours
+                });
+
+                distributionWithOverrun.push({
+                    date: currentDate.toISOString().split('T')[0],
+                    hoursWithOverrun: cumulativeHoursWithOverrun
+                });
+
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+
+            while (currentDate <= overrunEndDate) {
+                nodes.forEach(node => {
+                    const taskStart = new Date(node.Start);
+                    const adjustedTaskStart = new Date(node.AdjustedStart || node.Start);  // Use AdjustedStart if exists, otherwise use the original Start
+                    const adjustedTaskEnd = new Date(node.AdjustedFinish);
+
+
+                    const overrunFactor = 1 + parseFloat(node.overrun_probability);
+                    let dailyDuration = 0;  // Duration for this node on this day
+
+                    // Here, use adjustedTaskEnd for the overrun calculation
+                    if (adjustedTaskStart <= currentDate && currentDate <= adjustedTaskEnd) {
+                        if (taskStart.getTime() === adjustedTaskEnd.getTime()) {  // <-- Change this line
+                            if (node.TimeUnits === "Hours") {
+                                dailyDuration = parseFloat(node.Duration);
+                            } else {
+                                dailyDuration = parseFloat(node.Duration) * 24;
+                            }
+                        } else {
+                            const daysDuration = (adjustedTaskEnd.getTime() - taskStart.getTime()) / (1000 * 60 * 60 * 24) + 1; // <-- And this line
+                            if (node.TimeUnits === "Hours") {
+                                dailyDuration = parseFloat(node.Duration) / daysDuration;
+                            } else {
+                                dailyDuration = parseFloat(node.Duration) * 24 / daysDuration;
+                            }
+                        }
+
+                        cumulativeHoursWithOverrun += dailyDuration * overrunFactor;
+                    }
+                });
+
+                distributionWithOverrun.push({
+                    date: currentDate.toISOString().split('T')[0],
+                    hoursWithOverrun: cumulativeHoursWithOverrun
+                });
+
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+
+            const yUnits = nodes[0].TimeUnits === "Hours" ? "Cumulative Hours" : "Cumulative Days";
+
+            console.log("CHART_DEBUG: Distribution array created");
+            console.log("CHART_DEBUG: Distribution Data", distribution);
+            const ctx = document.getElementById('cumulativeHoursChart').getContext('2d');
+            const allDates = [...new Set([...distributionWithoutOverrun.map(d => d.date), ...distributionWithOverrun.map(d => d.date)])].sort();
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: allDates,
+                    datasets: [{
+                        label: 'Cumulative Hours',
+                        data: allDates.map(date => {
+                            const entry = distributionWithoutOverrun.find(d => d.date === date);
+                            return entry ? entry.hours : null;
+                        }),
+                        borderColor: '#FF5733',
+                        backgroundColor: 'rgba(255, 87, 51, 0.1)',
+                        fill: false
+                    },
+                    {
+                        label: 'Cumulative Hours with Overrun',
+                        data: allDates.map(date => {
+                            const entry = distributionWithOverrun.find(d => d.date === date);
+                            return entry ? entry.hoursWithOverrun : null;
+                        }),
+                        borderColor: '#00AA55',
+                        backgroundColor: 'rgba(0, 170, 85, 0.1)',
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#b4f5ff'
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: {
+                                color: '#5ac8fa'
+                            },
+                            grid: {
+                                color: '#41afeb'
+                            },
+                            title: {
+                                display: true,
+                                text: 'Date',
+                                color: '#5ac8fa'
+                            }
+                        },
+                        y: {
+                            ticks: {
+                                color: '#5ac8fa',
+                                callback: function (value, index, values) {
+                                    //return value + " hrs";
+                                    if (nodes[0].TimeUnits === "Hours") {
+                                        return value + " hrs";
+                                    } else {
+                                        // Convert hours to days for display
+                                        return (value / 24).toFixed(2) + " days";
+                                    }
+                                }
+                            },
+                            grid: {
+                                color: '#41afeb'
+                            },
+                            title: {
+                                display: true,
+                                text: 'Cumulative Hours', // Always display as hours
+                                color: '#5ac8fa'
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    const value = context.parsed.y;
+                                    return (nodes[0].TimeUnits === "Hours") ? value + " hrs" : value + " days";
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            console.log("CHART_DEBUG: Chart should be rendered");
+            return distribution;
+        }
+
+        function durationToMilliseconds(duration, timeUnits) {
+            switch (timeUnits) {
+                case 'Hours':
+                    return duration * 60 * 60 * 1000;
+                case 'Minutes':
+                    return duration * 60 * 1000;
+                case 'Seconds':
+                    return duration * 1000;
+                case 'Days':
+                    return duration * 24 * 60 * 60 * 1000;
+                default:
+                    return duration;  // Return the original value if the unit isn't recognized
+            }
+        }
+
+        function computeRiskAdjustedDurationsAndDates(nodes, links) {
+            const startNode = nodes.find(node => node.ID === "0");
+            const endNode = nodes.reduce((a, b) => (a.ID > b.ID) ? a : b);
+
+            const paths = findAllPaths(startNode, endNode, links, nodes);
+
+            nodes.forEach(node => {
+                const riskAdjustedDuration = node.Duration * (1 + node.overrun_probability);
+                node.riskAdjustedDuration = riskAdjustedDuration;
+                node.riskAdjustedStart = new Date(node.Start);
+                node.riskAdjustedEnd = new Date(node.Start);
+                node.riskAdjustedEnd.setHours(node.riskAdjustedEnd.getHours() + riskAdjustedDuration);
+            });
+
+            paths.forEach(path => {
+                path.forEach((node, index) => {
+                    if (index === 0) return; // Skip the first node as its risk-adjusted dates are set already
+
+                    const prevNode = path[index - 1];
+                    const potentialStartDate = new Date(prevNode.riskAdjustedEnd);
+
+                    if (potentialStartDate > node.riskAdjustedStart) {
+                        node.riskAdjustedStart = potentialStartDate;
+                        node.riskAdjustedEnd = new Date(node.riskAdjustedStart);
+                        node.riskAdjustedEnd.setHours(node.riskAdjustedEnd.getHours() + node.riskAdjustedDuration);
+                    }
+                });
+            });
+        }
+
+        function updateProgressBars(nodes) {
+            function renderProgressBar(elementId, progress, gradient) {
+                let progressBar = document.getElementById(elementId);
+                progressBar.style.transition = 'width 1s ease-in-out, background 1s ease-in-out'; // Animation
+                progressBar.style.width = progress + '%';
+                if (gradient) {
+                    progressBar.style.background = gradient;
+                }
+            }
+
+            function updateProgressLabel(labelId, progress) {
+                let label = document.getElementById(labelId);
+                label.textContent = progress.toFixed(2) + '%';
+            }
+
+            // Calculate schedule progress
+            let startDate = new Date(nodes[0].Start);
+            let endDate = new Date(nodes[nodes.length - 1].Finish);
+            let currentDate = new Date();
+            let scheduleDuration = endDate - startDate;
+            let elapsedDuration = currentDate - startDate;
+            let scheduleProgress = (elapsedDuration / scheduleDuration) * 100;
+
+            // Cap scheduleProgress at 100%
+            if (scheduleProgress > 100) scheduleProgress = 100;
+
+            // Calculate scope progress
+            let totalScope = nodes.reduce((sum, node) => sum + parseFloat(node.Duration), 0);
+            let completedScope = nodes.reduce((sum, node) => {
+                let percentComplete = parseFloat(node.PercentComplete);
+                if (isNaN(percentComplete)) percentComplete = 0; // Handle NaN cases
+                return sum + parseFloat(node.Duration) * percentComplete / 100;
+            }, 0);
+            let scopeProgress = (completedScope / totalScope) * 100;
+
+            // Handle NaN in scopeProgress
+            if (isNaN(scopeProgress)) scopeProgress = 0;
+
+            // Dynamic Gradient coding for scope progress bar
+            let deviationPercentage = (scopeProgress - scheduleProgress) / scheduleProgress;
+            let scopeGradient;
+            if (deviationPercentage < -0.1) {
+                scopeGradient = 'red';
+            } else if (deviationPercentage > 0.1) {
+                scopeGradient = 'green';
+            } else {
+                scopeGradient = `linear-gradient(90deg, yellow, ${deviationPercentage >= 0 ? 'green' : 'red'} ${Math.abs(deviationPercentage * 1000)}%)`;
+            }
+
+            // Update the progress bars
+            renderProgressBar('scheduleProgressBar', scheduleProgress);
+            updateProgressLabel('scheduleProgressLabel', scheduleProgress);
+            renderProgressBar('scopeProgressBar', scopeProgress, scopeGradient); // Pass the gradient here
+            updateProgressLabel('scopeProgressLabel', scopeProgress);
+
+            // Log for debugging
+            console.log("Start Date:", startDate);
+            console.log("End Date:", endDate);
+            console.log("Current Date:", currentDate);
+            console.log("Total Duration:", scheduleDuration);
+            console.log("Elapsed Duration:", elapsedDuration);
+            console.log("Schedule Progress:", scheduleProgress);
+            console.log("Scope Progress:", scopeProgress);
+        }
+
+
 
         function constructNetworkUsingPageRankWithDurationsCriticalPathAndOutliers(nodes, links) {
             const dampingFactor = 0.85;
@@ -4268,11 +5096,11 @@
                 if (selectedNodeId) {
                     const selectedNode = nodes.find(node => node.ID === selectedNodeId);
                     infoPanel.innerHTML = `
-                    <h3>Node Details</h3>
-                    <p><strong>ID:</strong> ${selectedNode.ID}</p>
-                    <p><strong>Name:</strong> ${selectedNode.Name}</p>
-                    <p><strong>Degree:</strong> ${selectedNode.degree}</p>
-                `;
+                        <h3>Node Details</h3>
+                        <p><strong>ID:</strong> ${selectedNode.ID}</p>
+                        <p><strong>Name:</strong> ${selectedNode.Name}</p>
+                        <p><strong>Degree:</strong> ${selectedNode.degree}</p>
+                    `;
                 } else {
                     infoPanel.innerHTML = '';
                 }
@@ -4305,9 +5133,9 @@
             network.on("hoverNode", function (properties) {
                 const hoveredNode = nodes.find(node => node.ID === properties.node);
                 const tooltipContent = `
-                <strong>ID:</strong> ${hoveredNode.ID}<br>
-                <strong>Name:</strong> ${hoveredNode.Name}
-            `;
+                    <strong>ID:</strong> ${hoveredNode.ID}<br>
+                    <strong>Name:</strong> ${hoveredNode.Name}
+                `;
                 // Display this content in a tooltip. (Implementation depends on your tooltip library)
             });
 
@@ -4315,11 +5143,11 @@
             const legend = document.createElement('div');
             legend.style.marginTop = "20px";
             legend.innerHTML = `
-                    <strong>Legend:</strong><br>
-                    <span style="display:inline-block; width:12px; height:12px; background-color:red;"></span> High Degree Node<br>
-                    <span style="display:inline-block; width:12px; height:12px; background-color:blue;"></span> Low Degree Node<br>
-                    <span style="display:inline-block; width:20px; height:2px; background-color:#a3d1ff;"></span> Link (Hover for duration)
-                `;
+                        <strong>Legend:</strong><br>
+                        <span style="display:inline-block; width:12px; height:12px; background-color:red;"></span> High Degree Node<br>
+                        <span style="display:inline-block; width:12px; height:12px; background-color:blue;"></span> Low Degree Node<br>
+                        <span style="display:inline-block; width:20px; height:2px; background-color:#a3d1ff;"></span> Link (Hover for duration)
+                    `;
             container.appendChild(legend);
         }
 
@@ -4700,7 +5528,7 @@
             computeNetworkMetrics(nodes, links, dampingFactor, maxIterations).then(result => {
                 console.log("Updated Nodes with Metrics:", result.updatedNodes);
                 console.log("Network Density:", result.networkDensity);
-
+                computeRiskAdjustedDurationsAndDates(nodes, links);
                 // Move all your drawing functions inside this .then() block
                 drawScatterPlotWithD3(result.updatedNodes, links);  // Use the updated nodes
                 console.log("Drawing S-Curve...");
@@ -4723,7 +5551,11 @@
                 generatePathsTable(result.updatedNodes, links);
                 generateKanbanCards(nodes, links);
                 drawMilestoneTable(nodes, links);
-
+                populateInternalMilestones(nodes)
+                initializeTaskCompletionChart(nodes);
+                getCumulativeDistribution(nodes, links);
+                updateKeyDeliverables(nodes, 5);  // initially show 5 tasks
+                updateProgressBars(nodes);
                 // Generate reduced graph using PageRank with durations, critical path, and outliers
                 console.log("About to Enter drawReducedGraphWithVis");
                 const result1 = constructNetworkUsingPageRankWithDurationsCriticalPathAndOutliers(result.updatedNodes, links);
@@ -5223,7 +6055,7 @@
                 pageRankCell.textContent = (score.pageRank || 0).toFixed(5);
                 var slackCell = document.createElement('td');
                 slackCell.textContent = score.slack.toFixed(2); // Assuming slack is a number
-                var overrunProbabilityCell = document.createElement('td');  
+                var overrunProbabilityCell = document.createElement('td');
                 overrunProbabilityCell.textContent = score.overrunProbability.toFixed(2);
                 // Check if overrunProbability is a string and try to convert it to a number
                 if (typeof score.overrunProbability === "string") {
@@ -5276,20 +6108,20 @@
             // Add critical path
             const criticalRow = document.createElement('tr');
             criticalRow.innerHTML = `
-                                            <td class="critical">Critical Path</td>
-                                            <td class="critical">${criticalPathData.duration}</td>
-                                            ${criticalPathData.path.map(node => `<td class="critical">${node.ID}</td>`).join('')}
-                                        `;
+                                                <td class="critical">Critical Path</td>
+                                                <td class="critical">${criticalPathData.duration}</td>
+                                                ${criticalPathData.path.map(node => `<td class="critical">${node.ID}</td>`).join('')}
+                                            `;
             tableBody.appendChild(criticalRow);
 
             // Add outlier paths
             outlierPathsData.paths.forEach((path, index) => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                                                <td class="outlier">Outlier Path</td>
-                                                <td class="outlier">${outlierPathsData.durations[index]}</td>
-                                                ${path.map(node => `<td class="outlier">${node.ID}</td>`).join('')}
-                                            `;
+                                                    <td class="outlier">Outlier Path</td>
+                                                    <td class="outlier">${outlierPathsData.durations[index]}</td>
+                                                    ${path.map(node => `<td class="outlier">${node.ID}</td>`).join('')}
+                                                `;
                 tableBody.appendChild(row);
             });
         }
@@ -5527,7 +6359,7 @@
                 }]
             };
 
-                // Calculate cumulative counts for overlay line graph
+            // Calculate cumulative counts for overlay line graph
             let cumulativeCounts = [];
             let cumulativeCount = 0;
             Object.values(durationCounts).forEach(count => {
@@ -5643,27 +6475,27 @@
                 const alarms = '<i class="fas fa-bell" style="color:orange;"></i>'.repeat(outlierCount);
 
                 const cardHTML = `
-                <div class="kanban-card sci-fi-card" data-start-date="${node.Start}" data-due-date="${node.Finish}" data-lateness="0">
-                    <div class="alarm-indicators">${alarms}</div>
-                    <h4>${node.Name} (ID: ${node.ID})</h4>
-                    <ul class="futuristic-list">
-                        <li style="color:${riskColor}">Risk: ${node.riskScore.toFixed(2)}</li>
-                        <li style="color:${importanceColor}">Importance: ${node.importanceScore.toFixed(2)}</li>
-                        <li style="color:${pathColor}">Path: ${pathType}</li>
-                    </ul>
-                    <p>Expected Start: ${startDate.toLocaleDateString()} | Duration: ${node.Duration} days</p>
-                    <div class="card-icons">
-                        <span class="due-date-icon"><i class="fas fa-calendar-alt"></i> Due: ${finishDate.toLocaleDateString()} (${daysLeftText})</span>
-                        <span class="slack"><i class="fas fa-clock"></i> Slack: ${node.slack} hours</span>
-                
+                    <div class="kanban-card sci-fi-card" data-start-date="${node.Start}" data-due-date="${node.Finish}" data-lateness="0">
+                        <div class="alarm-indicators">${alarms}</div>
+                        <h4>${node.Name} (ID: ${node.ID})</h4>
+                        <ul class="futuristic-list">
+                            <li style="color:${riskColor}">Risk: ${node.riskScore.toFixed(2)}</li>
+                            <li style="color:${importanceColor}">Importance: ${node.importanceScore.toFixed(2)}</li>
+                            <li style="color:${pathColor}">Path: ${pathType}</li>
+                        </ul>
+                        <p>Expected Start: ${startDate.toLocaleDateString()} | Duration: ${node.Duration} days</p>
+                        <div class="card-icons">
+                            <span class="due-date-icon"><i class="fas fa-calendar-alt"></i> Due: ${finishDate.toLocaleDateString()} (${daysLeftText})</span>
+                            <span class="slack"><i class="fas fa-clock"></i> Slack: ${node.slack} hours</span>
+
+                        </div>
+                        <div class="outlier-indicators">
+                            ${riskIcon}
+                            ${importanceIcon}
+                            ${pathIcon}
+                        </div>
                     </div>
-                    <div class="outlier-indicators">
-                        ${riskIcon}
-                        ${importanceIcon}
-                        ${pathIcon}
-                    </div>
-                </div>
-            `;
+                `;
 
                 columns[column].push(cardHTML);
             });
@@ -6624,10 +7456,8 @@
             <h1 class="block-title text-white" style="text-shadow: 0 0 10px #5ac8fa;"><i class="fas fa-rocket"></i> Welcome to Cybereum - the Future of Project Management</h1>
         </div>
         <p class="futuristic-introduction" style="color: #cdfaff; font-size: 18px; margin-top: 20px; line-height: 1.6; text-align: center; padding: 0 10%; margin-bottom: 30px;position: relative; z-index: 2;max-width: 600px; text-align: center;">
-            Dive deep into a world where data-driven decision-making and insights merge seamlessly.
             Harness the unmatched power of Cybereum's futuristic project analysis platform, a harmonious blend of advanced algorithms
-            and intuitive design. Every piece of project data tells a story, and our tools are crafted meticulously to bring those stories to life.
-            Embark on this transformative journey with us and redefine the boundaries of project management.
+            and intuitive design. Every piece of project data tells a story, and our tools are crafted meticulously to bring those stories to life to redefine the boundaries of project management.
 
             The Cybereum platform offers not just ground-breaking tools; it  transcends traditional boundaries between companies and data,
             offering insights that are profound and ground breaking. Cybereum is here to revolutionize the way you
@@ -6990,6 +7820,7 @@
         #dash4,
         #RadialRisk,
         #Kanban,
+        #Proj_Track,
         #reducedGraph {
             display: none; /* Initially hide the sections */
         }
@@ -7161,6 +7992,7 @@
             <li><a href="#pathsDistributionCurve">Paths Distribution Curve</a></li>
             <li><a href="#radialChart">Radial Chart</a></li>
             <li><a href="#Kanban">Kanban Project Flow</a></li>
+            <li><a href="#Proj_Track">Project Tracker</a></li>
             <li><a href="#reducedGraph">Reduced Graph</a></li>
         </ul>
     </div>
@@ -7169,7 +8001,7 @@
         <div class="charts-row">
             <div class="dashboard-card-full" id="dash4">
 
-                <h2>Risk Matrix</h2>
+                <h2>Risk and Importance</h2>
                 <style>
                     .legend {
                         display: flex;
@@ -7291,406 +8123,503 @@
                         <div id="progressBars"></div>
                     </div>
 
-                    <div class="table-container" id="pathMetrics">
-                        <!-- Milestone Path Table -->
-                        <h2>Milestone Paths</h2>
-                        <table class="sortable" id="milestoneTable">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Name</th>
-                                    <th>Risk</th>
-                                    <th>Importance</th>
-                                    <th>PageRank Centrality</th>
-                                    <th>Start Date</th>
-                                    <th>End Date</th>
-                                    <th>Slack</th>
-                                    <th>Overrun</th>
-                                    <th>Path</th>
-                                    <th class="pathLength">Path Length</th>
-                                    <th>Progress</th>
-                                </tr>
-                            </thead>
-                            <tbody id="milestoneTableBody"></tbody>
-                        </table>
-                    </div>
+
+
 
                 </div>
             </div>
         </div>
     </div>
-    <div class="charts-row">
-        <div class="dashboard-card2" id="SCurve">
-            <h2>S-Curve (Cumulative Distribution Chart)</h2>
 
-            <div id="scurve_chart" style="width: 300px; height: 280px;"></div>
-            </br>
-            <button class="learn-more-btn" onclick="openModal('SCurveModal')">Learn More</button>
-        </div>
-        <div class="dashboard-card2" id="histogram">
-            <h2>Task Duration Histogram</h2>
-            <canvas height="280" id="histogramChart" width="300"></canvas>
-            </br>
-            <button class="learn-more-btn" onclick="openModal('histogramModal')">Learn More</button>
-        </div>
-        <div class="dashboard-card2" id="pieChart">
-            <h2>Distribution of Task Types (Pie Chart)</h2>
-            <div id="pie_chart" style="width: 300px; height: 280px;"></div>
-            </br>
-            <button class="learn-more-btn" onclick="openModal('pieChartModal')">Learn More</button>
+    <div class="dashboard-card" id="Proj_Track">
 
-        </div>
-        <div class="dashboard-card2" id="pathsDistributionCurve">
-            <h2>Paths Distribution Curve</h2>
-            <div id="path_distribution_chart" style="width: 300px; height: 280px;"></div>
-            </br>
-            <button class="learn-more-btn" onclick="openModal('pathsDistributionCurveModal')">Learn More</button>
-        </div>
-        <div class="dashboard-card2" id="RadialRisk">
-            <h2>Radial Risk Chart</h2>
-            <canvas height="280" id="radialChart" width="300"></canvas>
-            </br>
-            <button class="learn-more-btn" onclick="openModal('radialChartModal')">Learn More</button>
-        </div>
-    </div>
-    </div>
+        <div class="row">
 
-    <section id="Kanban">
-        <!-- Date Range Slider -->
-        <div class="date-slider-container">
-            <input type="text" id="dateRangePicker" placeholder="Select Date Range...">
-        </div>
+            <!-- Left Side -->
+            <div class="col-2">
+                <!-- Schedule Completion Progress Bar -->
+                <div class="block">
+                    <div class="block-title text-white">
+                        <h2 class="block-title text-white" data-toggle="appear" data-class="animated fadeInDown">PROJECT CORE KPIs</h2>
+                    </div>
+                    <label class="text-white">Schedule</label>
+                    <div class="progress-bar-container">
+                        <div id="scheduleProgressBar" class="progress-bar"></div>
+                    </div>
+                    <span id="scheduleProgressLabel"></span>
+                    <hr class="separator">
+                    <label class="text-white">Scope</label>
+                    <div class="progress-bar-container">
+                        <div id="scopeProgressBar" class="progress-bar"></div>
+                    </div>
+                    <span id="scopeProgressLabel"></span>
+                </div>
 
-        <div class="kanban-columns">
+                <!-- Key Deliverables Block -->
+                <div class="block">
+                    <div class="block-title text-white">
+                        <h2 class="block-title text-white" data-toggle="appear" data-class="animated fadeInDown">Key Deliverables</h2>
+                    </div>
+                    <div class="block-content">
+                        <!-- Slider for selecting the number of tasks -->
+                        <div class="form-group">
+                            <label for="numTasksSlider" class="text-white-op">Number of Tasks: <span id="numTasksLabel">5</span></label>
+                            <input type="range" class="slider" id="numTasksSlider" min="2" max="10" value="5">
+                        </div>
 
-            <!-- Column 1: Planned -->
-            <div class="kanban-column" id="plannedColumn">
-                <h3 class="kanban-column-title">Planned</h3>
-                <!-- Cards will be dynamically added here -->
+                        <!-- Placeholder for the tasks -->
+                        <div id="keyDeliverablesTasksContainer">
+                            <!-- The tasks will be dynamically populated here by the JavaScript function -->
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <!-- Column 2: In Progress -->
-            <div class="kanban-column" id="inProgressColumn">
-                <h3 class="kanban-column-title">In Progress</h3>
-                <!-- Cards will be dynamically added here -->
+            <div class="col-8">
+
+                <!-- Cumulative Distribution of Project Hours -->
+                <div class="block">
+                    <div class="block-title text-white">
+                        <h2 class="block-title text-white" data-toggle="appear" data-class="animated fadeInDown">Cumulative Distribution of Project Hours</h2>
+                    </div>
+                    <div class="block-content">
+                        <div class="row">
+                            <div class="col-12">
+                                <canvas id="cumulativeHoursChart" style="max-width: 100%; height: 400px;"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <!-- Column 3: Completed -->
-            <div class="kanban-column" id="completedColumn">
-                <h3 class="kanban-column-title">Completed</h3>
-                <!-- Cards will be dynamically added here -->
+            <!-- Right Side -->
+            <div class="col-2">
+                <!-- Task Completion Status -->
+                <div class="task-completion-container" id="taskCompletionContainer">
+                    <!-- Task Completion Status -->
+                    <div class="block">
+                        <div class="block-header">
+                            <h2 class="block-title text-white">Task Completion Status</h2>
+                        </div>
+                        <div class="block-content overflow-hidden">
+                            <canvas id="taskCompletion"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- KEY INTERNAL MILESTONES -->
+                <div class="milestones-container" id="internalMilestones">
+                    <!-- KEY INTERNAL MILESTONES -->
+                    <div class="block">
+                        <h2 class="block-title text-white">Internal Milestones</h2>
+                        <div class="block-content block-content-full overflow-hidden" id="milestonesContent">
+                            <!-- This div will be dynamically populated using the JavaScript function provided earlier. -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <!-- Center Milestone Table -->
+            <div class="table-container" id="pathMetrics">
+                <!-- Milestone Path Table -->
+                <h2>Milestone Paths</h2>
+                <table class="sortable" id="milestoneTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Risk</th>
+                            <th>Importance</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Slack</th>
+                            <th>Overrun</th>
+                            <th>Path</th>
+                        </tr>
+                    </thead>
+                    <tbody id="milestoneTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+        </div>
+
+        <div class="charts-row">
+            <div class="dashboard-card2" id="SCurve">
+                <h2>S-Curve (Cumulative Distribution Chart)</h2>
+
+                <div id="scurve_chart" style="width: 300px; height: 280px;"></div>
+                </br>
+                <button class="learn-more-btn" onclick="openModal('SCurveModal')">Learn More</button>
+            </div>
+            <div class="dashboard-card2" id="histogram">
+                <h2>Task Duration Histogram</h2>
+                <canvas height="280" id="histogramChart" width="300"></canvas>
+                </br>
+                <button class="learn-more-btn" onclick="openModal('histogramModal')">Learn More</button>
+            </div>
+            <div class="dashboard-card2" id="pieChart">
+                <h2>Distribution of Task Types (Pie Chart)</h2>
+                <div id="pie_chart" style="width: 300px; height: 280px;"></div>
+                </br>
+                <button class="learn-more-btn" onclick="openModal('pieChartModal')">Learn More</button>
+
+            </div>
+            <div class="dashboard-card2" id="pathsDistributionCurve">
+                <h2>Paths Distribution Curve</h2>
+                <div id="path_distribution_chart" style="width: 300px; height: 280px;"></div>
+                </br>
+                <button class="learn-more-btn" onclick="openModal('pathsDistributionCurveModal')">Learn More</button>
+            </div>
+            <div class="dashboard-card2" id="RadialRisk">
+                <h2>Radial Risk Chart</h2>
+                <canvas height="280" id="radialChart" width="300"></canvas>
+                </br>
+                <button class="learn-more-btn" onclick="openModal('radialChartModal')">Learn More</button>
+            </div>
+        </div>
+
+        <section id="Kanban">
+            <!-- Date Range Slider -->
+            <div class="date-slider-container">
+                <input type="text" id="dateRangePicker" placeholder="Select Date Range...">
             </div>
 
+            <div class="kanban-columns">
+
+                <!-- Column 1: Planned -->
+                <div class="kanban-column" id="plannedColumn">
+                    <h3 class="kanban-column-title">Planned</h3>
+                    <!-- Cards will be dynamically added here -->
+                </div>
+
+                <!-- Column 2: In Progress -->
+                <div class="kanban-column" id="inProgressColumn">
+                    <h3 class="kanban-column-title">In Progress</h3>
+                    <!-- Cards will be dynamically added here -->
+                </div>
+
+                <!-- Column 3: Completed -->
+                <div class="kanban-column" id="completedColumn">
+                    <h3 class="kanban-column-title">Completed</h3>
+                    <!-- Cards will be dynamically added here -->
+                </div>
+
+            </div>
+        </section>
+
+        <div class="dashboard-section" id="chart_div_wrapper">
+            <h2>GANTT Chart</h2>
+            <div id="chart_div"></div>
         </div>
-    </section>
+        <div id="error_div"></div>
 
-    <div class="dashboard-section" id="chart_div_wrapper">
-        <h2>GANTT Chart</h2>
-        <div id="chart_div"></div>
-    </div>
-    <div id="error_div"></div>
+        <div class="dashboard-section" id="reducedGraph">
+            <h1>Reduced Graph</h1>
+            <!--
+    <button id="clusterBtn">Cluster</button>
+    <button id="declusterBtn">De-cluster</button>
+    -->
+            <div id="graph-container">
+                <div id="tooltip" style="position: absolute; visibility: hidden; background: #8ce6ff; padding: 8px; border: 2px solid #3292cd; border-radius: 3px; "></div>
+                <div id="path-list" style="position: absolute; top: 0; left: 0; max-height: 600px; overflow-y: auto;"></div>
 
-    <div class="dashboard-section" id="reducedGraph">
-        <h1>Reduced Graph</h1>
-        <!--
-        <button id="clusterBtn">Cluster</button>
-        <button id="declusterBtn">De-cluster</button>
-        -->
-        <div id="graph-container">
-            <div id="tooltip" style="position: absolute; visibility: hidden; background: #8ce6ff; padding: 8px; border: 2px solid #3292cd; border-radius: 3px; "></div>
-            <div id="path-list" style="position: absolute; top: 0; left: 0; max-height: 600px; overflow-y: auto;"></div>
+                <div id="dependency_chart" style="width: 90%; height: 600px; margin-left: 10%;">Graph will be rendered here.</div>
 
-            <div id="dependency_chart" style="width: 90%; height: 600px; margin-left: 10%;">Graph will be rendered here.</div>
-
+            </div>
+            <!--<div id="configuration-container"></div> -->
         </div>
-        <div id="configuration-container"></div>
-    </div>
     <section class="dashboard-section banner-section"><div class="ran-inspired-banner" style="background: linear-gradient(to bottom, #ffff00, #ff0000); padding: 50px 0; text-align: center; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); margin: 40px 0; border-radius: 20px; position: relative; overflow: hidden;"><canvas class="particle-canvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;"></canvas><img alt="Cybereum Logo" src="https://cybereum.io/wp-content/uploads/2023/05/Red_Logo.png" style="width: 120px; margin-bottom: 20px; filter: drop-shadow(0 0 15px #fdfd96);" /><h1 style="color: #ffff00; font-size: 28px; margin-bottom: 15px; font-weight: bold; text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);">Cybereum: A Symphony of Data and Design</h1><p style="color: #ffff00; font-size: 20px; max-width: 900px; margin: 0 auto; text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);">Our platform combines traditional project management with cutting-edge innovation. Expereince and Manage your Projects.</p></div></section>
     <!-- Footer -->
-    <div class="footer" style="background-color: rgba(0, 0, 0, 0.8); padding: 20px; color: #58a6ff; text-align: center;">
-        <p>© 2023 Cybereum. All rights reserved.</p>
-        <p>Powered by Advanced Algorithms, Intuitive Design, ML, AI, and DLT.</p>
-    </div>
-    <script>
-        function toggleSidebar() {
-            var sidebar = document.getElementById('sidebar');
-            if (sidebar.classList.contains('collapsed')) {
-                sidebar.classList.remove('collapsed');
-            } else {
-                sidebar.classList.add('collapsed');
-            }
-        }</script>
-    <script>
-        function toggleSidebar(event) {
-            event.stopPropagation();  // Prevent event from propagating further
-
-            var sidebar = document.getElementById('sidebar');
-            var toggleBtn = document.getElementById('sidebarToggleBtn');
-            if (sidebar.classList.contains('collapsed')) {
-                sidebar.classList.remove('collapsed');
-                toggleBtn.innerHTML = "≡";  /* Hamburger icon for expanded state */
-            } else {
-                sidebar.classList.add('collapsed');
-                toggleBtn.innerHTML = "←";  /* Arrow icon for collapsed state */
-            }
-        }</script>
-    <script>
-        document.getElementById('xmlFileInput').addEventListener('change', function () {
-            var fileName = this.files[0].name;
-            this.setAttribute('data-content', 'Selected: ' + fileName);
-        });</script>
-
-    <script>
-        document.getElementById("xmlFileInput").addEventListener("change", function () {
-            if (this.files.length > 0) {
-                // If a file is selected, show all the sections
-                document.getElementById('networkViualization').style.display = 'block';
-                document.getElementById('chart_div_wrapper').style.display = 'block';
-                document.getElementById('riskTable').style.display = 'block';
-                document.getElementById('referenceTable').style.display = 'block';
-                document.getElementById('riskMatrix').style.display = 'block';
-                document.getElementById('histogram').style.display = 'block';
-                document.getElementById('pieChart').style.display = 'block';
-                document.getElementById('pathsDistributionCurve').style.display = 'block';
-                document.getElementById('radialChart').style.display = 'block';
-                document.getElementById('reducedGraph').style.display = 'block';
-                document.getElementById('dash1').style.display = 'block';
-                document.getElementById('chart-container').style.display = 'block';
-                document.getElementById('sidebar').style.display = 'block';
-                document.getElementById('SCurve').style.display = 'block';
-                document.getElementById('graph-container').style.display = 'block';
-                document.getElementById('dash4').style.display = 'block';
-                document.getElementById('Kanban').style.display = 'block';
-                document.getElementById('RadialRisk').style.display = 'block';
-            }
-            //document.querySelector(".sci-fi-loading-text").innerText = "Loading...";
-            // Simulate loading progression (this can be replaced with actual loading progression in the real environment)
-            let progress = 0;
-            document.querySelector('.uploading-text').style.display = 'inline-block';
-            const interval = setInterval(() => {
-                progress += 10;
-                if (progress > 100) {
-                    progress = 100;
-                    clearInterval(interval);
-                    document.querySelector(".sci-fi-loading-text").innerText = "";
-                    document.querySelector('.uploading-text').style.display = 'none';
-                }
-                document.querySelector(".sci-fi-loading-bar").style.width = progress + "%";
-            }, 500);
-        });
-    </script>
-    <div id="modal0" class="futuristic-modal">
-        <div class="futuristic-modal-content">
-            <span class="close-btn" onclick="closeModal('modal0')">&times;</span>
-            <h2 class="modal-header">Introduction:</h2>
-            <div class="modal-body">
-                <b>Features & Navigation:</b>
-                <ul class="futuristic-list">
-                    <li><b>Zoom & Pan:</b> Navigate across the expansive network with ease. Use the mouse wheel to zoom in or out and click-drag to pan.</li>
-                    <li><b>Node Details:</b> Hover over nodes to see detailed insights. Click on them for a deeper dive.</li>
-                    <li><b>Color-coded Paths:</b> Different paths, like 'Critical' or 'Outlier', are represented with distinct colors for better clarity.</li>
-                    <li><b>Interactive Links:</b> The connections between nodes are as informative as the nodes themselves. Hover or click for more details.</li>
-                    <li><b>Dynamic Layout:</b> Add, remove, or modify nodes and watch the network adjust in real-time.</li>
-                </ul>
+            <div class="footer" style="background-color: rgba(0, 0, 0, 0.8); padding: 20px; color: #58a6ff; text-align: center;">
+                <p>© 2023 Cybereum. All rights reserved.</p>
+                <p>Powered by Advanced Algorithms, Intuitive Design, ML, AI, and DLT.</p>
             </div>
-        </div>
-    </div>
+            <script>
+                function toggleSidebar() {
+                    var sidebar = document.getElementById('sidebar');
+                    if (sidebar.classList.contains('collapsed')) {
+                        sidebar.classList.remove('collapsed');
+                    } else {
+                        sidebar.classList.add('collapsed');
+                    }
+                }</script>
+            <script>
+                function toggleSidebar(event) {
+                    event.stopPropagation();  // Prevent event from propagating further
 
-    <div id="networkVisualizationModal" class="futuristic-modal">
-        <div class="futuristic-modal-content">
-            <span class="close-btn" onclick="closeModal('networkVisualizationModal')">&times;</span>
-            <h2>Introduction:</h2>
-            Dive deep into the interconnections of your project with Cybereum's Network Visualization. This interactive tool offers a graphical representation of nodes and their relationships, making complex data structures understandable at a glance.
-            <br><br>
-            <b>Features & Navigation:</b>
-            <ul class="futuristic-list">
-                <li><b>Zoom & Pan:</b> Navigate across the expansive network with ease. Use the mouse wheel to zoom in or out and click-drag to pan.</li>
-                <li><b>Node Details:</b> Hover over nodes to see detailed insights. Click on them for a deeper dive.</li>
-                <li><b>Color-coded Paths:</b> Different paths, like 'Critical' or 'Outlier', are represented with distinct colors for better clarity.</li>
-                <li><b>Interactive Links:</b> The connections between nodes are as informative as the nodes themselves. Hover or click for more details.</li>
-                <li><b>Dynamic Layout:</b> Add, remove, or modify nodes and watch the network adjust in real-time.</li>
-            </ul>
-        </div>
-    </div>
+                    var sidebar = document.getElementById('sidebar');
+                    var toggleBtn = document.getElementById('sidebarToggleBtn');
+                    if (sidebar.classList.contains('collapsed')) {
+                        sidebar.classList.remove('collapsed');
+                        toggleBtn.innerHTML = "≡";  /* Hamburger icon for expanded state */
+                    } else {
+                        sidebar.classList.add('collapsed');
+                        toggleBtn.innerHTML = "←";  /* Arrow icon for collapsed state */
+                    }
+                }</script>
+            <script>
+                document.getElementById('xmlFileInput').addEventListener('change', function () {
+                    var fileName = this.files[0].name;
+                    this.setAttribute('data-content', 'Selected: ' + fileName);
+                });</script>
 
-    <div id="ganttChartModal" class="futuristic-modal">
-        <div class="futuristic-modal-content">
-            <span class="close-btn" onclick="closeModal('ganttChartModal')">&times;</span>
-            <h2>GANTT Chart: A Timeline of Progress</h2>
-            Track project milestones and task progress with the GANTT Chart. This horizontal bar chart gives you a visual timeline of when each task starts, its duration, and when it concludes.
-            <br><br>
-            <b>Features & Navigation:</b>
-            <ul class="futuristic-list">
-                <li><b>Resizable Bars:</b> Adjust task durations by dragging the edges of the bars.</li>
-                <li><b>Dependencies:</b> See how tasks are interlinked with arrows. A delay in one task impacts dependent tasks.</li>
-                <li><b>Hover Insights:</b> For a quick summary of task details, just hover over its bar.</li>
-                <li><b>Color-coded Status:</b> Tasks are color-coded based on their progress or status, making it easy to identify pending, ongoing, or completed tasks.</li>
-            </ul>
-        </div>
-    </div>
+            <script>
+                document.getElementById("xmlFileInput").addEventListener("change", function () {
+                    if (this.files.length > 0) {
+                        // If a file is selected, show all the sections
+                        document.getElementById('networkViualization').style.display = 'block';
+                        document.getElementById('chart_div_wrapper').style.display = 'block';
+                        document.getElementById('riskTable').style.display = 'block';
+                        document.getElementById('referenceTable').style.display = 'block';
+                        document.getElementById('riskMatrix').style.display = 'block';
+                        document.getElementById('histogram').style.display = 'block';
+                        document.getElementById('pieChart').style.display = 'block';
+                        document.getElementById('pathsDistributionCurve').style.display = 'block';
+                        document.getElementById('radialChart').style.display = 'block';
+                        document.getElementById('reducedGraph').style.display = 'block';
+                        document.getElementById('dash1').style.display = 'block';
+                        document.getElementById('chart-container').style.display = 'block';
+                        document.getElementById('sidebar').style.display = 'block';
+                        document.getElementById('SCurve').style.display = 'block';
+                        document.getElementById('graph-container').style.display = 'block';
+                        document.getElementById('dash4').style.display = 'block';
+                        document.getElementById('Kanban').style.display = 'block';
+                        document.getElementById('RadialRisk').style.display = 'block';
+                        document.getElementById('Proj_Track').style.display = 'block';
+                    }
+                    //document.querySelector(".sci-fi-loading-text").innerText = "Loading...";
+                    // Simulate loading progression (this can be replaced with actual loading progression in the real environment)
+                    let progress = 0;
+                    document.querySelector('.uploading-text').style.display = 'inline-block';
+                    const interval = setInterval(() => {
+                        progress += 10;
+                        if (progress > 100) {
+                            progress = 100;
+                            clearInterval(interval);
+                            document.querySelector(".sci-fi-loading-text").innerText = "";
+                            document.querySelector('.uploading-text').style.display = 'none';
+                        }
+                        document.querySelector(".sci-fi-loading-bar").style.width = progress + "%";
+                    }, 500);
+                });
+            </script>
+            <div id="modal0" class="futuristic-modal">
+                <div class="futuristic-modal-content">
+                    <span class="close-btn" onclick="closeModal('modal0')">&times;</span>
+                    <h2 class="modal-header">Introduction:</h2>
+                    <div class="modal-body">
+                        <b>Features & Navigation:</b>
+                        <ul class="futuristic-list">
+                            <li><b>Zoom & Pan:</b> Navigate across the expansive network with ease. Use the mouse wheel to zoom in or out and click-drag to pan.</li>
+                            <li><b>Node Details:</b> Hover over nodes to see detailed insights. Click on them for a deeper dive.</li>
+                            <li><b>Color-coded Paths:</b> Different paths, like 'Critical' or 'Outlier', are represented with distinct colors for better clarity.</li>
+                            <li><b>Interactive Links:</b> The connections between nodes are as informative as the nodes themselves. Hover or click for more details.</li>
+                            <li><b>Dynamic Layout:</b> Add, remove, or modify nodes and watch the network adjust in real-time.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
 
-    <div id="riskMatrixModal" class="futuristic-modal">
-        <div class="futuristic-modal-content">
-            <span class="close-btn" onclick="closeModal('riskMatrixModal')">&times;</span>
-            <h2>Risk Matrix: Evaluating Potential Pitfalls</h2>
-            The Risk Matrix helps assess and prioritize risks based on their potential impact and likelihood. Understand which risks require immediate attention and which can be monitored over time.
-            <br><br>
-            <b>Features & Navigation:</b>
-            <ul class="futuristic-list">
-                <li><b>Quadrant View:</b> Risks are plotted on a 2D matrix, categorizing them into four quadrants based on severity and occurrence probability.</li>
-                <li><b>Interactive Points:</b> Hover over points to see detailed risk descriptions.</li>
-                <li><b>Color Indicators:</b> High-priority risks are marked distinctly for quick identification.</li>
-                <li><b>Adjustable Axes:</b> Customize the matrix's axes to suit your risk evaluation criteria.</li>
-            </ul>
-        </div>
-    </div>
+            <div id="networkVisualizationModal" class="futuristic-modal">
+                <div class="futuristic-modal-content">
+                    <span class="close-btn" onclick="closeModal('networkVisualizationModal')">&times;</span>
+                    <h2>Introduction:</h2>
+                    Dive deep into the interconnections of your project with Cybereum's Network Visualization. This interactive tool offers a graphical representation of nodes and their relationships, making complex data structures understandable at a glance.
+                    <br><br>
+                    <b>Features & Navigation:</b>
+                    <ul class="futuristic-list">
+                        <li><b>Zoom & Pan:</b> Navigate across the expansive network with ease. Use the mouse wheel to zoom in or out and click-drag to pan.</li>
+                        <li><b>Node Details:</b> Hover over nodes to see detailed insights. Click on them for a deeper dive.</li>
+                        <li><b>Color-coded Paths:</b> Different paths, like 'Critical' or 'Outlier', are represented with distinct colors for better clarity.</li>
+                        <li><b>Interactive Links:</b> The connections between nodes are as informative as the nodes themselves. Hover or click for more details.</li>
+                        <li><b>Dynamic Layout:</b> Add, remove, or modify nodes and watch the network adjust in real-time.</li>
+                    </ul>
+                </div>
+            </div>
 
-    <div id="histogramModal" class="futuristic-modal">
-        <div class="futuristic-modal-content">
-            <span class="close-btn" onclick="closeModal('histogramModal')">&times;</span>
-            <h2>Histogram: Data Distribution Insights</h2>
-            The Histogram offers a visual representation of the frequency distribution of your data. It helps you understand where most of your data points lie and identify any outliers.
-            <br><br>
-            <b>Features & Navigation:</b>
-            <ul class="futuristic-list">
-                <li><b>Bins:</b> The x-axis represents data ranges, while the y-axis shows the frequency of data points within those ranges.</li>
-                <li><b>Interactive Bars:</b> Hover over bars for exact counts.</li>
-                <li><b>Customizable Ranges:</b> Adjust the bin width to analyze data distribution at varying levels of granularity.</li>
-            </ul>
-        </div>
-    </div>
+            <div id="ganttChartModal" class="futuristic-modal">
+                <div class="futuristic-modal-content">
+                    <span class="close-btn" onclick="closeModal('ganttChartModal')">&times;</span>
+                    <h2>GANTT Chart: A Timeline of Progress</h2>
+                    Track project milestones and task progress with the GANTT Chart. This horizontal bar chart gives you a visual timeline of when each task starts, its duration, and when it concludes.
+                    <br><br>
+                    <b>Features & Navigation:</b>
+                    <ul class="futuristic-list">
+                        <li><b>Resizable Bars:</b> Adjust task durations by dragging the edges of the bars.</li>
+                        <li><b>Dependencies:</b> See how tasks are interlinked with arrows. A delay in one task impacts dependent tasks.</li>
+                        <li><b>Hover Insights:</b> For a quick summary of task details, just hover over its bar.</li>
+                        <li><b>Color-coded Status:</b> Tasks are color-coded based on their progress or status, making it easy to identify pending, ongoing, or completed tasks.</li>
+                    </ul>
+                </div>
+            </div>
 
-    <div id="pieChartModal" class="futuristic-modal">
-        <div class="futuristic-modal-content">
-            <span class="close-btn" onclick="closeModal('pieChartModal')">&times;</span>
-            <h2>Pie Chart: A Slice of Your Data</h2>
-            The Pie Chart provides a circular statistical graphic divided into slices to illustrate numerical proportions. It's a visual treat that also offers deep data insights.
-            <br><br>
-            <b>Features & Navigation:</b>
-            <ul class="futuristic-list">
-                <li><b>Segmented View:</b> Each segment represents a category, and its size is proportional to its value.</li>
-                <li><b>Hover Insights:</b> For detailed percentages and values, hover over slices.</li>
-                <li><b>Color-coded Categories:</b> Each category gets a unique color for easy differentiation.</li>
-            </ul>
-        </div>
-    </div>
+            <div id="riskMatrixModal" class="futuristic-modal">
+                <div class="futuristic-modal-content">
+                    <span class="close-btn" onclick="closeModal('riskMatrixModal')">&times;</span>
+                    <h2>Risk Matrix: Evaluating Potential Pitfalls</h2>
+                    The Risk Matrix helps assess and prioritize risks based on their potential impact and likelihood. Understand which risks require immediate attention and which can be monitored over time.
+                    <br><br>
+                    <b>Features & Navigation:</b>
+                    <ul class="futuristic-list">
+                        <li><b>Quadrant View:</b> Risks are plotted on a 2D matrix, categorizing them into four quadrants based on severity and occurrence probability.</li>
+                        <li><b>Interactive Points:</b> Hover over points to see detailed risk descriptions.</li>
+                        <li><b>Color Indicators:</b> High-priority risks are marked distinctly for quick identification.</li>
+                        <li><b>Adjustable Axes:</b> Customize the matrix's axes to suit your risk evaluation criteria.</li>
+                    </ul>
+                </div>
+            </div>
 
-    <div id="pathsDistributionCurveModal" class="futuristic-modal">
-        <div class="futuristic-modal-content">
-            <span class="close-btn" onclick="closeModal('pathsDistributionCurveModal')">&times;</span>
-            <h2>Paths Distribution Curve: Understanding Path Frequencies</h2>
-            The Paths Distribution Curve visualizes how often different paths are taken within your project. It aids in identifying common routes and anomalies.
-            <br><br>
-            <b>Features & Navigation:</b>
-            <ul class="futuristic-list">
-                <li><b>Area Under Curve:</b> The shaded region helps understand path frequencies at a glance.</li>
-                <li><b>Interactive Points:</b> Hover over specific points on the curve for detailed insights.</li>
-                <li><b>Customizable Axes:</b> Adjust axis scales to focus on specific sections of the distribution.</li>
-            </ul>
-        </div>
-    </div>
+            <div id="histogramModal" class="futuristic-modal">
+                <div class="futuristic-modal-content">
+                    <span class="close-btn" onclick="closeModal('histogramModal')">&times;</span>
+                    <h2>Histogram: Data Distribution Insights</h2>
+                    The Histogram offers a visual representation of the frequency distribution of your data. It helps you understand where most of your data points lie and identify any outliers.
+                    <br><br>
+                    <b>Features & Navigation:</b>
+                    <ul class="futuristic-list">
+                        <li><b>Bins:</b> The x-axis represents data ranges, while the y-axis shows the frequency of data points within those ranges.</li>
+                        <li><b>Interactive Bars:</b> Hover over bars for exact counts.</li>
+                        <li><b>Customizable Ranges:</b> Adjust the bin width to analyze data distribution at varying levels of granularity.</li>
+                    </ul>
+                </div>
+            </div>
 
-    <div id="radialChartModal" class="futuristic-modal">
-        <div class="futuristic-modal-content">
-            <span class="close-btn" onclick="closeModal('radialChartModal')">&times;</span>
-            <h2>Radial Chart: A 360° View of Your Data</h2>
-            The Radial Chart, or Circular Bar Chart, offers a unique twist to traditional bar charts. Data categories are represented in a circular fashion, providing a comprehensive view of your metrics.
-            <br><br>
-            <b>Features & Navigation:</b>
-            <ul class="futuristic-list">
-                <li><b>Circular Bars:</b> Each bar's length is proportional to its value.</li>
-                <li><b>Hover Details:</b> Hover over bars for specific data insights.</li>
-                <li><b>Segmented Categories:</b> Each category is distinctly color-coded.</li>
-            </ul>
-        </div>
-    </div>
+            <div id="pieChartModal" class="futuristic-modal">
+                <div class="futuristic-modal-content">
+                    <span class="close-btn" onclick="closeModal('pieChartModal')">&times;</span>
+                    <h2>Pie Chart: A Slice of Your Data</h2>
+                    The Pie Chart provides a circular statistical graphic divided into slices to illustrate numerical proportions. It's a visual treat that also offers deep data insights.
+                    <br><br>
+                    <b>Features & Navigation:</b>
+                    <ul class="futuristic-list">
+                        <li><b>Segmented View:</b> Each segment represents a category, and its size is proportional to its value.</li>
+                        <li><b>Hover Insights:</b> For detailed percentages and values, hover over slices.</li>
+                        <li><b>Color-coded Categories:</b> Each category gets a unique color for easy differentiation.</li>
+                    </ul>
+                </div>
+            </div>
 
-    <div id="reducedGraphModal" class="futuristic-modal">
-        <div class="futuristic-modal-content">
-            <span class="close-btn" onclick="closeModal('reducedGraphModal')">&times;</span>
-            <h2>Reduced Graph: A Simplified Network View</h2>
-            When networks become overwhelmingly complex, the Reduced Graph comes into play. It offers a simplified view, focusing on key nodes and connections.
-            <br><br>
-            <b>Features & Navigation:</b>
-            <ul class="futuristic-list">
-                <li><b>Key Nodes:</b> Only the most significant nodes are displayed.</li>
-                <li><b>Simplified Connections:</b> Redundant or non-critical links are omitted for clarity.</li>
-                <li><b>Interactive Elements:</b> As with the full Network Visualization, you can zoom, pan, and click for detailed insights.</li>
-            </ul>
-        </div>
-    </div>
+            <div id="pathsDistributionCurveModal" class="futuristic-modal">
+                <div class="futuristic-modal-content">
+                    <span class="close-btn" onclick="closeModal('pathsDistributionCurveModal')">&times;</span>
+                    <h2>Paths Distribution Curve: Understanding Path Frequencies</h2>
+                    The Paths Distribution Curve visualizes how often different paths are taken within your project. It aids in identifying common routes and anomalies.
+                    <br><br>
+                    <b>Features & Navigation:</b>
+                    <ul class="futuristic-list">
+                        <li><b>Area Under Curve:</b> The shaded region helps understand path frequencies at a glance.</li>
+                        <li><b>Interactive Points:</b> Hover over specific points on the curve for detailed insights.</li>
+                        <li><b>Customizable Axes:</b> Adjust axis scales to focus on specific sections of the distribution.</li>
+                    </ul>
+                </div>
+            </div>
 
+            <div id="radialChartModal" class="futuristic-modal">
+                <div class="futuristic-modal-content">
+                    <span class="close-btn" onclick="closeModal('radialChartModal')">&times;</span>
+                    <h2>Radial Chart: A 360° View of Your Data</h2>
+                    The Radial Chart, or Circular Bar Chart, offers a unique twist to traditional bar charts. Data categories are represented in a circular fashion, providing a comprehensive view of your metrics.
+                    <br><br>
+                    <b>Features & Navigation:</b>
+                    <ul class="futuristic-list">
+                        <li><b>Circular Bars:</b> Each bar's length is proportional to its value.</li>
+                        <li><b>Hover Details:</b> Hover over bars for specific data insights.</li>
+                        <li><b>Segmented Categories:</b> Each category is distinctly color-coded.</li>
+                    </ul>
+                </div>
+            </div>
 
-    <div id="SCurveModal" class="futuristic-modal">
-        <div class="futuristic-modal-content">
-            <span class="close-btn" onclick="closeModal('SCurveModal')">&times;</span>
-            <h2>S Curve: Cumulative Distribution</h2>
-            When networks become overwhelmingly complex, the Reduced Graph comes into play. It offers a simplified view, focusing on key nodes and connections.
-            <br><br>
-            <b>Features & Navigation:</b>
-            <ul class="futuristic-list">
-                <li><b>Key Nodes:</b> Only the most significant nodes are displayed.</li>
-                <li><b>Simplified Connections:</b> Redundant or non-critical links are omitted for clarity.</li>
-                <li><b>Interactive Elements:</b> As with the full Network Visualization, you can zoom, pan, and click for detailed insights.</li>
-            </ul>
-        </div>
-    </div>
-
-    <div id="pathDistributionModal" class="futuristic-modal">
-        <div class="futuristic-modal-content">
-            <span class="close-btn" onclick="closeModal('pathDistributionModal')">&times;</span>
-            <h2>Path Distribution Bar Chart: Visualizing Path Durations</h2>
-            The Path Distribution Bar Chart showcases the number of paths based on their durations. It aids in understanding the most frequent path durations and their respective counts within the network.
-            <br><br>
-            <b>Features & Navigation:</b>
-            <ul class="futuristic-list">
-                <li><b>Duration Bins:</b> The x-axis showcases various path durations, while the y-axis displays the count of paths for each duration.</li>
-                <li><b>Interactive Bars:</b> Hover over bars to get the exact count of paths for specific durations.</li>
-                <li><b>Cumulative Line Overlay:</b> A line overlaying the bars shows the cumulative count of paths, aiding in understanding the growth in path counts as duration increases.</li>
-            </ul>
-        </div>
-    </div>
-
-    <div id="riskMatrixModal" class="futuristic-modal">
-        <div class="futuristic-modal-content">
-            <span class="close-btn" onclick="closeModal('riskMatrixModal')">&times;</span>
-            <h2>Risk Matrix: Evaluating Risk Impact vs. Likelihood</h2>
-            The Risk Matrix is a critical tool for risk assessment. By plotting risks based on their impact and likelihood, it helps in prioritizing and strategizing risk management efforts.
-            <br><br>
-            <b>Features & Navigation:</b>
-            <ul class="futuristic-list">
-                <li><b>Risk Importance Scale:</b> Risks are color-coded based on their importance. Shades of red, yellow, and green signify high, medium, and low risks respectively.</li>
-                <li><b>Interactive Cells:</b> Hover over specific cells in the matrix to get detailed insights on the number of risks and their descriptions.</li>
-                <li><b>Grid Layout:</b> The matrix is divided into a grid where the x-axis represents risk likelihood and the y-axis showcases risk impact.</li>
-            </ul>
-        </div>
-    </div>
-
-    <div id="taskModal" class="futuristic-modal">
-        <div class="futuristic-modal-content">
-            <span class="close" onclick="closeModal('riskMatrixModal')">&times;</span>
-            <h2 class="modal-header">Task Details:</h2>
-            <p id="taskDetail"></p>
-        </div>
-    </div>
+            <div id="reducedGraphModal" class="futuristic-modal">
+                <div class="futuristic-modal-content">
+                    <span class="close-btn" onclick="closeModal('reducedGraphModal')">&times;</span>
+                    <h2>Reduced Graph: A Simplified Network View</h2>
+                    When networks become overwhelmingly complex, the Reduced Graph comes into play. It offers a simplified view, focusing on key nodes and connections.
+                    <br><br>
+                    <b>Features & Navigation:</b>
+                    <ul class="futuristic-list">
+                        <li><b>Key Nodes:</b> Only the most significant nodes are displayed.</li>
+                        <li><b>Simplified Connections:</b> Redundant or non-critical links are omitted for clarity.</li>
+                        <li><b>Interactive Elements:</b> As with the full Network Visualization, you can zoom, pan, and click for detailed insights.</li>
+                    </ul>
+                </div>
+            </div>
 
 
-    <script>
-        // Function to open a modal
-        function openModal(modalId) {
-            document.getElementById(modalId).style.display = "block";
-        }
+            <div id="SCurveModal" class="futuristic-modal">
+                <div class="futuristic-modal-content">
+                    <span class="close-btn" onclick="closeModal('SCurveModal')">&times;</span>
+                    <h2>S Curve: Cumulative Distribution</h2>
+                    When networks become overwhelmingly complex, the Reduced Graph comes into play. It offers a simplified view, focusing on key nodes and connections.
+                    <br><br>
+                    <b>Features & Navigation:</b>
+                    <ul class="futuristic-list">
+                        <li><b>Key Nodes:</b> Only the most significant nodes are displayed.</li>
+                        <li><b>Simplified Connections:</b> Redundant or non-critical links are omitted for clarity.</li>
+                        <li><b>Interactive Elements:</b> As with the full Network Visualization, you can zoom, pan, and click for detailed insights.</li>
+                    </ul>
+                </div>
+            </div>
 
-        // Function to close a modal
-        function closeModal(modalId) {
-            document.getElementById(modalId).style.display = "none";
-        }
+            <div id="pathDistributionModal" class="futuristic-modal">
+                <div class="futuristic-modal-content">
+                    <span class="close-btn" onclick="closeModal('pathDistributionModal')">&times;</span>
+                    <h2>Path Distribution Bar Chart: Visualizing Path Durations</h2>
+                    The Path Distribution Bar Chart showcases the number of paths based on their durations. It aids in understanding the most frequent path durations and their respective counts within the network.
+                    <br><br>
+                    <b>Features & Navigation:</b>
+                    <ul class="futuristic-list">
+                        <li><b>Duration Bins:</b> The x-axis showcases various path durations, while the y-axis displays the count of paths for each duration.</li>
+                        <li><b>Interactive Bars:</b> Hover over bars to get the exact count of paths for specific durations.</li>
+                        <li><b>Cumulative Line Overlay:</b> A line overlaying the bars shows the cumulative count of paths, aiding in understanding the growth in path counts as duration increases.</li>
+                    </ul>
+                </div>
+            </div>
 
-        // Closing modal if clicked outside the modal content
-        window.onclick = function (event) {
-            if (event.target.classList.contains('futuristic-modal')) {
-                event.target.style.display = "none";
-            }
-        }
-    </script>
+            <div id="riskMatrixModal" class="futuristic-modal">
+                <div class="futuristic-modal-content">
+                    <span class="close-btn" onclick="closeModal('riskMatrixModal')">&times;</span>
+                    <h2>Risk Matrix: Evaluating Risk Impact vs. Likelihood</h2>
+                    The Risk Matrix is a critical tool for risk assessment. By plotting risks based on their impact and likelihood, it helps in prioritizing and strategizing risk management efforts.
+                    <br><br>
+                    <b>Features & Navigation:</b>
+                    <ul class="futuristic-list">
+                        <li><b>Risk Importance Scale:</b> Risks are color-coded based on their importance. Shades of red, yellow, and green signify high, medium, and low risks respectively.</li>
+                        <li><b>Interactive Cells:</b> Hover over specific cells in the matrix to get detailed insights on the number of risks and their descriptions.</li>
+                        <li><b>Grid Layout:</b> The matrix is divided into a grid where the x-axis represents risk likelihood and the y-axis showcases risk impact.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div id="taskModal" class="futuristic-modal">
+                <div class="futuristic-modal-content">
+                    <span class="close" onclick="closeModal('riskMatrixModal')">&times;</span>
+                    <h2 class="modal-header">Task Details:</h2>
+                    <p id="taskDetail"></p>
+                </div>
+            </div>
+
+
+            <script>
+                // Function to open a modal
+                function openModal(modalId) {
+                    document.getElementById(modalId).style.display = "block";
+                }
+
+                // Function to close a modal
+                function closeModal(modalId) {
+                    document.getElementById(modalId).style.display = "none";
+                }
+
+                // Closing modal if clicked outside the modal content
+                window.onclick = function (event) {
+                    if (event.target.classList.contains('futuristic-modal')) {
+                        event.target.style.display = "none";
+                    }
+                }
+            </script>
+            <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+            <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
 </body>
