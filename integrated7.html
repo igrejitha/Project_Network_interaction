@@ -4403,122 +4403,128 @@
         //cumulativeHoursChart
         function getCumulativeDistribution(nodes, links) {
             console.log("CHART_DEBUG: Entering function");
-            adjustTaskTimesWithDependencies(nodes, links);
 
             // Sort nodes by ID to get the start and end dates
             nodes.sort((a, b) => parseInt(a.ID) - parseInt(b.ID));
             const startDate = new Date(nodes[0].Start);
-            const endDate = new Date(nodes[nodes.length - 1].Finish);
-
-            const totalOverrunHours = nodes.reduce((sum, node) => {
-                const overrunFactor = 1 + parseFloat(node.overrun_probability);
-                let duration;
-                if (node.TimeUnits === "Hours") {
-                    duration = parseFloat(node.Duration);
-                } else {
-                    duration = parseFloat(node.Duration) * 24;
-                }
-                return sum + (duration * overrunFactor - duration);
-            }, 0);
-
-            const overrunEndDate = new Date(endDate.getTime() + totalOverrunHours * 3600000); // 3600000 is milliseconds in an hour
+            const endDate = new Date(nodes[nodes.length - 1].riskAdjustedEnd);  // Using riskAdjustedEnd for the final date
 
             let currentDate = startDate;
             const distribution = [];
             let cumulativeHours = 0;
             let cumulativeHoursWithOverrun = 0;
 
+            let evCumulativeHours = 0;
+            let evCurrentDate = startDate
+
             const distributionWithoutOverrun = [];
             const distributionWithOverrun = [];
+
+            const evDistribution = [];
+
+            const originalEndDate = new Date(Math.max.apply(null, nodes.map(node => new Date(node.Finish))));
+
             while (currentDate <= endDate) {
+                let dailyHours = 0;  // To track how much is added on this date
+                let dailyHoursWithOverrun = 0;  // To track how much overrun is added on this date
+                let evDailyHours = 0;  // To track how much planned hours is added on this risk-adjusted date
+                let maxResourcesForTheDay = 1;  // Initialize with default 1 resource
+
+
                 nodes.forEach(node => {
                     const taskStart = new Date(node.Start);
                     const taskEnd = new Date(node.Finish);
-                    const adjustedTaskEnd = new Date(node.AdjustedFinish);  // <-- Add this line
-                    const overrunFactor = 1 + parseFloat(node.overrun_probability);
-                    let dailyDuration = 0;  // Duration for this node on this day
+                    const riskAdjustedEnd = new Date(node.riskAdjustedEnd);
+                    // Check for resources required and if it's not there or less than 1, default to 1
+                    //const Resources = node.resourcesRequired && node.resourcesRequired > 1 ? node.resourcesRequired : 1;
+                    const Resources = node.isOnCriticalPath ? node.resourcesRequired : (node.resourcesRequired && node.resourcesRequired > 1 ? node.resourcesRequired : 1);
 
-                    const latestTaskEnd = (adjustedTaskEnd > taskEnd) ? adjustedTaskEnd : taskEnd;
-                    if (taskStart <= currentDate && currentDate <= latestTaskEnd) {
 
-                        if (taskStart.getTime() === taskEnd.getTime()) {
-                            if (node.TimeUnits === "Hours") {
-                                dailyDuration = parseFloat(node.Duration);
-                            } else {
-                                dailyDuration = parseFloat(node.Duration) * 24;
-                            }
-                        } else {
-                            const daysDuration = (taskEnd.getTime() - taskStart.getTime()) / (1000 * 60 * 60 * 24) + 1;
-                            if (node.TimeUnits === "Hours") {
-                                dailyDuration = parseFloat(node.Duration) / daysDuration;
-                            } else {
-                                dailyDuration = parseFloat(node.Duration) * 24 / daysDuration;
-                            }
-                        }
-
-                        cumulativeHours += dailyDuration;
-                        cumulativeHoursWithOverrun += dailyDuration * overrunFactor;
-
-                        //console.log(`CHART_DEBUG: Node ${node.ID} - ${node.Name} - ${overrunFactor} - ${node.overrun_probability}- ${adjustedDuration} hrs`);
+                    // Track the maximum number of resources required for all tasks occurring on this date
+                    if (taskStart <= currentDate && currentDate <= riskAdjustedEnd) {
+                        maxResourcesForTheDay = Math.max(maxResourcesForTheDay, Resources);
                     }
+
+                    if (taskStart <= currentDate && currentDate <= taskEnd) {
+                        const daysDuration = differenceInCalendarDays(taskEnd, taskStart) + 1;
+                        const dailyDuration = convertToHours(node.Duration, node.TimeUnits || "Hours") / daysDuration;
+
+                        dailyHours += dailyDuration;
+                    }
+
+                    if (taskStart <= currentDate && currentDate <= riskAdjustedEnd) {
+                        const daysDurationRisk = differenceInCalendarDays(riskAdjustedEnd, taskStart) + 1;
+                        const dailyDurationRisk = convertToHours(node.Duration, node.TimeUnits || "Hours") / daysDurationRisk;
+                        const overrunDuration = dailyDurationRisk * parseFloat(node.overrun_probability);
+
+                        dailyHoursWithOverrun += dailyDurationRisk + overrunDuration;
+
+                    }
+
                 });
+
+                cumulativeHoursWithOverrun += dailyHoursWithOverrun;
+                if (currentDate <= originalEndDate) {
+                    cumulativeHours += dailyHours;
+                    distributionWithoutOverrun.push({
+                        date: currentDate.toISOString().split('T')[0],
+                        hours: cumulativeHours
+                    });
+                }
 
                 distribution.push({
                     date: currentDate.toISOString().split('T')[0],
                     hours: cumulativeHours,
                     hoursWithOverrun: cumulativeHoursWithOverrun
                 });
-                distributionWithoutOverrun.push({
-                    date: currentDate.toISOString().split('T')[0],
-                    hours: cumulativeHours
-                });
 
                 distributionWithOverrun.push({
                     date: currentDate.toISOString().split('T')[0],
                     hoursWithOverrun: cumulativeHoursWithOverrun
                 });
+  
+                //currentDate = addDurationToDate(currentDate, 24, 8, 5, "Hours");
+                currentDate = addDurationToDate(currentDate, 24, 8 * maxResourcesForTheDay, 5, "Hours");
+                //currentDate = addDurationToDate(currentDate, 24, 8 * Resources || 1), 5, "Hours");
 
-                currentDate.setDate(currentDate.getDate() + 1);
             }
+            // Separate loop for calculating EV
+            let evDate = startDate;
+            while (evDate <= endDate) {
+                let evDailyHours = 0;  // To track how much planned hours is added on this risk-adjusted date
+                let maxResourcesForTheDay = 1;  // Initialize with default 1 resource
 
-            while (currentDate <= overrunEndDate) {
                 nodes.forEach(node => {
                     const taskStart = new Date(node.Start);
-                    const adjustedTaskStart = new Date(node.AdjustedStart || node.Start);  // Use AdjustedStart if exists, otherwise use the original Start
-                    const adjustedTaskEnd = new Date(node.AdjustedFinish);
+                    const taskEnd = new Date(node.Finish);
+                    const riskAdjustedEnd = new Date(node.riskAdjustedEnd);
 
+                    // Check for resources required and if it's not there or less than 1, default to 1
+                    //const Resources = node.resourcesRequired && node.resourcesRequired > 1 ? node.resourcesRequired : 1;
+                    const Resources = node.isOnCriticalPath ? node.resourcesRequired : (node.resourcesRequired && node.resourcesRequired > 1 ? node.resourcesRequired : 1);
 
-                    const overrunFactor = 1 + parseFloat(node.overrun_probability);
-                    let dailyDuration = 0;  // Duration for this node on this day
+                    // Track the maximum number of resources required for all tasks occurring on this date
+                    if (taskStart <= evDate && evDate <= riskAdjustedEnd) {
+                        maxResourcesForTheDay = Math.max(maxResourcesForTheDay, Resources);
+                    }
 
-                    // Here, use adjustedTaskEnd for the overrun calculation
-                    if (adjustedTaskStart <= currentDate && currentDate <= adjustedTaskEnd) {
-                        if (taskStart.getTime() === adjustedTaskEnd.getTime()) {  // <-- Change this line
-                            if (node.TimeUnits === "Hours") {
-                                dailyDuration = parseFloat(node.Duration);
-                            } else {
-                                dailyDuration = parseFloat(node.Duration) * 24;
-                            }
-                        } else {
-                            const daysDuration = (adjustedTaskEnd.getTime() - taskStart.getTime()) / (1000 * 60 * 60 * 24) + 1; // <-- And this line
-                            if (node.TimeUnits === "Hours") {
-                                dailyDuration = parseFloat(node.Duration) / daysDuration;
-                            } else {
-                                dailyDuration = parseFloat(node.Duration) * 24 / daysDuration;
-                            }
-                        }
-
-                        cumulativeHoursWithOverrun += dailyDuration * overrunFactor;
+                    if (taskStart <= evDate && evDate <= riskAdjustedEnd && evDate <= taskEnd) {
+                        // Calculate hours based on the original duration but allocate to the risk-adjusted date
+                        const daysDuration = differenceInCalendarDays(taskEnd, taskStart) + 1;
+                        const evDuration = convertToHours(node.Duration, node.TimeUnits || "Hours") / daysDuration;
+                        evDailyHours += evDuration;
                     }
                 });
 
-                distributionWithOverrun.push({
-                    date: currentDate.toISOString().split('T')[0],
-                    hoursWithOverrun: cumulativeHoursWithOverrun
+                evCumulativeHours += evDailyHours;
+                evDistribution.push({
+                    date: evDate.toISOString().split('T')[0],
+                    hours: evCumulativeHours
                 });
 
-                currentDate.setDate(currentDate.getDate() + 1);
+                evDate = addDurationToDate(evDate, 24, 8 * maxResourcesForTheDay, 5, "Hours");
             }
+
 
             const yUnits = nodes[0].TimeUnits === "Hours" ? "Cumulative Hours" : "Cumulative Days";
 
@@ -4550,8 +4556,19 @@
                         borderColor: '#00AA55',
                         backgroundColor: 'rgba(0, 170, 85, 0.1)',
                         fill: false
+                    },
+                    {
+                        label: 'EV',
+                        data: allDates.map(date => {
+                            const entry = evDistribution.find(d => d.date === date);
+                            return entry ? entry.hours : null;
+                        }),
+                        borderColor: '#0000FF',  // Use blue color for the EV curve
+                        backgroundColor: 'rgba(0, 0, 255, 0.1)',
+                        fill: false
                     }]
                 },
+
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
@@ -4615,6 +4632,22 @@
             return distribution;
         }
 
+        function differenceInCalendarDays(date1, date2) {
+            const msPerDay = 24 * 60 * 60 * 1000; // number of milliseconds in a day
+            return (date1 - date2) / msPerDay;
+        }
+
+        function convertToHours(duration, unit) {
+            switch (unit) {
+                case "Hours":
+                    return duration;
+                case "Days":
+                    return duration * 24;
+                default:
+                    throw new Error(`Unsupported time unit: ${unit}`);
+            }
+        }
+
         function durationToMilliseconds(duration, timeUnits) {
             switch (timeUnits) {
                 case 'Hours':
@@ -4630,18 +4663,59 @@
             }
         }
 
+        function calculateResources(start, end, duration, hoursPerDay = 8, workDaysPerWeek = 5) {
+            const startDate = new Date(start);
+            const endDate = new Date(end);
+            const totalDays = Math.floor((endDate - startDate) / (24 * 60 * 60 * 1000)) + 1;
+
+            let workDays = 0;
+            let currentDay = new Date(startDate);
+            while (currentDay <= endDate) {
+                if (currentDay.getDay() >= 1 && currentDay.getDay() <= workDaysPerWeek) {
+                    workDays++;
+                }
+                currentDay.setDate(currentDay.getDate() + 1);
+            }
+
+            // Calculate total available hours for a resource
+            const totalAvailableHours = workDays * hoursPerDay;
+            // Calculate the number of resources required
+            const resourcesRequired = duration / totalAvailableHours;
+            // Debug logs
+            console.log(`calculateResources Task Start: ${start}, Task End: ${end}, Duration: ${duration}`);
+            console.log(`calculateResources Total Days: ${totalDays}, Work Days: ${workDays}`);
+            console.log(`calculateResources Total Available Hours: ${totalAvailableHours}, Resources Required: ${resourcesRequired}`);
+
+            return Math.ceil(resourcesRequired); // Round up to ensure all work can be done
+        }
+
+
         function computeRiskAdjustedDurationsAndDates(nodes, links) {
+            const workingHoursPerDay = 8;
+            const workingDaysPerWeek = 5;
+
             const startNode = nodes.find(node => node.ID === "0");
             const endNode = nodes.reduce((a, b) => (a.ID > b.ID) ? a : b);
-
             const paths = findAllPaths(startNode, endNode, links, nodes);
 
             nodes.forEach(node => {
                 const riskAdjustedDuration = node.Duration * (1 + node.overrun_probability);
                 node.riskAdjustedDuration = riskAdjustedDuration;
                 node.riskAdjustedStart = new Date(node.Start);
-                node.riskAdjustedEnd = new Date(node.Start);
-                node.riskAdjustedEnd.setHours(node.riskAdjustedEnd.getHours() + riskAdjustedDuration);
+                // Check and assign a default value if TimeUnits is undefined
+                const timeUnit = node.TimeUnits || "Hours";
+                // Calculate resources required for the task
+                node.resourcesRequired = calculateResources(node.Start, node.Finish, node.Duration, workingHoursPerDay, workingDaysPerWeek);
+                //node.riskAdjustedEnd = addDurationToDate(node.riskAdjustedStart, riskAdjustedDuration, workingHoursPerDay, workingDaysPerWeek, timeUnit);
+                //node.riskAdjustedEnd = addDurationToDate(node.riskAdjustedStart, riskAdjustedDuration, workingHoursPerDay * (node.resourcesRequired || 1), workingDaysPerWeek, timeUnit);
+                //node.riskAdjustedEnd = addDurationToDate(node.riskAdjustedStart, riskAdjustedDuration, workingHoursPerDay * (node.resourcesRequired && node.resourcesRequired > 1 ? node.resourcesRequired : 1), workingDaysPerWeek, timeUnit);
+                if (node.isOnCriticalPath) {
+                    node.riskAdjustedEnd = addDurationToDate(node.riskAdjustedStart, riskAdjustedDuration, workingHoursPerDay * node.resourcesRequired, workingDaysPerWeek, timeUnit);
+                } else {
+                    node.riskAdjustedEnd = addDurationToDate(node.riskAdjustedStart, riskAdjustedDuration, workingHoursPerDay * (node.resourcesRequired && node.resourcesRequired > 1 ? node.resourcesRequired : 1), workingDaysPerWeek, timeUnit);
+                }
+
+
             });
 
             paths.forEach(path => {
@@ -4649,15 +4723,93 @@
                     if (index === 0) return; // Skip the first node as its risk-adjusted dates are set already
 
                     const prevNode = path[index - 1];
-                    const potentialStartDate = new Date(prevNode.riskAdjustedEnd);
+                    const potentialStartDate = prevNode.riskAdjustedEnd;
 
                     if (potentialStartDate > node.riskAdjustedStart) {
                         node.riskAdjustedStart = potentialStartDate;
-                        node.riskAdjustedEnd = new Date(node.riskAdjustedStart);
-                        node.riskAdjustedEnd.setHours(node.riskAdjustedEnd.getHours() + node.riskAdjustedDuration);
+                        const timeUnit = node.TimeUnits || "Hours";
+                        //node.riskAdjustedEnd = addDurationToDate(node.riskAdjustedStart, node.riskAdjustedDuration, workingHoursPerDay * (node.resourcesRequired && node.resourcesRequired > 1 ? node.resourcesRequired : 1), workingDaysPerWeek, timeUnit);
+                        if (node.isOnCriticalPath) {
+                            node.riskAdjustedEnd = addDurationToDate(node.riskAdjustedStart, node.riskAdjustedDuration, workingHoursPerDay * node.resourcesRequired, workingDaysPerWeek, timeUnit);
+                        } else {
+                            node.riskAdjustedEnd = addDurationToDate(node.riskAdjustedStart, node.riskAdjustedDuration, workingHoursPerDay * (node.resourcesRequired && node.resourcesRequired > 1 ? node.resourcesRequired : 1), workingDaysPerWeek, timeUnit);
+                        }
+
                     }
                 });
             });
+        }
+
+        // compute the difference between two dates in terms of the given TimeUnits.
+        function computeDateDifference(startDate, endDate, workingHoursPerDay, workingDaysPerWeek, timeUnits) {
+            const diff = endDate - startDate; // Difference in milliseconds
+            switch (timeUnits) {
+                case 'Hours':
+                    const hours = diff / (1000 * 60 * 60);
+                    return hours / workingHoursPerDay;
+                case 'Days':
+                    return diff / (1000 * 60 * 60 * 24);
+                case 'Weeks':
+                    return diff / (1000 * 60 * 60 * 24 * 7);
+                default:
+                    throw new Error(`Unsupported time unit: ${timeUnits}`);
+            }
+        }
+        function addWorkDays(startDate, daysToAdd, workingDaysPerWeek = 5) {
+            let endDate = new Date(startDate);
+            while (daysToAdd > 0) {
+                endDate.setDate(endDate.getDate() + 1);
+                // If it's a weekend, don't count it as a day added
+                if (endDate.getDay() !== 0 && endDate.getDay() !== 6) {
+                    daysToAdd--;
+                }
+            }
+            return endDate;
+        }
+        //add the given duration (in terms of the given TimeUnits) to a given start date.
+        function addDurationToDate(startDate, duration, workingHoursPerDay, workingDaysPerWeek, timeUnits) {
+            switch (timeUnits) {
+                case 'Hours':
+                    let totalHours = duration;
+                    let fullDaysFromHours = Math.floor(totalHours / workingHoursPerDay);
+                    let remainingHours = totalHours % workingHoursPerDay;
+                    let intermediateDate = addWorkDays(startDate, fullDaysFromHours, workingDaysPerWeek);
+
+                    // Adding remaining hours without considering working hours
+                    intermediateDate.setHours(intermediateDate.getHours() + remainingHours);
+                    return intermediateDate;
+
+                case 'Days':
+                    // Add full working days, excluding weekends
+                    return addWorkDays(startDate, duration, workingDaysPerWeek);
+
+                case 'Weeks':
+                    // Convert weeks to days, then add
+                    let daysFromWeeks = duration * workingDaysPerWeek;
+                    return addWorkDays(startDate, daysFromWeeks, workingDaysPerWeek);
+
+                default:
+                    throw new Error(`Unsupported time unit: ${timeUnits}`);
+            }
+        }
+
+
+        //subtract the given duration (in terms of the given TimeUnits) from a given start date.
+        function subtractDurationFromDate(startDate, duration, workingHoursPerDay, workingDaysPerWeek, timeUnits) {
+            let newDate = new Date(startDate);
+            switch (timeUnits) {
+                case 'Hours':
+                    newDate.setHours(newDate.getHours() - duration * workingHoursPerDay);
+                    return newDate;
+                case 'Days':
+                    newDate.setDate(newDate.getDate() - duration);
+                    return newDate;
+                case 'Weeks':
+                    newDate.setDate(newDate.getDate() - duration * workingDaysPerWeek);
+                    return newDate;
+                default:
+                    throw new Error(`Unsupported time unit: ${timeUnits}`);
+            }
         }
 
         function updateProgressBars(nodes) {
