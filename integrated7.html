@@ -3032,7 +3032,91 @@
                 console.log("All paths found:", paths);
                 return paths;
             }
-            */
+            
+        //findShortestDistance using Djikstra's method more computational intensive but more accurate
+        function findShortestDistance(startNode, targetNode, links, nodes) {
+            // Initialize the distances object and set every distance to Infinity, except for the startNode
+            const distances = {};
+            nodes.forEach(node => {
+                distances[node.ID] = Infinity;
+            });
+            distances[startNode.ID] = 0;
+
+            const previousNodes = {};
+
+            // Create a list of unvisited nodes. The startNode's distance is zero and all others are Infinity
+            const unvisitedSet = new Set(nodes.map(node => node.ID));
+
+            let currentNode = startNode;
+
+            // Loop as long as we have unvisited nodes
+            while (unvisitedSet.size > 0) {
+                // Find all neighbors of the current node
+                const neighbors = links.filter(link => link.source.ID === currentNode.ID)
+                    .map(link => nodes.find(node => node.ID === link.target.ID));
+
+                // Update tentative distances and previous nodes for neighbors of the current node
+                for (let neighbor of neighbors) {
+                    const link = links.find(link => (link.source.ID === currentNode.ID && link.target.ID === neighbor.ID));
+                    const weight = link.duration;  // Using 'duration' as the weight
+                    const tentativeDistance = distances[currentNode.ID] + weight;
+
+                    if (tentativeDistance < distances[neighbor.ID]) {
+                        distances[neighbor.ID] = tentativeDistance;
+                        previousNodes[neighbor.ID] = currentNode;
+                    }
+                }
+
+                // Remove the current node from the unvisited set
+                unvisitedSet.delete(currentNode.ID);
+
+                // If we've reached the target node, we can break
+                if (currentNode.ID === targetNode.ID) {
+                    break;
+                }
+
+                // Select the unvisited node with the smallest tentative distance
+                currentNode = Array.from(unvisitedSet)
+                    .map(id => nodes.find(node => node.ID === id))
+                    .reduce((nearestNode, node) => {
+                        return (distances[node.ID] < distances[nearestNode.ID]) ? node : nearestNode;
+                    }, { ID: null, distance: Infinity });
+            }
+
+            return distances[targetNode.ID];
+        }
+        */
+        function findShortestDistance(startNode, targetNode, links, nodes) {
+            const neighborsMap = {};
+            nodes.forEach(node => {
+                neighborsMap[node.ID] = links
+                    .filter(link => (link.source.ID || link.source) === node.ID)
+                    .map(link => nodes.find(n => n.ID === (link.target.ID || link.target)));
+            });
+
+            let shortestDistance = Infinity;
+
+            function dfs(currentNode, currentDistance, visited) {
+                if (currentNode.ID === targetNode.ID) {
+                    shortestDistance = Math.min(shortestDistance, currentDistance);
+                    return;
+                }
+
+                visited.add(currentNode.ID);
+                for (let neighbor of neighborsMap[currentNode.ID]) {
+                    if (!visited.has(neighbor.ID)) {
+                        const link = links.find(link => link.source.ID === currentNode.ID && link.target.ID === neighbor.ID);
+                        dfs(neighbor, currentDistance + link.duration, visited);
+                    }
+                }
+                visited.delete(currentNode.ID);
+            }
+
+            dfs(startNode, 0, new Set());
+
+            return shortestDistance === Infinity ? -1 : shortestDistance;
+        }
+
 
         function calculateSlack(nodes, links) {
             if (!nodes || !links || nodes.length === 0 || links.length === 0) {
@@ -3301,6 +3385,14 @@
             console.log("defaultOverrunData");
             console.log("defaultOverrunData", defaultOverrunData, defaultOverrunData.costOverrun, defaultOverrunData.scheduleOverrun);
 
+            // Find the start and end nodes
+            const startN = nodes.find(node => node.ID === "0");
+            const endN = nodes.reduce((a, b) => (a.ID > b.ID) ? a : b);
+
+            // Calculate distances to the end node for each node
+            findDistancesToEnd(startN, endN, links, nodes);
+
+
             //console.log("defaultOverrunData2", defaultOverrunData, defaultOverrunData.costOverrun, defaultOverrunData.scheduleOverrun);
 
             // Compute PageRank
@@ -3429,11 +3521,19 @@
                 const minRiskExposure = Math.min(...riskExposures);
                 const maxRiskExposure = Math.max(...riskExposures);
 
+                // Compute the max and min values for longestDistanceToEnd across all nodes
+                const maxLongestDistanceToEnd = Math.max(...nodes.map(n => n.longestDistanceToEnd));
+                const minLongestDistanceToEnd = Math.min(...nodes.map(n => n.longestDistanceToEnd));
+
+
                 const taskInfluenceScoreNorm = normalize(taskInfluenceScore, minTaskInfluenceScore, maxTaskInfluenceScore);
                 const bufferRequirementNorm = normalize(bufferRequirement, minBufferRequirement, maxBufferRequirement);
                 const flowDisruptionPotentialNorm = normalize(flowDisruptionPotential, minFlowDisruptionPotential, maxFlowDisruptionPotential);
                 //const riskExposureNorm = normalize(riskExposure, minRiskExposure, maxRiskExposure);
                 const riskExposureNorm = handleNaN(normalize(riskExposure, minRiskExposure, maxRiskExposure), "riskExposureNorm", node.ID);
+
+                // Normalize longestDistanceToEnd for the current node
+                const longestDistanceToEndNorm = normalize(node.longestDistanceToEnd, minLongestDistanceToEnd, maxLongestDistanceToEnd);
 
 
                 const dependencyRatio = (inDegree + outDegree) !== 0 ? inDegree / (inDegree + outDegree) : 0;
@@ -3466,13 +3566,24 @@
                 const EPSILON = 0.001; // a small value to avoid division by zero or near-zero values
                 const adjustedClusteringCoefficient = Math.max(node.clusteringCoefficient, -1 + EPSILON);
 
+                // Compute the distance from the start node for each node
+                //let distanceFromStart = findShortestDistance(startNode, node, links, nodes);  // You'll need to implement this function
+                //const maxDistance = Math.max(...nodes.map(n => findShortestDistance(startNode, n, links, nodes)));
+                //const minDistance = Math.min(...nodes.map(n => findShortestDistance(startNode, n, links, nodes)));
+                //const distanceFactor = 1 - normalize(distanceFromStart, minDistance, maxDistance);  // Closer to start means higher importance
+
+                // Compute Risk Score (New formula)
+
+
+                // Compute Importance Score (New formula)
+
+
                 // Compute Risk Score
-                const riskScore = (0.15 * inDegreeNorm) +
-                    (0.15 * outDegreeNorm) +
-                    (0.25 * betweennessCentralityNorm) +
-                    (0.1 * durationNorm) +
+                const riskScore = (0.25 * betweennessCentralityNorm) +
+                    (0.2 * pageRankNorm) +
+                    (0.2 * durationNorm) +
                     (0.15 * riskExposureNorm) +
-                    (0.2 * pageRank);
+                    (0.2 * inDegreeNorm);  // New factor for in-degree
 
                 // Compute Importance Score
                 //const taskInfluenceScore = pageRank + betweennessCentrality; // Simplified for the example
@@ -3482,9 +3593,11 @@
                 const importanceScore = (0.15 * dependencyRatioNorm) +
                     (0.25 * taskInfluenceScore) +
                     (0.15 * bufferRequirement) +
-                    (0.05 * flowDisruptionPotential) +
+                    (0.15 * longestDistanceToEndNorm) +
+                    (0.15 * flowDisruptionPotential) +
                     (0.15 * bottleneckScoreNorm) +
-                    (0.2 * pageRank);
+                    (0.15 * pageRank);//reduce to 0.1 if distanceFactor is used
+
                 console.log("computeNetworkMetrics Final Importance Score for node", node.ID, ":", importanceScore);
 
                 // Adjust multipliers based on node's presence on critical or outlier paths
@@ -3788,6 +3901,19 @@
             const tableBody = document.getElementById('milestoneTableBody');
             tableBody.innerHTML = ''; // Clear any previous rows
 
+            // Step 1: Determine min and max averageOverrunProbability across all milestones
+            let minOverrunProbability = Infinity;
+            let maxOverrunProbability = -Infinity;
+
+            milestones.forEach(milestone => {
+                const allPathsToMilestone = findAllPaths(startNode, milestone, links, nodes);
+                allPathsToMilestone.forEach(path => {
+                    const averageOverrunProbability = path.reduce((sum, node) => sum + node.overrun_probability, 0) / path.length;
+                    minOverrunProbability = Math.min(minOverrunProbability, averageOverrunProbability);
+                    maxOverrunProbability = Math.max(maxOverrunProbability, averageOverrunProbability);
+                });
+            });
+
             // Calculate the maximum path length among all milestones
             let maxPathLength = 0;
             milestones.forEach(milestone => {
@@ -3821,32 +3947,73 @@
                 const riskAdjustedDuration = calculateExpectedOverrunDurationForPath(longestPath);
                 console.log(`drawMilestoneTable Longest path to milestone ID ${milestone.ID}: [${longestPath.map(p => p.ID).join(", ")}] - Duration: ${longestDuration}`);
 
+                // Calculate averageOverrunProbability for this milestone
+                const averageOverrunProbability = longestPath.reduce((sum, node) => sum + node.overrun_probability, 0) / longestPath.length;
+
+                // Calculate the bar color based on averageOverrunProbability
+                const scaledProbability = (averageOverrunProbability - minOverrunProbability) / (maxOverrunProbability - minOverrunProbability);
+                const greenValue = Math.floor((1 - scaledProbability) * 255);
+                const barColor = `rgb(255, ${greenValue}, 0)`;
+
+                // Initialize sums for duration-weighted risk and importance
+                let sumWeightedRisk = 0;
+                let sumWeightedImportance = 0;
+                let totalPathDuration = 0;
+
                 // Log durations and risk-adjusted durations of each activity along the path for debugging purposes
                 console.log("drawMilestoneTable Activity Durations and Risk-adjusted Durations for the Longest Path:");
                 longestPath.forEach(node => {
                     const nodeRiskAdjustedDuration = node.Duration + (node.Duration * node.overrun_probability);
                     console.log(` drawMilestoneTable Node ID: ${node.ID}, Duration: ${node.Duration}, Risk-adjusted Duration: ${nodeRiskAdjustedDuration}`);
+
+                    const weightedRisk = node.Duration * node.riskScore;
+                    const weightedImportance = node.Duration * node.importanceScore;
+
+                    //Sum up weighted risk and importance
+                    sumWeightedRisk += weightedRisk;
+                    sumWeightedImportance += weightedImportance;
+                    totalPathDuration += node.Duration;
+
                 });
+
+                // Calculate duration-weighted average risk and importance
+                const avgWeightedRisk = sumWeightedRisk / totalPathDuration;
+                const avgWeightedImportance = sumWeightedImportance / totalPathDuration;
+
 
                 // Creating a row for each milestone
                 const row = document.createElement('tr');
 
                 // Add cells to the row
-                ['ID', 'Name', 'riskScore', 'importanceScore', 'Start', 'Finish', 'slack', 'overrun_probability'].forEach(key => {
+                ['ID', 'Name', 'avgWeightedRisk', 'avgWeightedImportance', 'Start', 'Finish', 'riskAdjustedEnd', 'slack', 'path_overrun_probability'].forEach(key => {
                     const cell = document.createElement('td');
                     if (key === 'slack') {
-                        cell.textContent = Math.round(milestone[key]); // Rounding off the decimal for slack
-                    } else if (key === 'riskScore' || key === 'importanceScore' || key === 'overrun_probability') {
-                        cell.textContent = milestone[key].toFixed(2);
+                        cell.textContent = Math.round(milestone[key]);
+                    } else if (key === 'avgWeightedRisk') {
+                        cell.textContent = avgWeightedRisk.toFixed(2);  // Updated to show the duration-weighted average risk
+                    } else if (key === 'avgWeightedImportance') {
+                        cell.textContent = avgWeightedImportance.toFixed(2);  // Updated to show the duration-weighted average importance
                     } else if (key === 'Start') {
-                        cell.textContent = formatDate(startNode.Start);  // Use start date of the startNode
+                        cell.textContent = formatDate(startNode.Start);
                     } else if (key === 'Finish') {
-                        cell.textContent = formatDate(milestone.Finish);  // Use finish date of the milestone
+                        cell.textContent = formatDate(milestone.Finish);
+                    } else if (key === 'riskAdjustedEnd') {
+                        cell.textContent = formatDate(milestone.riskAdjustedEnd);
+                    } else if (key === 'path_overrun_probability') {
+                        cell.textContent = (averageOverrunProbability * 100).toFixed(2) + '%';
+                        // Calculate the text color based on averageOverrunProbability
+                        const scaledProbability = (averageOverrunProbability - minOverrunProbability) / (maxOverrunProbability - minOverrunProbability);
+                        const greenValue = Math.floor((1 - scaledProbability) * 255);
+                        const textColor = `rgb(255, ${greenValue}, 0)`;
+                        // Set the text color
+                        cell.style.color = textColor;
                     } else {
                         cell.textContent = milestone[key];
                     }
                     row.appendChild(cell);
                 });
+
+
 
                 const MIN_BAR_WIDTH = 15; // Minimum width in pixels
 
@@ -3916,10 +4083,11 @@
                 durationDiv.style.position = 'relative';
                 durationDiv.title = `Path Duration: ${longestDuration.toFixed(0)} ${timeUnits}`;
 
-                // Actual Progress Bar (Foreground Bar)
+                // Actual ProgresAdds Bar (Foreground Bar)
                 const progressDiv = document.createElement('div');
                 progressDiv.style.width = totalProgress * 100 + '%';
-                progressDiv.style.background = 'linear-gradient(to right, #5ac8fa, #1e69aa)';
+                //progressDiv.style.background = 'linear-gradient(to right, #5ac8fa, #1e69aa)';
+                progressDiv.style.background = barColor;  // <-- New Code
                 progressDiv.style.height = '20px';
                 progressDiv.style.borderRadius = '10px';
                 progressDiv.style.boxShadow = '0 0 10px #5ac8fa';
@@ -3949,7 +4117,8 @@
                 const riskAdjustedDurationDiv = document.createElement('div');
                 //riskAdjustedDurationDiv.style.width = ((riskAdjustedDuration / maxPathLength) * 100) + MIN_BAR_WIDTH + '%';
                 riskAdjustedDurationDiv.style.width = Math.min(((riskAdjustedDuration / maxPathLength) * 100) + MIN_BAR_WIDTH, 100) + '%';
-                riskAdjustedDurationDiv.style.background = '#113464';  // Darker color
+                //riskAdjustedDurationDiv.style.background = '#113464';  // Darker color
+                riskAdjustedDurationDiv.style.background = barColor;  // Darker color
                 riskAdjustedDurationDiv.style.height = '20px';
                 riskAdjustedDurationDiv.style.borderRadius = '10px';
                 riskAdjustedDurationDiv.style.position = 'relative';
@@ -4214,11 +4383,49 @@
 
             // Create the bar chart
             function createBarChart() {
+                const tooltipDate = d3.select("body").append("div")
+                    .attr("class", "tooltip-date")
+                    .style("opacity", 0)
+                    .style("position", "absolute")
+                    .style("background-color", "#f9f9f9")
+                    .style("border", "solid")
+                    .style("border-width", "1px")
+                    .style("border-radius", "5px")
+                    .style("padding", "10px");
+
+                const tooltipHour = d3.select("body").append("div")
+                    .attr("class", "tooltip-hour")
+                    .style("opacity", 0)
+                    .style("position", "absolute")
+                    .style("background-color", "#f9f9f9")
+                    .style("border", "solid")
+                    .style("border-width", "1px")
+                    .style("border-radius", "5px")
+                    .style("padding", "10px");
+
+
+                // Clear existing SVGs
+                d3.select("#progressBars").html("");
                 // Retrieve the start date from the Start Milestone
                 const startDate = new Date(nodes.find(node => node.ID === "0").Start);
+                const endNode = nodes.reduce((a, b) => (a.ID > b.ID) ? a : b);
+                //const endNode = new Date(nodes.find(node => node.ID === "0").Start);
 
                 // Calculate the planned completion date
                 const plannedCompletionDate = new Date(criticalPathData.path[criticalPathData.path.length - 1].Finish);
+                const riskAdjustedEndDate = new Date(endNode.riskAdjustedEnd);
+
+                const minDate = d3.min([startDate, plannedCompletionDate, riskAdjustedEndDate]);
+                const maxDate = d3.max([startDate, plannedCompletionDate, riskAdjustedEndDate]);
+
+
+                // Retrieve the planned and risk-adjusted end dates from the End Milestone
+               //const plannedCompletionDate = new Date(endNode.Finish); // Using endNode found dynamically
+                //const riskAdjustedEndDate = new Date(endNode.riskAdjustedEnd); // Using endNode found dynamically
+
+                // Calculate the total original hours and the total risk-adjusted duration for all activities
+                const totalOriginalHours = nodes.reduce((sum, node) => sum + (node.Duration || 0), 0);
+                const totalRiskAdjustedDuration = nodes.reduce((sum, node) => sum + (node.riskAdjustedDuration || 0), 0);
 
                 const timeUnits = nodes[0].TimeUnits;
 
@@ -4226,12 +4433,13 @@
                 const probableEndDate = new Date(startDate);
                 probableEndDate.setDate(startDate.getDate() + Math.round(longestRiskAdjustedDuration));
 
-                const data = [
+                const dateData = [
                     {
-                        label: 'Critical Path',
+                        label: 'Planned Completion',
                         value: adjustDuration(criticalPathData.duration, 'Days'),
                         units: 'Days',
                         startDate: startDate,
+                        fontSize: '16px',
                         endDate: plannedCompletionDate
                     },
                     {
@@ -4239,77 +4447,178 @@
                         value: adjustDuration(longestRiskAdjustedDuration, 'Days'),
                         units: 'Days',
                         startDate: startDate,
-                        endDate: probableEndDate
+                        fontSize: '16px',
+                        endDate: riskAdjustedEndDate
                     }
                 ];
-                console.log(data);
-                console.log("createBarChart", startDate)
-
-                const margin = { top: 20, right: 50, bottom: 40, left: 100 }; // Adjusted the margins
-                const width = 700 - margin.left - margin.right;  // Increased the width
+                // Data for hours
+                const hourData = [
+                    {
+                        label: 'Total Original Hours',
+                        value: totalOriginalHours,
+                        units: 'Hours',
+                        startDate: startDate,
+                        fontSize: '16px',
+                        endDate: plannedCompletionDate
+                    },
+                    {
+                        label: 'Total Risk-Adjusted Duration',
+                        value: totalRiskAdjustedDuration,
+                        units: 'Hours',
+                        startDate: startDate,
+                        fontSize: '16px',
+                        endDate: riskAdjustedEndDate
+                    }
+                ];
+                //console.log(data);
+                console.log("createBarChart", startDate);
+                // Common properties
+                const margin = { top: 20, right: 60, bottom: 100, left: 180 };
+                const width = 700 - margin.left - margin.right;
                 const height = 250 - margin.top - margin.bottom;
 
-                const svg = d3.select("#progressBars").append("svg")
+                function getRiskAdjustedColor(duration) {
+                    if (duration <= 30) {
+                        return "green";
+                    } else if (duration <= 60) {
+                        return "yellow";
+                    } else {
+                        return "red";
+                    }
+                }
+
+                // Create SVG for dates
+                const svgDates = d3.select("#progressBars").append("svg")
                     .attr("width", width + margin.left + margin.right)
                     .attr("height", height + margin.top + margin.bottom)
                     .append("g")
                     .attr("transform", `translate(${margin.left},${margin.top})`);
 
-                const x = d3.scaleLinear()
-                    .domain([0, d3.max(data, d => d.value)])
+                const xDates = d3.scaleTime()
+                    .domain([startDate, d3.max(dateData, d => d.endDate)])
                     .range([0, width]);
 
-                const y = d3.scaleBand()
-                    .domain(data.map(d => d.label))
+                const yDates = d3.scaleBand()
+                    .domain(dateData.map(d => d.label))
                     .range([height, 0])
                     .padding(0.1);
 
-                // Add tooltip
-                const tooltip = d3.select("body").append("div")
-                    .attr("class", "bar-chart-tooltip")
-                    .style("opacity", 0);
-
-                svg.selectAll(".bar")
-                    .data(data)
+                // Drawing the date bars on svgDates
+                svgDates.selectAll(".date-bar")
+                    .data(dateData)
                     .enter().append("rect")
-                    .attr("class", "bar")
-                    .attr("y", d => y(d.label))
-                    .attr("height", y.bandwidth())
-                    .attr("x", 0)
-                    .attr("width", d => x(d.value))
-                    .on("mouseover", (event, d) => {
-                        console.log("Tooltip Data:", d); // Log data for debugging
-                        tooltip.style("opacity", 0.9);   // Explicitly set opacity before transition
-                        tooltip.transition()
+                    .attr("class", "date-bar")
+                    .attr("y", d => yDates(d.label))
+                    .attr("height", yDates.bandwidth())
+                    .attr("x", d => xDates(d.startDate))
+                    .attr("width", d => xDates(d.endDate) - xDates(d.startDate))
+                    //.attr("fill", "blue");  // Choose your color
+                    .attr("fill", d => d.label === 'Risk Adjusted' ? getRiskAdjustedColor(d.value) : '#b4f5ff')  // Corrected the label and used the color function
+                    .on("mouseover", function (event, d) {
+                        tooltipDate.transition()
                             .duration(200)
-                            .style("opacity", 0.9);
-                        //tooltip.html(`Path: ${d.label}<br>Duration: ${d.value} ${d.units}<br>Start Date: ${d.startDate?.toLocaleDateString()}<br>End Date: ${d.endDate?.toLocaleDateString()}`)
-                        tooltip.html(`Path: ${d.label}<br>Duration: ${d.value} ${d.units}<br>Start Date: ${new Date(d.startDate).toLocaleDateString()}<br>End Date: ${new Date(d.endDate).toLocaleDateString()}`)
-                            .style("left", `${event.pageX + 5}px`)
-                            .style("top", `${event.pageY - 70}px`);
+                            .style("opacity", 1);
+                        tooltipDate.html(d.label + "<br/>" + d.value + " " + d.units)
+                            .style("left", (event.pageX + 10) + "px")
+                            .style("top", (event.pageY - 28) + "px");
                     })
-                    .on("mouseout", () => {
-                        tooltip.transition()
+                    .on("mouseout", function () {
+                        tooltipDate.transition()
                             .duration(500)
                             .style("opacity", 0);
                     });
 
 
-                svg.append("g")
-                    .call(d3.axisLeft(y));
 
-                svg.append("g")
-                    .attr("transform", `translate(0,${height})`)
-                    //.call(d3.axisBottom(x).ticks(10).tickFormat(d => `${d} Days`))
-                    .call(d3.axisBottom(x).ticks(10).tickFormat(d => `${d}`))
-                    .append("text")
-                    .attr("x", width / 2)
-                    .attr("y", 30)
-                    .attr("fill", "#000")
-                    .attr("text-anchor", "middle")
-                    .text(`Duration (${timeUnits})`)
-                    .style("font-size", "16px")
-                    .style("fill", "#b4f5ff");
+
+                // Adding Y-Axis for Date Bars
+                svgDates.append("g")
+                    .call(d3.axisLeft(yDates))
+                    .selectAll("text")
+                    .style("font-size", "12px");  // Increased font-size
+
+                // Adding X-Axis for Date Bars
+                // Calculate how many days are between the minimum and maximum date
+                const numDays = (maxDate - minDate) / (1000 * 60 * 60 * 24);
+
+                // Determine tick interval based on the range of dates
+                let tickInterval;
+                if (numDays <= 30) {
+                    tickInterval = d3.timeDay.every(1);
+                } else if (numDays <= 90) {
+                    tickInterval = d3.timeWeek.every(1);
+                } else if (numDays <= 365) {
+                    tickInterval = d3.timeMonth.every(1);
+                } else {
+                    tickInterval = d3.timeMonth.every(3);
+                }
+                svgDates.append("g")
+                    .attr("transform", `translate(0, ${height})`)
+                    .call(d3.axisBottom(xDates).ticks(d3.timeDay.every(tickInterval)).tickFormat(d3.timeFormat('%Y-%m-%d')))
+                    .selectAll("text")
+                    .attr("transform", "rotate(45)")
+                    .style("text-anchor", "start")
+                    .style("font-size", "14px"); 
+
+                // Create SVG for hours
+                const svgHours = d3.select("#progressBars").append("svg")
+                    .attr("width", width + margin.left + margin.right)
+                    .attr("height", height + margin.top + margin.bottom)
+                    .append("g")
+                    .attr("transform", `translate(${margin.left},${margin.top})`);
+
+                const xHours = d3.scaleLinear()
+                    .domain([0, d3.max(hourData, d => d.value)])
+                    .range([0, width]);
+
+                const yHours = d3.scaleBand()
+                    .domain(hourData.map(d => d.label))
+                    .range([height, 0])
+                    .padding(0.1);
+
+                // Drawing the hour bars on svgHours
+                svgHours.selectAll(".hour-bar")
+                    .data(hourData)
+                    .enter().append("rect")
+                    .attr("class", "hour-bar")
+                    .attr("y", d => yHours(d.label))
+                    .attr("height", yHours.bandwidth())
+                    .attr("x", 0)  // Starting from zero
+                    .attr("width", d => xHours(d.value))  
+                    //.attr("fill", "green");  // Choose your color
+                    .attr("fill", d => d.label === 'Total Risk-Adjusted Duration' ? getRiskAdjustedColor(d.value) : '#b4f5ff')  // Used the color function
+                    .on("mouseover", function (event, d) {
+                        tooltipHour.transition()
+                            .duration(200)
+                            .style("opacity", 1);
+                        tooltipHour.html(d.label + "<br/>" + d.value + " " + d.units)
+                            .style("left", (event.pageX + 10) + "px")
+                            .style("top", (event.pageY - 28) + "px");
+                    })
+                    .on("mouseout", function () {
+                        tooltipHour.transition()
+                            .duration(500)
+                            .style("opacity", 0);
+                    });
+
+
+
+                // Adding Y-Axis for Hour Bars
+                svgHours.append("g")
+                    .call(d3.axisLeft(yHours))
+                    .selectAll("text")
+                    .style("font-size", "12px");
+
+                // Adding X-Axis for Hour Bars
+                svgHours.append("g")
+                    .attr("transform", `translate(0, ${height})`)
+                    .call(d3.axisBottom(xHours).ticks(10).tickFormat(d => `${d} Hours`))
+                    .selectAll("text")
+                    .attr("dy", ".35em")
+                    .attr("transform", "rotate(45)")
+                    .style("text-anchor", "start")
+                    .style("font-size", "14px");
+
             }
 
             // Call the createBarChart function to insert the chart
@@ -4338,6 +4647,61 @@
                     table.tBodies[0].append(...sortedRows);
                 });
             });
+        }
+
+        // Example usage
+        // const sortedNodes = topologicalSort(nodes, links);
+        // console.log("Topologically sorted nodes:", sortedNodes);
+        function topologicalSort(nodes, links) {
+            const inDegree = {};  // Initialize in-degree count for each node
+            const neighbors = {}; // Neighbors for each node
+            const sortedNodes = []; // Final sorted array of nodes
+            const queue = []; // Queue to keep track of nodes with in-degree 0
+
+            // Initialize inDegree and neighbors
+            nodes.forEach(node => {
+                inDegree[node.ID] = 0;
+                neighbors[node.ID] = [];
+            });
+
+            // Populate inDegree and neighbors from links
+            links.forEach(link => {
+                const sourceId = link.source.ID || link.source;
+                const targetId = link.target.ID || link.target;
+                inDegree[targetId]++;
+                neighbors[sourceId].push(targetId);
+            });
+
+            // Enqueue nodes with in-degree of 0
+            for (const nodeId in inDegree) {
+                if (inDegree[nodeId] === 0) {
+                    queue.push(nodeId);
+                }
+            }
+
+            while (queue.length > 0) {
+                const current = queue.shift();
+                sortedNodes.push(current);
+
+                // Decrease in-degree of neighbors by 1
+                neighbors[current].forEach(neighbor => {
+                    inDegree[neighbor]--;
+                    if (inDegree[neighbor] === 0) {
+                        queue.push(neighbor);
+                    }
+                });
+            }
+
+            // Check if graph had cycles
+            if (sortedNodes.length !== nodes.length) {
+                console.error("The graph contains a cycle, so topological sort is not possible.");
+                return null;
+            }
+
+            // Map sorted node IDs back to node objects
+            const sortedNodeObjects = sortedNodes.map(id => nodes.find(node => node.ID === id));
+
+            return sortedNodeObjects;
         }
 
         function calculateExpectedOverrunDurationForPath(path) {
@@ -4850,6 +5214,22 @@
             // Handle NaN in scopeProgress
             if (isNaN(scopeProgress)) scopeProgress = 0;
 
+            // Calculate total budget (proxy for cost)
+            let totalBudget = nodes.reduce((sum, node) => sum + parseFloat(node.Duration), 0);
+
+            // Calculate spent budget
+            let spentBudget = nodes.reduce((sum, node) => {
+                let percentComplete = parseFloat(node.PercentComplete);
+                if (isNaN(percentComplete)) percentComplete = 0; // Handle NaN cases
+                return sum + parseFloat(node.Duration) * percentComplete / 100;
+            }, 0);
+
+            // Calculate budget progress
+            let budgetProgress = (spentBudget / totalBudget) * 100;
+
+            // Handle NaN in budgetProgress
+            if (isNaN(budgetProgress)) budgetProgress = 0;
+
             // Dynamic Gradient coding for scope progress bar
             let deviationPercentage = (scopeProgress - scheduleProgress) / scheduleProgress;
             let scopeGradient;
@@ -4862,12 +5242,17 @@
             }
 
             // Update the progress bars
+            renderProgressBar('budgetProgressBar', budgetProgress);
+            updateProgressLabel('budgetProgressLabel', budgetProgress);
             renderProgressBar('scheduleProgressBar', scheduleProgress);
             updateProgressLabel('scheduleProgressLabel', scheduleProgress);
             renderProgressBar('scopeProgressBar', scopeProgress, scopeGradient); // Pass the gradient here
             updateProgressLabel('scopeProgressLabel', scopeProgress);
 
             // Log for debugging
+            console.log("Total Budget:", totalBudget);
+            console.log("Spent Budget:", spentBudget);
+            console.log("Budget Progress:", budgetProgress);
             console.log("Start Date:", startDate);
             console.log("End Date:", endDate);
             console.log("Current Date:", currentDate);
@@ -5536,6 +5921,114 @@
             tooltip.html(`Path Duration: ${duration} units`).style("background-color", 'color');
         }
 
+        function findDistancesToEnd(startNode, endNode, links, nodes) {
+            const neighborsMap = {};
+            nodes.forEach(node => {
+                neighborsMap[node.ID] = links
+                    .filter(link => (link.source.ID || link.source) === node.ID)
+                    .map(link => nodes.find(n => n.ID === (link.target.ID || link.target)));
+            });
+
+            console.log('findDistancesToEnd Neighbors Map:', neighborsMap);
+
+            const shortestDistances = {};  // for memoization of shortest distances
+            const longestDistances = {};  // for memoization of longest distances
+
+            function dfs(currentNode, visited) {
+                console.log('Visiting node:', currentNode.ID);
+
+                if (currentNode.ID === endNode.ID) {
+                    console.log('Reached end node:', currentNode.ID);
+                    return [0, 0];
+                }
+
+                if (shortestDistances[currentNode.ID] !== undefined && longestDistances[currentNode.ID] !== undefined) {
+                    console.log('findDistancesToEnd Distances already computed for node:', currentNode.ID);
+                    return [shortestDistances[currentNode.ID], longestDistances[currentNode.ID]];
+                }
+
+                visited.add(currentNode.ID);
+
+                let minDistance = Infinity;
+                let maxDistance = -Infinity;
+                for (let neighbor of neighborsMap[currentNode.ID]) {
+                    if (!visited.has(neighbor.ID)) {
+
+                        // Use Duration from the neighbor node
+                        const nodeDuration = Number(neighbor.Duration) || 0;  // convert to number, use 0 if NaN or missing
+
+                        const [minDistThroughNeighbor, maxDistThroughNeighbor] = dfs(neighbor, visited);
+                        const distanceThroughNeighbor = nodeDuration + minDistThroughNeighbor;
+                        const distanceThroughNeighborMax = nodeDuration + maxDistThroughNeighbor;
+
+                        minDistance = Math.min(minDistance, distanceThroughNeighbor);
+                        maxDistance = Math.max(maxDistance, distanceThroughNeighborMax);
+                    }
+                }
+
+                visited.delete(currentNode.ID);
+
+                shortestDistances[currentNode.ID] = isFinite(minDistance) ? minDistance : 0;
+                longestDistances[currentNode.ID] = isFinite(maxDistance) ? maxDistance : 0;
+
+                console.log('findDistancesToEnd Computed distances for node', currentNode.ID, ':', minDistance, maxDistance);
+
+                return [minDistance, maxDistance];
+            }
+
+            dfs(startNode, new Set());
+
+            // Store the distances as node properties
+            nodes.forEach(node => {
+                node.shortestDistanceToEnd = shortestDistances[node.ID] !== undefined ? shortestDistances[node.ID] : 0;
+                node.longestDistanceToEnd = longestDistances[node.ID] !== undefined ? longestDistances[node.ID] : 0;
+            });
+
+            console.log('findDistancesToEnd Shortest Distances:', shortestDistances);
+            console.log('findDistancesToEndLongest Distances:', longestDistances);
+
+            return { shortestDistances, longestDistances };
+        }
+
+        const KMeans = require('shaman').KMeans;  // Use any k-means library
+
+        function findActivityClusters(nodes, numClusters) {
+            // Prepare data: Assuming nodes have attributes like 'duration', 'riskExposure' etc.
+            const data = nodes.map(node => [node.duration, node.riskExposure, node.resourceCount]);
+
+            // Run k-means clustering
+            const kmeans = new KMeans(numClusters);
+            kmeans.cluster(data, (err) => {
+                if (err) throw new Error(err);
+
+                // Assign each node to a cluster
+                nodes.forEach((node, index) => {
+                    node.activityCluster = kmeans.centroids[kmeans.assignments[index]];
+                });
+            });
+        }
+
+        function findPathClusters(paths, numClusters) {
+            // Prepare data: Assuming each path is an array of nodes
+            const data = paths.map(path => {
+                const totalDuration = path.reduce((sum, node) => sum + node.duration, 0);
+                const totalRisk = path.reduce((sum, node) => sum + node.riskExposure, 0);
+                const resourceOverlap = calculateResourceOverlap(path);  // Implement this function as needed
+                return [totalDuration, totalRisk, resourceOverlap];
+            });
+
+            // Run k-means clustering
+            const kmeans = new KMeans(numClusters);
+            kmeans.cluster(data, (err) => {
+                if (err) throw new Error(err);
+
+                // Assign each path to a cluster
+                paths.forEach((path, index) => {
+                    path.pathCluster = kmeans.centroids[kmeans.assignments[index]];
+                });
+            });
+        }
+
 
         function clearHighlights(link, node) {
             link.style("stroke", null)
@@ -5999,6 +6492,8 @@
                 name: node.Name,
                 start: node.Start,
                 finish: node.Finish,
+                riskAdjustedStart: node.riskAdjustedStart,
+                riskAdjustedEnd: node.riskAdjustedEnd,
                 pageRank: node.pageRank,
                 slack: node.slack,
                 path: node.isOnCriticalPath ? 'Critical Path' :
@@ -6202,6 +6697,8 @@
                 var pathCell = document.createElement('td');
                 var startCell = document.createElement('td');
                 var finishCell = document.createElement('td');
+                var riskAdjustedStartCell = document.createElement('td');
+                var riskAdjustedEndCell = document.createElement('td');
                 var pageRankCell = document.createElement('td');
                 //pageRankCell.textContent = score.pageRank.toFixed(5);
                 pageRankCell.textContent = (score.pageRank || 0).toFixed(5);
@@ -6226,11 +6723,14 @@
                 riskCell.textContent = score.riskScore.toFixed(2);
                 importanceCell.textContent = score.importanceScore.toFixed(2);
                 pathCell.textContent = score.path;
-                startCell.textContent = score.start;
-                finishCell.textContent = score.finish;
+                //startCell.textContent = score.start;
+                //finishCell.textContent = score.finish;
 
                 startCell.textContent = formatDate(score.start);
                 finishCell.textContent = formatDate(score.finish);
+                riskAdjustedStartCell.textContent = formatDate(score.riskAdjustedStart);
+                riskAdjustedEndCell.textContent = formatDate(score.riskAdjustedEnd);
+
 
                 // Adjust text color based on path type
                 if (score.path === 'Critical Path') {
@@ -6247,6 +6747,8 @@
                 row.appendChild(pageRankCell);
                 row.appendChild(startCell);
                 row.appendChild(finishCell);
+                row.appendChild(riskAdjustedStartCell);  
+                row.appendChild(riskAdjustedEndCell);
                 row.appendChild(slackCell);
                 row.appendChild(overrunProbabilityCell);
 
@@ -8219,8 +8721,10 @@
                                     <th>Importance</th>
                                     <th>Path</th> <!-- Column for Path -->
                                     <th>PageRank Centrality</th>
-                                    <th>Start Date</th> <!-- New column for Start Date -->
-                                    <th>End Date</th> <!-- New column for End Date -->
+                                    <th>Start Date</th> <!-- Start Date -->
+                                    <th>End Date</th> <!--  End Date -->
+                                    <th>Expected Start Date</th> <!-- Risk adjusted Start Date -->
+                                    <th>Expected End Date</th> <!-- Risk adjusted End Date -->
                                     <th>Slack</th>  <!--  slack -->
                                     <th>Overrun</th>
                                 </tr>
@@ -8245,7 +8749,7 @@
                     </div>
                     <!-- Paths Distribution Table -->
                     <div class="table-container" id="pathsDistributionTableContainer">
-                        <h2>Paths Distribution</h2>
+                        <h2>Critical & Outlier Paths</h2>
                         <table class="sortable" id="pathsDistributionTable">
                             <thead>
                                 <tr>
@@ -8257,7 +8761,7 @@
 
                     <!-- Reference Table for Critical & Outlier Paths -->
                     <div class="table-container" id="referenceTable">
-                        <h2>Critical & Outlier Paths</h2>
+                        <h2>Activities on the Critical & Outlier Paths</h2>
                         <table class="sortable">
                             <thead>
                                 <tr>
@@ -8294,6 +8798,12 @@
                     <div class="block-title text-white">
                         <h2 class="block-title text-white" data-toggle="appear" data-class="animated fadeInDown">PROJECT CORE KPIs</h2>
                     </div>
+                    <label class="text-white">Scope</label>
+                    <div class="progress-bar-container">
+                        <div id="budgetProgressBar" class="progress-bar"></div>
+                    </div>
+                    <span id="budgetProgressLabel"></span>
+                    <hr class="separator">
                     <label class="text-white">Schedule</label>
                     <div class="progress-bar-container">
                         <div id="scheduleProgressBar" class="progress-bar"></div>
@@ -8385,6 +8895,7 @@
                             <th>Importance</th>
                             <th>Start Date</th>
                             <th>End Date</th>
+                            <th>Expected End Date</th>
                             <th>Slack</th>
                             <th>Overrun</th>
                             <th>Path</th>
