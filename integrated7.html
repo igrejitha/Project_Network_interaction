@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 
 <html>
 <head>
@@ -99,25 +99,8 @@
             transition: fill 0.3s;
             filter: url(#drop-shadow);
         }
-       .learn-more-btn{
-width: 100%;
-       }
 
 
-
-
-h1{
-    font-size: 1.5rem !important;
-}
-
-
-h2{
-    font-size: 1.2rem !important;
-}
-
-h4{
-    font-size: 1.3rem !important;
-}
         /* Futuristic Node Label */
         .node-label {
             position: absolute;
@@ -148,10 +131,6 @@ h4{
             text-shadow: 0 0 10px #58a6ff, 0 0 20px #58a6ff, 0 0 30px #58a6ff;
         }
 
-        .joystick .arrow, .joystick .center{
-            width: 45px !important;
-    height: 45px !important;
-        }
         /* Animation effect */
         @keyframes fadeIn {
             from {
@@ -241,7 +220,7 @@ h4{
             font-size: 0.85em; /* This makes the font size smaller for all elements inside the card */
             display: flex;
             justify-content: center;
-            /* align-items: center; */
+            align-items: center;
             flex-direction: column;
         }
 
@@ -256,7 +235,7 @@ h4{
 
             .dashboard-card2 button {
                 /* width: 23%;  */
-                /* height: 30px;  */
+                height: 30px; /* Compact height */
                 background: linear-gradient(45deg, #5ac8fa, #287dc8); /* Gradient background */
                 color: #ffffff; /* Font color */
                 border: none; /* Removing the default border */
@@ -367,7 +346,7 @@ h4{
         }
 
         .label-container {
-            /* display: flex; */
+            display: flex;
             justify-content: space-between; /* Adjusts spacing between label and span */
             align-items: center; /* Centers items vertically */
         }
@@ -400,7 +379,7 @@ h4{
             flex-wrap: wrap;
             gap: 10px;
             justify-content: space-between;
-            /* align-items: center; */
+            align-items: center;
             background: #0e2446;
             margin: 10px 0;
             padding: 10px;
@@ -433,9 +412,6 @@ h4{
             letter-spacing: 1px; /* Spacing between letters for clarity */
             box-shadow: 0 0 10px rgba(90, 200, 250, 0.5); /* A soft glow effect */
             transition: all 0.3s; /* Transition for hover effects */
-            align-items: center;
-            justify-content: center;
-            display: flex;
         }
 
             .control-panel button:hover {
@@ -791,7 +767,7 @@ h4{
 
         table, th, td {
             border: 1px solid #3292cd;
-            padding: 6px;
+            padding: 8px;
             text-align: left;
         }
 
@@ -4415,8 +4391,7 @@ h4{
                     .style("border", "solid")
                     .style("border-width", "1px")
                     .style("border-radius", "5px")
-                    .style("padding", "10px")
-                    
+                    .style("padding", "10px");
 
                 const tooltipHour = d3.select("body").append("div")
                     .attr("class", "tooltip-hour")
@@ -4426,8 +4401,7 @@ h4{
                     .style("border", "solid")
                     .style("border-width", "1px")
                     .style("border-radius", "5px")
-                    .style("padding", "10px")
-                    
+                    .style("padding", "10px");
 
 
                 // Clear existing SVGs
@@ -7350,7 +7324,7 @@ h4{
             }
 
         #sidebar.collapsed {
-            width: 116px !important; 
+            width: 40px; /* Adjust the width when collapsed to fit the button */
         }
 
             #sidebar.collapsed h3,
@@ -7372,7 +7346,7 @@ h4{
 
             /* Collapsed state styles for the sidebar */
             #sidebar.collapsed {
-                width: 116px !important;  /* Width of the sidebar when collapsed */
+                width: 50px; /* Width of the sidebar when collapsed */
             }
 
                 #sidebar.collapsed ul {
@@ -7399,8 +7373,8 @@ h4{
         /* Toggle Button in collapsed state */
         #sidebar.collapsed #sidebarToggleBtn {
             background-color: #113464; /* Dark color from the theme */
-            padding: 2px 29px; /* Reduced padding to make the button more compact */
-            font-size: 27px; /* Size of the icon */
+            padding: 10px 5px; /* Reduced padding to make the button more compact */
+            font-size: 24px; /* Size of the icon */
         }
 
         /* Adjusting the position and z-index of the toggle button */
@@ -8131,7 +8105,7 @@ h4{
             <img alt="Cybereum Logo" src="https://cybereum.io/wp-content/uploads/2022/12/cropped-circle6.png" style="max-width: 120px; border-radius: 50%; box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);box-shadow: 0 0 40px #5ac8fa;" />
         </div>
         <div id="networkAnimationTooltip" style="position: absolute; display: none; padding: 5px 10px; background-color: rgba(0, 0, 0, 0.8); border-radius: 5px; color: #cdfaff; pointer-events: none; font-size: 14px; transition: opacity 0.3s; z-index: 999;"></div>
-        <div id="connectionLabel" style="position: absolute; display: none; max-width: 0px !important; padding: 5px 10px; background-color: rgba(0, 0, 0, 0.8); border-radius: 5px; color: #cdfaff; pointer-events: none; font-size: 14px; transition: opacity 0.3s; z-index: 1000;"></div>
+        <div id="connectionLabel" style="position: absolute; display: none; padding: 5px 10px; background-color: rgba(0, 0, 0, 0.8); border-radius: 5px; color: #cdfaff; pointer-events: none; font-size: 14px; transition: opacity 0.3s; z-index: 1000;"></div>
         <div class="block-header futuristic-header" style="background: rgba(0, 0, 0, 0.2); border-top-left-radius: 15px; border-top-right-radius: 15px; padding: 10px 20px; box-shadow: 0 0 10px #5ac8fa;position: relative; z-index: 2;">
             <h1 class="block-title text-white" style="text-shadow: 0 0 10px #5ac8fa;"><i class="fas fa-rocket"></i> Welcome to Cybereum - the Future of Project Management</h1>
         </div>
@@ -8178,7 +8152,6 @@ h4{
                 transition: opacity 0.3s;
                 z-index: 1000;
                 transform-origin: center;
-                max-width: 0px !important;
             }
         </style>
         <script>
@@ -8396,7 +8369,7 @@ h4{
                 formId: "9535e8fc-88e8-43f6-b6e9-c06e15d584a2"
             });</script>
     </div>
-    <section class="dashboard-section introduction-section" style="margin: 35px !important;">
+    <section class="dashboard-section introduction-section">
         <div class="project-selection-container">
             <!--
                 <div class="megaproject-icon-container">
@@ -8476,7 +8449,7 @@ h4{
             <input accept=".xml" id="xmlFileInput" name="file" style="display: none;" type="file" />
             <div class="sci-fi-loading-bar-container" style="width: 100%; margin-top: 10px; background: rgba(40, 125, 200, 0.3); border-radius: 8px;">
                 <div class="sci-fi-loading-bar" style="background: linear-gradient(90deg, #287dc8, #5ac8fa); height: 5px; border-radius: 5px; transition: width 0.5s;"></div>
-                <div class="sci-fi-loading-text" style="color: #5ac8fa; font-size: 14px; margin-top: 5px; font-weight: bold; transition: opacity 0.5s; margin: 0px !important;">0%</div>
+                <div class="sci-fi-loading-text" style="color: #5ac8fa; font-size: 14px; margin-top: 5px; font-weight: bold; transition: opacity 0.5s;">0%</div>
                 <span class="uploading-text">Upload in progress...</span>
             </div>
         </label>
@@ -8508,17 +8481,14 @@ h4{
     </style>
 
 
-    <div class="dashboard-section" id="dash1" style="margin-left: 30px;
-    margin-right: 30px;">
+    <div class="dashboard-section" id="dash1">
         <div id="self-referencing-tasks-warning"><h1>Self Referencing Errors</h1></div>
     </div>
-    <div class="dashboard-card" id="networkViualization" style="padding-left: 20px;
-    margin-left: 30px;
-    margin-right: 30px;">
+    <div class="dashboard-card" id="networkViualization">
         <h1>Interactive Project Task Map</h1>
         <button onclick="openModal('modal0')">More Information about Project Network Visualization</button>
         <div class="control-panel">
-            <div class="dashboard-stat" style="width: 422px !important;">
+            <div class="dashboard-stat">
                 <label class="control-label">Zoom:</label>
                 <button onclick="zoomIn()">+</button>
                 <button onclick="zoomOut()">-</button>
@@ -8592,7 +8562,7 @@ h4{
                 <div class="= dashboard-card2">
                     <div class="label-container">
                         <label class="control-label">Filter Nodes (risk):</label>
-                        <span id="riskFilterValue" style="font-size: 1.3rem !important;">&gt; 0</span>
+                        <span id="riskFilterValue">&gt; 0</span>
                     </div>
                     <input class="slider" id="riskFilterSlider" max="1" min="0" step="0.1" type="range" value="0" />
                 </div>
@@ -8601,32 +8571,30 @@ h4{
                 <div class="= dashboard-card2">
                     <div class="label-container">
                         <label class="control-label">Filter Nodes (importance):</label>
-                        <span id="importanceFilterValue" style="font-size: 1.3rem !important;">&gt; 0</span>
+                        <span id="importanceFilterValue">&gt; 0</span>
                     </div>
                     <input class="slider" id="importanceFilterSlider" max="1" min="0" step="0.1" type="range" value="0" />
                 </div>
             </div>
-             <!-- Accordion for Path Details -->
-         <div class="accordion" style="display: flex; margin-left: 67px !important;">
-            <button class="accordion-button">Critical Path</button>
-            <div class="panel">
-                <p id="criticalPathDetails">Critical path details go here...</p>
-            </div>
-            <button class="accordion-button">Outlier Paths</button>
-            <div class="panel">
-                <p id="outlierPathsDetails">Outlier paths details go here...</p>
-            </div>
-            <button class="accordion-button">All Paths</button>
-            <div class="panel">
-                <p id="allPathsDetails">All paths details go here...</p>
+            <!-- Accordion for Path Details -->
+            <div class="accordion" style="display: flex;">
+                <button class="accordion-button">Critical Path</button>
+                <div class="panel">
+                    <p id="criticalPathDetails">Critical path details go here...</p>
+                </div>
+                <button class="accordion-button">Outlier Paths</button>
+                <div class="panel">
+                    <p id="outlierPathsDetails">Outlier paths details go here...</p>
+                </div>
+                <button class="accordion-button">All Paths</button>
+                <div class="panel">
+                    <p id="allPathsDetails">All paths details go here...</p>
+                </div>
             </div>
         </div>
-        </div>
-
-       
         <div class="control-panel">
             <!-- Search and Highlight Controls -->
-            <div class="controls search-controls">
+            <div class="controls search-controls" style="width: 500px;">
                 <input id="searchInput" placeholder="Search by name or ID" type="text" />
             </div>
             <div class="highlight-controls">
@@ -8637,8 +8605,8 @@ h4{
             <div id="longestPathDisplay"></div>
             <div id="outlierPathsDisplay"></div>
             <div class="highlight-controls">
-                <label style="margin-left: -191px;"><input id="highlightCriticalPath" type="checkbox" /> Highlight Critical Path</label>
-                <label style="padding-left: 40px;"><input id="highlightOutliers" type="checkbox" /> Highlight Outlier Paths</label>
+                <label><input id="highlightCriticalPath" type="checkbox" /> Highlight Critical Path</label>
+                <label><input id="highlightOutliers" type="checkbox" /> Highlight Outlier Paths</label>
             </div>
             <!-- Info Panel -->
             <div id="infoPanel"></div>
@@ -8721,7 +8689,7 @@ h4{
                 </style>
                 <div class="risk-content">
                     <div class="charts-row">
-                        <div class="dashboard-card2" id="chart-container" style="margin-left: 0px !important;">
+                        <div class="dashboard-card2" id="chart-container">
                             <h2>Risk Matrix</h2>
 
                             <div class="legend">
@@ -8732,16 +8700,16 @@ h4{
                             </div>
                             <canvas height="280" id="riskMatrix" width="300"></canvas>
                             </br>
-                            <button class="learn-more-btn" onclick="openModal('riskMatrixModal')" style="margin-top: 11px !important;">Learn More</button>
+                            <button class="learn-more-btn" onclick="openModal('riskMatrixModal')">Learn More</button>
                         </div>
-                        <div class="dashboard-card2" id="RadialRisk" style="margin-right: 0px !important;">
+                        <div class="dashboard-card2" id="RadialRisk">
                             <h2>Radial Risk Chart</h2>
                             <canvas height="280" id="radialChart" width="300"></canvas>
                             </br>
-                            <button class="learn-more-btn" onclick="openModal('radialChartModal')" style="margin-top: 21px;">Learn More</button>
+                            <button class="learn-more-btn" onclick="openModal('radialChartModal')">Learn More</button>
                         </div>
                     </div>
-                    <div class="table-container" id="pathMetrics" style="width: 100% !important;">
+                    <div class="table-container" id="pathMetrics">
                         <!-- Risk Table -->
                         <h2>Risk Table</h2>
                         <table class="sortable" id="riskTable">
@@ -8766,13 +8734,13 @@ h4{
                     </div>
 
                     <div class="charts-row">
-                        <div class="dashboard-card2" id="pathsDistributionCurve" style="margin-left: 0px !important;">
+                        <div class="dashboard-card2" id="pathsDistributionCurve">
                             <h2>Paths Distribution Curve</h2>
                             <div id="path_distribution_chart" style="width: 90%; "></div>
                             <br>
-                            <button class="learn-more-btn" onclick="openModal('pathsDistributionCurveModal')" style="margin-top: 363px !important;">Learn More</button>
+                            <button class="learn-more-btn" onclick="openModal('pathsDistributionCurveModal')">Learn More</button>
                         </div>
-                        <div class="dashboard-card2" id="pathDistributionCard" style="margin-right: 0px !important;">
+                        <div class="dashboard-card2" id="pathDistributionCard">
                             <h2>Path Distribution Bar Chart</h2>
                             <canvas height="280" id="pathDistributionStackedBarChart" width="300"></canvas>
                             <br>
@@ -8806,9 +8774,9 @@ h4{
                         </table>
                     </div>
 
-                    <div class="dashboard-card2" id="pathDistributionCard" style="width: 100% !important;">
+                    <div class="dashboard-card2" id="pathDistributionCard">
                         <h2>Expected Completion</h2>
-                        <div id="progressBars" style="width: 100% !important;"></div>
+                        <div id="progressBars"></div>
                     </div>
 
 
@@ -8819,13 +8787,12 @@ h4{
         </div>
     </div>
 
-    <div class="dashboard-card" id="Proj_Track" style="margin: 28px;
-    padding: 40px; margin-top: 0px !important;">
+    <div class="dashboard-card" id="Proj_Track">
 
         <div class="row">
 
             <!-- Left Side -->
-            <div class="col-3">
+            <div class="col-2">
                 <!-- Schedule Completion Progress Bar -->
                 <div class="block">
                     <div class="block-title text-white">
@@ -8870,7 +8837,7 @@ h4{
                 </div>
             </div>
 
-            <div class="col-6">
+            <div class="col-8">
 
                 <!-- Cumulative Distribution of Project Hours -->
                 <div class="block">
@@ -8888,7 +8855,7 @@ h4{
             </div>
 
             <!-- Right Side -->
-            <div class="col-3">
+            <div class="col-2">
                 <!-- Task Completion Status -->
                 <div class="task-completion-container" id="taskCompletionContainer">
                     <!-- Task Completion Status -->
@@ -8903,17 +8870,13 @@ h4{
                 </div>
 
                 <!-- KEY INTERNAL MILESTONES -->
-               
-            </div>
-
-            <div class="milestones-container" id="internalMilestones" style="padding-top: 35px;
-            width: 100%;
-            line-height: 3.5;">
-                <!-- KEY INTERNAL MILESTONES -->
-                <div class="block">
-                    <h2 class="block-title text-white">Internal Milestones</h2>
-                    <div class="block-content block-content-full overflow-hidden" id="milestonesContent">
-                        <!-- This div will be dynamically populated using the JavaScript function provided earlier. -->
+                <div class="milestones-container" id="internalMilestones">
+                    <!-- KEY INTERNAL MILESTONES -->
+                    <div class="block">
+                        <h2 class="block-title text-white">Internal Milestones</h2>
+                        <div class="block-content block-content-full overflow-hidden" id="milestonesContent">
+                            <!-- This div will be dynamically populated using the JavaScript function provided earlier. -->
+                        </div>
                     </div>
                 </div>
             </div>
@@ -8922,7 +8885,7 @@ h4{
             <!-- Center Milestone Table -->
             <div class="table-container" id="pathMetrics">
                 <!-- Milestone Path Table -->
-                <h2 style="padding-top: 50px !important;">Milestone Paths</h2>
+                <h2>Milestone Paths</h2>
                 <table class="sortable" id="milestoneTable">
                     <thead>
                         <tr>
@@ -8944,26 +8907,25 @@ h4{
         </div>
         </div>
 
-        <div class="charts-row" style="padding-right: 11px;
-        padding-left: 12px;">
+        <div class="charts-row">
             <div class="dashboard-card2" id="SCurve">
                 <h2>S-Curve (Cumulative Distribution Chart)</h2>
 
                 <div id="scurve_chart" style="width: 300px; height: 280px;"></div>
                 </br>
-                <button class="learn-more-btn" onclick="openModal('SCurveModal')" style="margin-top: 64px;">Learn More</button>
+                <button class="learn-more-btn" onclick="openModal('SCurveModal')">Learn More</button>
             </div>
             <div class="dashboard-card2" id="histogram">
                 <h2>Task Duration Histogram</h2>
                 <canvas height="280" id="histogramChart" width="300"></canvas>
                 </br>
-                <button class="learn-more-btn" onclick="openModal('histogramModal')" style="margin-top: 14px;">Learn More</button>
+                <button class="learn-more-btn" onclick="openModal('histogramModal')">Learn More</button>
             </div>
             <div class="dashboard-card2" id="pieChart">
                 <h2>Distribution of Task Types (Pie Chart)</h2>
                 <div id="pie_chart" style="width: 300px; height: 280px;"></div>
                 </br>
-                <button class="learn-more-btn" onclick="openModal('pieChartModal')" style="margin-top: 64px;">Learn More</button>
+                <button class="learn-more-btn" onclick="openModal('pieChartModal')">Learn More</button>
 
             </div>
             <div class="dashboard-card2" id="pathsDistributionCurve">
@@ -8980,7 +8942,7 @@ h4{
             </div>
         </div>
 
-        <section id="Kanban" style="margin: 31px !important;">
+        <section id="Kanban">
             <!-- Date Range Slider -->
             <div class="date-slider-container">
                 <input type="text" id="dateRangePicker" placeholder="Select Date Range...">
