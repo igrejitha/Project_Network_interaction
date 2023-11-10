@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 
 <html>
 <head>
@@ -22,9 +22,10 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://unpkg.com/vis-network@7.6.2/dist/vis-network.min.css" rel="stylesheet" type="text/css" />
     <script src="https://unpkg.com/vis-network@7.6.2/dist/vis-network.min.js" type="text/javascript"></script>
-    <link href="css/style.css" rel="stylesheet" />
-    <link href="css/site.css" rel="stylesheet" />
-    <link href="img/Blue_Logo.png" rel="stylesheet" />
+    <!-- <link href="css/style.css" rel="stylesheet"/> -->
+    <!-- <link href="css/site.css" rel="stylesheet"/> -->
+     <link rel="stylesheet" href="css/general.css"> 
+    <link href="img/Blue_Logo.png" rel="stylesheet"/>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.css" type="text/css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
@@ -67,1143 +68,7 @@
         Chart.plugins.register(centerTextPlugin);
 
     </script>
-    <style>
-        /* Links */
-        .links line {
-            stroke: linear-gradient(to right, #8ce6ff, #3292cd);
-            stroke-width: 3px;
-        }
-
-        .link {
-            stroke: #cdfaff;
-            stroke-opacity: 0.85;
-            stroke-width: 1.5px;
-        }
-
-        /* Refining links */
-        .links line {
-            stroke: #8ce6ff;
-            stroke-width: 2px;
-        }
-
-        /* Nodes */
-        .node text {
-            fill: #b4f5ff;
-            font-size: 12px;
-        }
-
-        .node circle {
-            stroke: #41afeb;
-            stroke-width: 2px;
-            fill: #0d2137;
-            transition: fill 0.3s;
-            filter: url(#drop-shadow);
-        }
-
-
-        /* Futuristic Node Label */
-        .node-label {
-            position: absolute;
-            background-color: rgba(0, 0, 0, 0.6);
-            border: 1px solid #58a6ff;
-            color: #58a6ff;
-            padding: 5px 10px;
-            border-radius: 5px;
-            transform: scale(0);
-            transition: transform 0.3s ease-out;
-            pointer-events: none;
-            text-shadow: 0 0 5px #58a6ff;
-        }
-
-        /* Enhanced Futuristic Connection Label */
-        .connection-label {
-            position: absolute;
-            background-color: rgba(10, 10, 50, 0.85);
-            border: 2px solid #58a6ff;
-            color: #58a6ff;
-            padding: 8px 15px;
-            border-radius: 8px;
-            transform: scale(0);
-            transition: transform 0.3s ease-out, opacity 0.3s ease-out;
-            pointer-events: none;
-            font-size: 0.9em;
-            opacity: 0;
-            text-shadow: 0 0 10px #58a6ff, 0 0 20px #58a6ff, 0 0 30px #58a6ff;
-        }
-
-        /* Animation effect */
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .input {
-            width: 50% !important;
-            margin: 0px auto;
-        }
-
-        div.vis-configuration.vis-config-label {
-            color: black !important;
-        }
-
-        .vis-configuration-wrapper {
-            width: 100% !important;
-        }
-
-        .tooltip {
-            position: absolute;
-            padding: 5px; /* Increased padding for more space */
-            background-color: rgba(16, 45, 80, 0.9);
-            color: #00ff00;
-            border-radius: 5px;
-            pointer-events: none;
-            max-width: 230px;
-            font-family: 'Roboto', sans-serif;
-            z-index: 1000; /* Ensure tooltip is above everything else */
-            /* Using a darker gradient border */
-            border: 3px solid transparent;
-            background-image: linear-gradient(rgba(16, 45, 80, 0.9), rgba(16, 45, 80, 0.9)), linear-gradient(90deg, #8ce6ff, #3292cd);
-            background-origin: padding-box, border-box;
-            background-clip: content-box, border-box;
-        }
-
-        .charts-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-
-        #riskTable {
-            width: 80%; /* Increase table width */
-            margin: 0 auto; /* Center the table within its container */
-        }
-
-        .charts-row {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            width: 100%;
-            margin-bottom: 30px; /* Spacing between the rows */
-        }
-
-        /* Dashboard Card */
-        .dashboard-card {
-            background-color: #113464;
-            padding: 10px;
-            color: #b4f5ff;
-            border-radius: 10px;
-            margin-bottom: 30px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
-            position: relative;
-            z-index: 1;
-            overflow: hidden;
-        }
-
-        .dashboard-card2 {
-            padding: 10px; /* Adjust this to set your desired padding */
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            background-color: #0e2446;
-            margin: 20px; /* Optional: Adds some margin around the card */
-            overflow: hidden; /* Optional: In case the content spills out */
-            font-size: 0.85em; /* This makes the font size smaller for all elements inside the card */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-        }
-
-            /* If you want specific elements to have even smaller fonts, you can target them like this */
-            .dashboard-card2 h3 {
-                font-size: 1em; /* Adjusted font-size for h3 elements inside the dashboard card */
-            }
-
-            .dashboard-card2 p, .dashboard-card2 li {
-                font-size: 0.8em; /* Adjusted font-size for p and li elements inside the dashboard card */
-            }
-
-            .dashboard-card2 button {
-                /* width: 23%;  */
-                height: 30px; /* Compact height */
-                background: linear-gradient(45deg, #5ac8fa, #287dc8); /* Gradient background */
-                color: #ffffff; /* Font color */
-                border: none; /* Removing the default border */
-                border-radius: 5px; /* Slightly rounded corners */
-                cursor: pointer;
-                font-weight: bold; /* Bold font for clarity */
-                text-transform: uppercase; /* Uppercase letters for a modern look */
-                letter-spacing: 1px; /* Spacing between letters for clarity */
-                box-shadow: 0 0 10px rgba(90, 200, 250, 0.5); /* A soft glow effect */
-                transition: all 0.3s; /* Transition for hover effects */
-            }
-
-                .dashboard-card2 button:hover {
-                    transform: translateY(-3px); /* Button moves up slightly on hover */
-                    box-shadow: 0 0 15px rgba(90, 200, 250, 0.7); /* Increased glow on hover */
-                }
-
-                .dashboard-card2 button:active {
-                    transform: translateY(0); /* Button returns to original position when clicked */
-                }
-
-        .dashboard-card2 {
-            flex: 1;
-            /* max-width: calc(33.33% - 20px); Three cards per row with spacing */
-        }
-
-        .dashboard-card-full {
-            width: 98%; /* Occupying most of the width for emphasis */
-            /* box-shadow: 0 6px 12px rgba(0,0,0,0.15);  Enhanced shadow for emphasis
-            border: 1px solid #29395f;  Slight border for definition against the background */
-        }
-
-        div#pathMetrics {
-            width: 98%;
-        }
-
-        .risk-content {
-            display: flex;
-            flex-direction: column; /* Stack the children vertically */
-            gap: 16px; /* Provide a small gap between the chart and table */
-            align-items: center; /* Center-align the children horizontally */
-        }
-
-        .chart-container, .table-container {
-            width: 100%; /* Use full available width */
-        }
-
-        .chart-container {
-            flex: 1.2; /* Allow the chart container to be slightly wider */
-        }
-
-        .table-container {
-            flex: 1; /* Allow the table container to grow and shrink */
-        }
-
-        #riskTable {
-            width: 100%; /* Increase table width */
-            margin: 0 auto; /* Center the table within its container */
-        }
-
-        div.vis-configuration.vis-config-item.vis-config-s3 {
-            background-color: #0f2d51 !important;
-        }
-
-        div.vis-configuration.vis-config-item.vis-config-s2 {
-            background-color: #0f2d51 !important;
-        }
-
-        div.vis-configuration.vis-config-item.vis-config-s4 {
-            background-color: #0f2d51 !important;
-        }
-
-        div.vis-configuration.vis-config-label {
-            color: white !important;
-        }
-
-        #configuration-container .vis-configuration .vis-config-item {
-            margin: 1.5rem !important;
-            padding: 2rem !important;
-        }
-
-        .futuristic-card {
-            background-image: url('https://www.transparenttextures.com/patterns/space.png');
-            background-color: rgba(0, 0, 0, 0.6);
-            padding: 40px;
-        }
-
-            .futuristic-card:hover {
-                box-shadow: 0px 0px 20px #58a6ff;
-            }
-
-        .futuristic-header {
-            background: rgba(0, 0, 0, 0.2);
-            border-top-left-radius: 15px;
-            border-top-right-radius: 15px;
-            padding: 10px 20px;
-            box-shadow: 0 0 10px #5ac8fa;
-        }
-
-        .futuristic-introduction {
-            color: #cdfaff;
-            font-size: 18px;
-            margin-top: 20px;
-            line-height: 1.6;
-            text-align: center;
-            padding: 0 10%;
-            margin-bottom: 30px;
-        }
-
-        .label-container {
-            display: flex;
-            justify-content: space-between; /* Adjusts spacing between label and span */
-            align-items: center; /* Centers items vertically */
-        }
-
-        #outDegreeFilterValue, #filterValue, #degreeFilterValue {
-            font-size: 1.5em; /* Adjusts the size of the span text */
-        }
-
-        #graph-container {
-            background-color: #0d2137;
-            overflow: auto;
-            position: relative;
-            height: 1000px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            margin-top: 20px;
-            flex-grow: 1; /* Allow graph container to grow and occupy available space */
-            width: 96%;
-            margin: 0 auto;
-        }
-
-            #graph-container svg {
-                width: 100%;
-                height: 100%;
-            }
-
-        /* Control Panel */
-        .control-panel {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            justify-content: space-between;
-            align-items: center;
-            background: #0e2446;
-            margin: 10px 0;
-            padding: 10px;
-            border-radius: 5px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        input#searchInput {
-            width: 95%;
-            padding: 0.6rem;
-        }
-
-        .control-label {
-            font-weight: bold;
-            color: #b4f5ff;
-            margin-bottom: 10px;
-            display: block;
-        }
-
-        .control-panel button {
-            width: 50px; /* Compact width */
-            height: 30px; /* Compact height */
-            background: linear-gradient(45deg, #5ac8fa, #287dc8); /* Gradient background */
-            color: #ffffff; /* Font color */
-            border: none; /* Removing the default border */
-            border-radius: 5px; /* Slightly rounded corners */
-            cursor: pointer;
-            font-weight: bold; /* Bold font for clarity */
-            text-transform: uppercase; /* Uppercase letters for a modern look */
-            letter-spacing: 1px; /* Spacing between letters for clarity */
-            box-shadow: 0 0 10px rgba(90, 200, 250, 0.5); /* A soft glow effect */
-            transition: all 0.3s; /* Transition for hover effects */
-        }
-
-            .control-panel button:hover {
-                transform: translateY(-3px); /* Button moves up slightly on hover */
-                box-shadow: 0 0 15px rgba(90, 200, 250, 0.7); /* Increased glow on hover */
-            }
-
-            .control-panel button:active {
-                transform: translateY(0); /* Button returns to original position when clicked */
-            }
-
-        transform: scale(1.1);
-        }
-
-        .joystick {
-            display: grid;
-            grid-template-rows: repeat(3, 30px);
-            grid-template-columns: repeat(3, 30px);
-            gap: 5px;
-        }
-
-            .joystick .arrow,
-            .joystick .center {
-                width: 30px; /* Consistent width */
-                height: 30px; /* Consistent height */
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                background: linear-gradient(45deg, #5ac8fa, #287dc8); /* Gradient background */
-                color: #ffffff; /* Font color */
-                border: none; /* Removing the default border */
-                cursor: pointer;
-                font-weight: bold; /* Bold font for arrows */
-                text-transform: uppercase; /* Uppercase letters */
-                box-shadow: 0 0 10px rgba(90, 200, 250, 0.5); /* A soft glow effect */
-                transition: all 0.3s; /* Transition for hover effects */
-            }
-
-                .joystick .arrow:hover,
-                .joystick .center:hover {
-                    transform: translateY(-3px); /* Slight move up on hover */
-                    box-shadow: 0 0 15px rgba(90, 200, 250, 0.7); /* Increased glow on hover */
-                }
-
-                .joystick .arrow:active,
-                .joystick .center:active {
-                    transform: translateY(0); /* Button returns to original position when clicked */
-                }
-
-            .joystick .center {
-                border-radius: 50%; /* Circular shape for the center button */
-            }
-
-
-        .slider {
-            width: 100%;
-            margin: 10px 0;
-            -webkit-appearance: none; /* Remove default appearance for Webkit browsers */
-            appearance: none;
-            height: 5px; /* Height of the slider */
-            background: #b4f5ff; /* Lighter background color for the track */
-            border-radius: 5px; /* Rounded edges */
-            outline: none; /* Remove default outline */
-            box-shadow: 0 0 10px rgba(205, 250, 255, 0.3); /* Soft shadow with a lighter color */
-        }
-
-            .slider::-webkit-slider-thumb {
-                -webkit-appearance: none; /* Remove default appearance for Webkit browsers */
-                appearance: none;
-                width: 15px; /* Width of the thumb */
-                height: 15px; /* Height of the thumb */
-                background: linear-gradient(45deg, #cdfaff, #8ce6ff); /* Lighter gradient background */
-                border-radius: 50%; /* Circular shape for the thumb */
-                cursor: pointer; /* Cursor changes to pointer */
-                box-shadow: 0 0 5px rgba(205, 250, 255, 0.5); /* Soft shadow with a lighter color */
-                transition: transform 0.3s; /* Transition for hover effect */
-            }
-
-                .slider::-webkit-slider-thumb:hover {
-                    transform: scale(1.1); /* Slightly enlarge the thumb on hover */
-                }
-
-            /* For Firefox browsers */
-            .slider::-moz-range-track {
-                background: #b4f5ff;
-                border-radius: 5px;
-                box-shadow: 0 0 10px rgba(205, 250, 255, 0.3);
-            }
-
-            .slider::-moz-range-thumb {
-                width: 15px;
-                height: 15px;
-                background: linear-gradient(45deg, #cdfaff, #8ce6ff);
-                border-radius: 50%;
-                cursor: pointer;
-                box-shadow: 0 0 5px rgba(205, 250, 255, 0.5);
-                transition: transform 0.3s;
-            }
-
-                .slider::-moz-range-thumb:hover {
-                    transform: scale(1.1);
-                }
-
-        .zoom-controls, .rotate-controls {
-            flex-basis: 30%;
-        }
-
-        .pan-controls {
-            flex-basis: 35%;
-        }
-
-        .control-panel button {
-            width: 100%;
-        }
-
-        #legend {
-            font-family: 'Arial', sans-serif;
-            font-size: 14px;
-            margin-top: 10px;
-        }
-
-        .legend-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 5px;
-        }
-
-        .color-box {
-            width: 20px;
-            height: 20px;
-            border: 1px solid #000;
-            margin-right: 10px;
-        }
-
-        .accordion-button {
-            cursor: pointer;
-            padding: 10px;
-            width: 100%;
-            text-align: left;
-            background: #007bff;
-            color: #fff;
-            border: none;
-            outline: none;
-            transition: background-color 0.3s;
-        }
-
-            .accordion-button:hover {
-                background-color: #0056b3;
-            }
-
-        button, input[type="submit"], input[type="button"] {
-            background-color: #195a8c;
-            border: 1px solid #5ac8fa;
-            color: #b4f5ff;
-            padding: 8px 16px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 14px;
-            margin: 4px 2px;
-            cursor: pointer;
-            border-radius: 3px;
-            transition: background-color 0.3s, transform 0.3s, box-shadow 0.2s, color 0.3s;
-        }
-
-            button:hover, input[type="submit"]:hover, input[type="button"]:hover {
-                background-color: #287dc8;
-                color: #cdfaff;
-                transform: scale(1.02);
-                box-shadow: 0 0 8px #41afeb;
-            }
-
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #113464; /* Dark blue background for a space-like aesthetic */
-        }
-
-        .panel {
-            padding: 0 10px;
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease-out;
-        }
-
-        .bar {
-            fill: #3292cd; /* Updated from the color palette */
-        }
-
-            .bar:hover {
-                fill: #5ac8fa; /* Updated from the color palette */
-            }
-
-        .axis-label {
-            font-size: 14px;
-            fill: #b4f5ff; /* Updated from the color palette */
-        }
-
-        .axis path,
-        .axis line {
-            fill: none;
-            stroke: #b4f5ff; /* Updated from the color palette */
-            shape-rendering: crispEdges;
-        }
-
-        .chart-container {
-            padding: 20px;
-            border: 1px solid #3292cd; /* Updated from the color palette */
-            margin: 20px 0;
-            background: linear-gradient(145deg, #113464, #0e2446);
-            box-shadow: 4px 4px 10px #102d50, -4px -4px 10px #0e2446;
-        }
-
-        .chart-title {
-            text-align: center;
-            font-size: 1.5em;
-            margin-bottom: 20px;
-            color: #b4f5ff; /* Updated from the color palette */
-        }
-
-        .chart-legend {
-            display: flex;
-            justify-content: center;
-            margin-top: 20px;
-            color: #b4f5ff; /* Updated from the color palette */
-        }
-
-        .chart-legend-item {
-            margin: 0 10px;
-        }
-
-        #scurve_chart, #histogramChart, #pie_chart {
-            width: 100%;
-            max-width: 600px;
-            height: 400px;
-            margin: 0 auto;
-        }
-
-        /* Added hover effects for the interactive feel */
-        .chart-container:hover {
-            background: linear-gradient(145deg, #0e2446, #113464);
-            box-shadow: 6px 6px 14px #102d50, -6px -6px 14px #0e2446;
-        }
-
-        /* Style for the new chart containers */
-        #taskDurationHistogram, #taskDegreePieChart {
-            width: 100%;
-            max-width: 600px;
-            height: 400px;
-            margin: 20px auto;
-            padding: 20px;
-            border: 1px solid #3292cd;
-            background: linear-gradient(145deg, #113464, #0e2446);
-            box-shadow: 4px 4px 10px #102d50, -4px -4px 10px #0e2446;
-        }
-
-        .tooltip {
-            position: absolute;
-            background-color: white;
-            border: 1px solid black;
-            padding: 5px;
-            border-radius: 5px;
-            pointer-events: none;
-            opacity: 0;
-        }
-
-        .activity-list {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            background-color: rgba(255, 255, 255, 0.7);
-            padding: 10px;
-            border-radius: 5px;
-            max-height: 500px; /* Adjust as needed */
-            overflow-y: auto;
-        }
-
-        .progress-bar-container {
-            width: 100%;
-            height: 20px;
-            position: relative;
-            background-color: #f3f3f3;
-            border-radius: 5px;
-            box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
-        }
-
-        .progress-bar {
-            height: 100%;
-            background-color: #ddd; /* This represents the duration */
-        }
-
-        .progress-bar-fill {
-            height: 100%;
-            background-color: #4CAF50; /* This represents the completion */
-            width: 0%; /* Default to 0% completion */
-            border-radius: 5px 0 0 5px;
-            animation: progressBarFillAnimation 1s ease-in-out;
-        }
-
-        .progress-label {
-            position: absolute;
-            right: 5px; /* adjust as needed for padding */
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 0.9em; /* adjust as needed for font size */
-        }
-
-        @keyframes progressBarFillAnimation {
-            0% {
-                width: 0%;
-            }
-
-            100% {
-                width: /* This will be set dynamically */;
-            }
-        }
-
-        .dashboard-table td:nth-child(7) { /* assuming 'Progress Bar' is the 9th column */
-            width: 400px; /* adjust to a larger value as needed */
-            max-width: 400px; /* add this line to ensure it doesn't shrink beyond this width */
-        }
-
-
-        .vis-configuration-wrapper {
-            background-color: #0f2d51;
-            /* Adjust as needed font-family: 'Arial', sans-serif;
-            // Adjust as needed */
-        }
-
-            .vis-configuration-wrapper button {
-                background-color: #007bff;
-                color: white;
-                border: none;
-                padding: 5px 15px;
-                border-radius: 5px;
-            }
-
-                .vis-configuration-wrapper button:hover {
-                    background-color: #0056b3;
-                }
-
-        /* Adjusting the layout for better spacing and alignment */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-        }
-
-        table, th, td {
-            border: 1px solid #3292cd;
-            padding: 8px;
-            text-align: left;
-        }
-
-        th {
-            background-color: #195a8c;
-            color: #cdfaff;
-        }
-
-        td {
-            background-color: #0d2137;
-            color: #b4f5ff;
-        }
-
-        tr:hover {
-            background-color: #195a8c;
-        }
-
-        button, input[type="submit"], input[type="button"] {
-            background-color: #41afeb;
-            border: none;
-            color: white;
-            padding: 10px 20px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 16px;
-            margin: 4px 2px;
-            cursor: pointer;
-            border-radius: 5px;
-            transition: background-color 0.3s, transform 0.3s;
-        }
-
-            button:hover, input[type="submit"]:hover, input[type="button"]:hover {
-                background-color: #00d4ff;
-                transform: scale(1.05);
-            }
-
-        .project-dropdown, .location-dropdown {
-            transition: all 0.3s ease;
-            border: none;
-            border-bottom: 2px solid #46b9fa;
-            background: transparent;
-            color: white;
-            font-size: 16px;
-            margin-bottom: 15px;
-        }
-
-            .project-dropdown:focus, .location-dropdown:focus {
-                outline: none;
-                border-bottom: 2px solid #ffffff;
-            }
-
-            .project-dropdown:hover, .location-dropdown:hover {
-                background: linear-gradient(145deg, #5ac8fa, #1e69aa);
-            }
-
-        .upload-section {
-            background: linear-gradient(145deg, #0e2446, #287dc8);
-            border-radius: 20px;
-            padding: 20px;
-            box-shadow: 10px 10px 30px #0b2c55, -10px -10px 30px #66dbff;
-            transition: transform 0.3s ease;
-        }
-
-        .upload-btn-wrapper .btn {
-            border-radius: 30px;
-            letter-spacing: 1.5px;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 20px #46b9fa, inset 0 0 10px #5ac8fa;
-        }
-
-            .upload-btn-wrapper .btn:hover {
-                background: linear-gradient(145deg, #287dc8, #0e2446);
-                box-shadow: 0 0 30px #46b9fa, inset 0 0 20px #5ac8fa;
-                transform: translateY(-2px) scale(1.05);
-            }
-
-        .upload-description {
-            font-size: 18px;
-            margin-bottom: 20px;
-            text-shadow: 2px 2px 10px #0e2446;
-            font-weight: bold;
-        }
-
-        .upload-btn-wrapper .btn {
-            background: transparent;
-            border: 2px solid #5ac8fa;
-        }
-
-            .upload-btn-wrapper .btn:hover {
-                background: #5ac8fa;
-                color: #0e2446;
-            }
-
-        .project-dropdown, .location-dropdown {
-            width: 100%;
-            padding: 10px;
-            border: 2px solid #5ac8fa;
-            border-radius: 30px;
-            background: transparent;
-            font-size: 18px;
-            color: #5ac8fa;
-            margin-bottom: 20px;
-            transition: background 0.3s ease, color 0.3s ease;
-        }
-
-            .project-dropdown:focus, .location-dropdown:focus {
-                background: #5ac8fa;
-                color: #0e2446;
-                outline: none;
-            }
-
-            .project-dropdown option, .location-dropdown option {
-                color: #0e2446;
-                background: #5ac8fa;
-            }
-
-        #networkCanvasEnhanced {
-            width: 100%;
-            height: 100%;
-        }
-
-        .upload-section h1 {
-            font-size: 30px;
-            margin-bottom: 20px;
-            text-shadow: 2px 2px 10px #0e2446;
-        }
-
-        .upload-btn-wrapper {
-            position: relative;
-            overflow: hidden;
-            display: inline-block;
-        }
-
-            .upload-btn-wrapper .btn {
-                background-color: #287dc8;
-                color: #fff;
-                padding: 10px 30px;
-                font-size: 16px;
-                transition: background 0.3s ease;
-                cursor: pointer;
-                border: none;
-                border-radius: 30px;
-                box-shadow: 0 0 20px rgba(40, 125, 200, 0.5);
-                position: relative;
-                z-index: 1;
-            }
-
-                .upload-btn-wrapper .btn::before {
-                    content: "";
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    background: rgba(255, 255, 255, 0.1);
-                    z-index: -1;
-                    border-radius: 30px;
-                    transition: all 0.3s ease;
-                }
-
-                .upload-btn-wrapper .btn:hover::before {
-                    background: rgba(255, 255, 255, 0.3);
-                    transform: scale(1.1);
-                }
-
-            .upload-btn-wrapper input[type=file] {
-                font-size: 100px;
-                position: absolute;
-                left: 0;
-                top: 0;
-                opacity: 0;
-            }
-
-        #cybereum-intro:hover {
-            color: #FFEB3B; /* Bright yellow color on hover */
-            transition: color 0.3s ease-in-out;
-        }
-
-        #drop-shadow {
-            height: 130%;
-        }
-
-            #drop-shadow feGaussianBlur {
-                stdDeviation: 2;
-                result: "blur";
-            }
-
-            #drop-shadow feOffset {
-                dx: 2;
-                dy: 2;
-                result: "offsetBlur";
-            }
-
-            #drop-shadow feMerge {
-                feMergeNode: "";
-                .upload-btn-wrapper
-
-        {
-            position: relative;
-            overflow: hidden;
-            display: inline-block;
-            cursor: pointer;
-            transition: transform 0.2s ease-in-out;
-        }
-
-        .upload-btn-wrapper:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 15px 3px #cdfaff;
-        }
-
-        .upload-btn-wrapper input[type=file] {
-            font-size: 100px;
-            position: absolute;
-            left: 0;
-            top: 0;
-            opacity: 0;
-            cursor: pointer;
-        }
-
-        .btn {
-            border: 2px solid #cdfaff;
-            color: #cdfaff;
-            background-color: transparent;
-            padding: 8px 20px;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: bold;
-            transition: all 0.2s ease-in-out;
-        }
-
-            .btn:hover {
-                background-color: rgba(205, 250, 255, 0.2);
-            }
-
-
-        a {
-            color: #58a6ff;
-            text-decoration: none;
-        }
-
-            a:hover {
-                text-decoration: underline;
-            }
-
-        .custom-cursor {
-            width: 20px;
-            height: 20px;
-            border: 2px solid #58a6ff;
-            border-radius: 50%;
-            position: absolute;
-            transform: translate(-50%, -50%);
-            pointer-events: none;
-            z-index: 10000;
-            mix-blend-mode: difference;
-            transition: all 0.3s ease-out;
-        }
-
-        /* Parallax effect */
-        .parallax-element {
-            transition: transform 0.5s;
-        }
-
-        /* For the dropdown */
-        #projectSectorDropdown {
-            border: 2px solid #cdfaff;
-            color: #cdfaff;
-            background-color: transparent;
-            padding: 8px 20px;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: bold;
-            transition: all 0.2s ease-in-out;
-            width: 250px;
-            margin-left: 10px;
-            appearance: none;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            background: url('https://cdn.icon-icons.com/icons2/2699/PNG/512/white_down_icon_17046.png') no-repeat;
-            background-position: 90% center;
-            background-size: 20px;
-        }
-
-            #projectSectorDropdown:hover {
-                background-color: rgba(205, 250, 255, 0.2);
-            }
-
-        .bar-chart-tooltip {
-            position: absolute;
-            padding: 8px;
-            background-color: white;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            pointer-events: none;
-        }
-
-        .sci-fi-card {
-            background: linear-gradient(145deg, #0d2137, #1a3458); /* Gradient background */
-            margin-bottom: 20px;
-            padding: 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4), 0 0 20px #5ac8fa; /* Glowing border effect */
-            border: 1px solid #5ac8fa;
-            border-radius: 10px;
-            position: relative;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Sleek font */
-        }
-
-            .sci-fi-card .alarm-indicators {
-                display: flex;
-                justify-content: flex-end;
-            }
-
-            .sci-fi-card .card-icons {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                margin-top: 10px;
-            }
-
-            .sci-fi-card .outlier-indicators {
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                margin-top: 10px;
-                font-size: 0.9em; /* A bit smaller than the main content */
-            }
-
-            /* Progress bar with a sci-fi look */
-            .sci-fi-card .progress-bar {
-                height: 10px;
-                width: 100%;
-                border: 1px solid #5ac8fa;
-                border-radius: 5px;
-                margin-top: 10px;
-                background: linear-gradient(145deg, #0d2137, #5ac8fa);
-                position: relative;
-            }
-
-                .sci-fi-card .progress-bar::before {
-                    content: "";
-                    height: 100%;
-                    border-radius: 4px;
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    background: #5ac8fa;
-                    box-shadow: 0 0 10px #5ac8fa;
-                    transition: width 0.3s;
-                }
-
-            .sci-fi-card.futuristic-list {
-                list-style-type: none;
-                padding-left: 0;
-            }
-
-                .sci-fi-card.futuristic-list li {
-                    position: relative;
-                    margin-bottom: 10px;
-                    padding-left: 20px;
-                }
-
-                    .sci-fi-card.futuristic-list li:before {
-                        content: '•';
-                        position: absolute;
-                        left: 0;
-                        top: 0;
-                        color: #5ac8fa; /* Glowing bullet points */
-                        text-shadow: 0 0 5px #5ac8fa;
-                    }
-
-                    .sci-fi-card.futuristic-list li:hover {
-                        color: #5ac8fa; /* Hover effect */
-                        text-shadow: 0 0 5px #5ac8fa;
-                    }
-
-        /* Add the Materialize grid classes to the containers */
-
-        #container {
-            display: flex;
-            flex-direction: column;
-            width: 100%;
-            height: 100%;
-            box-sizing: border-box;
-            /* Add the Materialize grid class */
-            class ="container";
-        }
-
-        .chart-size {
-            width: 20px;
-            height: 20px;
-        }
-
-        .form-group {
-            margin-bottom: 15px; /* Adjust this value as needed */
-        }
-
-        .progressBarContainer {
-            width: 100%;
-            background-color: #f3f3f3;
-            height: 30px;
-            margin: 10px 0;
-        }
-
-        .progressBar {
-            height: 100%;
-            background-color: #4CAF50;
-            width: 0%; /* Initial width, will be set by JavaScript */
-        }
-
-        .main-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 16px;
-        }
-
-        .flex-container {
-            display: flex; /* This will turn on flex mode for the container */
-            justify-content: space-between; /* This will put space between your columns */
-            flex-wrap: nowrap; /* This will prevent wrapping of columns */
-        }
-
-        .left-container, .right-container {
-            flex: 1; /* This allows both the left and right containers to grow or shrink equally */
-            max-width: calc(25% - 10px); /* This limits their width to 25% of the flex-container width, minus 10px for margin */
-            margin-right: 10px; /* Margin for spacing */
-            width: 25%;
-        }
-
-        .table-container {
-            flex: 2; /* This allows the center column to take up twice as much space as the side columns */
-            max-width: calc(50% - 20px); /* This limits its width to 50% of the flex-container width, minus 20px for margin */
-            margin-right: 10px; /* Margin for spacing */
-            width: 50%;
-        }
-    </style>
+   
     <script type="text/javascript">
         google.charts.load('current', { 'packages': ['gantt'] });
         google.charts.setOnLoadCallback(initFileInput);
@@ -4391,7 +3256,8 @@
                     .style("border", "solid")
                     .style("border-width", "1px")
                     .style("border-radius", "5px")
-                    .style("padding", "10px");
+                    .style("padding", "10px")
+                    
 
                 const tooltipHour = d3.select("body").append("div")
                     .attr("class", "tooltip-hour")
@@ -4401,7 +3267,8 @@
                     .style("border", "solid")
                     .style("border-width", "1px")
                     .style("border-radius", "5px")
-                    .style("padding", "10px");
+                    .style("padding", "10px")
+                    
 
 
                 // Clear existing SVGs
@@ -4926,6 +3793,7 @@
                         data: allDates.map(date => {
                             const entry = evDistribution.find(d => d.date === date);
                             return entry ? entry.hours : null;
+                            
                         }),
                         borderColor: '#0000FF',  // Use blue color for the EV curve
                         backgroundColor: 'rgba(0, 0, 255, 0.1)',
@@ -6457,10 +5325,11 @@
                     textStyle: { color: '#ffffff' }
                 },
                 backgroundColor: '#113464',
+               
                 colors: ['#46b9fa'],
                 chartArea: {
                     width: '90%',  // Adjust based on your needs
-                    height: '80%'  // Adjust based on your needs
+                    // height: '100%'  
                 }
             };
 
@@ -7260,83 +6129,7 @@
         }
 
     </script>
-    <style>
-        #sidebar {
-            position: fixed;
-            top: 15%;
-            left: 0;
-            width: 200px;
-            background-color: #0e2446;
-            padding: 10px;
-            box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
-        }
-
-            #sidebar h3 {
-                color: #fff;
-                text-align: center;
-                margin-bottom: 10px;
-            }
-
-            #sidebar ul {
-                list-style-type: none;
-                padding: 0;
-            }
-
-                #sidebar ul li {
-                    margin-bottom: 10px;
-                }
-
-                    #sidebar ul li a {
-                        color: #ddd;
-                        text-decoration: none;
-                        font-size: 0.9em;
-                        display: block;
-                        padding: 5px;
-                        border-radius: 5px;
-                        transition: background-color 0.3s;
-                    }
-
-                        #sidebar ul li a:hover {
-                            background-color: #575757;
-                            #sidebar ul li:hover
-
-        {
-            background-color: #8ce6ff; /* Lighter shade for hover */
-            color: #113464;
-        }
-
-        #toggleSidebar {
-            position: absolute;
-            top: 20px;
-            left: 260px;
-            background-color: transparent; /* Making the button background transparent */
-            color: #0d2137; /* Darker shade for the arrow */
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-            padding: 10px 15px;
-            font-size: 20px;
-            transition: transform 0.3s; /* Transition for rotation */
-        }
-
-            #toggleSidebar:hover {
-                color: #113464; /* Slightly different darker shade for hover */
-            }
-
-        #sidebar.collapsed {
-            width: 40px; /* Adjust the width when collapsed to fit the button */
-        }
-
-            #sidebar.collapsed h3,
-            #sidebar.collapsed ul {
-                display: none; /* Hide other elements of the sidebar when collapsed */
-            }
-
-            #sidebar.collapsed #toggleSidebar {
-                transform: rotate(180deg); /* Rotate the arrow when the sidebar is collapsed */
-            }
-        }
-    </style>
+   
     <style>
         /* Sidebar Styles */
         #sidebar {
@@ -7346,7 +6139,7 @@
 
             /* Collapsed state styles for the sidebar */
             #sidebar.collapsed {
-                width: 50px; /* Width of the sidebar when collapsed */
+                width: 116px !important;  /* Width of the sidebar when collapsed */
             }
 
                 #sidebar.collapsed ul {
@@ -7373,8 +6166,8 @@
         /* Toggle Button in collapsed state */
         #sidebar.collapsed #sidebarToggleBtn {
             background-color: #113464; /* Dark color from the theme */
-            padding: 10px 5px; /* Reduced padding to make the button more compact */
-            font-size: 24px; /* Size of the icon */
+            padding: 2px 29px; /* Reduced padding to make the button more compact */
+            font-size: 27px; /* Size of the icon */
         }
 
         /* Adjusting the position and z-index of the toggle button */
@@ -7589,6 +6382,8 @@
         .dashboard-stat .progress-column {
             width: 150px !important; /* Assigning a fixed width to ensure full visibility */
         }
+
+       
     </style>
     <style>
         /* Typography */
@@ -7649,447 +6444,8 @@
         }
     </style>
 
-    <style>
-        .sci-fi-loading-bar-container {
-            width: 100%;
-            height: 30px;
-            border: 2px solid #5ac8fa;
-            border-radius: 15px;
-            position: relative;
-            margin-top: 20px;
-            background: #0d2137;
-            overflow: hidden;
-            width: 100%;
-            height: 30px;
-            border: 2px solid #5ac8fa;
-            border-radius: 15px;
-            margin-top: 10px;
-            background: #0d2137;
-            overflow: hidden;
-            display: inline-block;
-            box-shadow: 0 0 20px #5ac8fa;
-            position: relative;
-            margin-top: 10px;
-            background: rgba(40, 125, 200, 0.3);
-            border-radius: 8px;
-        }
-
-        .sci-fi-loading-bar {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, #5ac8fa, #287dc8);
-            position: absolute;
-            top: 0;
-            left: 0;
-        }
-
-        .sci-fi-loading-text {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: #ffffff;
-            font-size: 14px;
-            z-index: 10;
-        }
-
-        @keyframes loadingGlow {
-            0% {
-                background-position: 100% 50%;
-            }
-
-            100% {
-                background-position: 0% 50%;
-            }
-        }
-
-        .sci-fi-loading-bar {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, #5ac8fa, #287dc8, #5ac8fa);
-            background-size: 200% 200%;
-            animation: loadingGlow 1.5s infinite;
-            position: absolute;
-            top: 0;
-            left: 0;
-        }
-
-        @keyframes loadingGlow {
-            0% {
-                background-position: 100% 50%;
-            }
-
-            100% {
-                background-position: 0% 50%;
-            }
-        }
-
-        .sci-fi-loading-bar-container {
-            width: 60%; /* Extended length */
-            height: 30px;
-            border: 2px solid #5ac8fa;
-            border-radius: 15px;
-            position: relative;
-            margin-top: 20px;
-            background: #0d2137;
-            overflow: hidden;
-            display: inline-block; /* Displayed inline with the file upload button */
-            vertical-align: middle;
-            padding-bottom: 20px;
-        }
-
-        .sci-fi-loading-bar {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, #5ac8fa, #287dc8, #5ac8fa);
-            background-size: 200% 200%;
-            animation: loadingGlow 1.5s infinite;
-            position: absolute;
-            top: 0;
-            left: 0;
-            height: 42px;
-        }
-
-        #xmlFileInput {
-            display: inline-block;
-            padding: 10px 15px;
-            background: linear-gradient(90deg, #5ac8fa, #287dc8);
-            color: #ffffff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            outline: none;
-            transition: background 0.3s;
-            margin-right: 15px;
-        }
-
-            #xmlFileInput:hover {
-                background: linear-gradient(90deg, #287dc8, #5ac8fa);
-            }
-
-        /* Additional styles for the new elements */
-        .uploading-text {
-            display: none;
-            font-size: 16px;
-            font-weight: bold;
-            color: darkred;
-            margin-left: 15px;
-        }
-
-        .sci-fi-loading-bar-container {
-            width: 70%; /* Adjusted to accommodate the "upload in progress" text */
-        }
-    </style>
-    <style>
-        #xmlFileInput {
-            display: none;
-        }
-
-        .upload-label {
-            display: inline-block;
-            padding: 10px 15px;
-            background: linear-gradient(90deg, #5ac8fa, #287dc8);
-            color: #ffffff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background 0.3s, transform 0.3s;
-            margin-right: 15px;
-            position: relative;
-            overflow: hidden;
-            z-index: 1;
-            font-size: 14px;
-            font-weight: bold;
-            text-align: center;
-        }
-
-            .upload-label:hover {
-                background: linear-gradient(90deg, #287dc8, #5ac8fa);
-                transform: scale(1.05);
-            }
-
-            .upload-label::before {
-                content: "📂";
-                font-size: 18px;
-                margin-right: 5px;
-            }
-
-            .upload-label:hover::before {
-                content: "📤";
-            }
-    </style>
-    <style>
-        #xmlFileInput {
-            display: none;
-        }
-
-        .upload-label {
-            display: inline-block;
-            padding: 10px 20px;
-            background: linear-gradient(90deg, #5ac8fa, #287dc8);
-            color: #ffffff;
-            border: 2px solid #5ac8fa;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: background 0.3s, transform 0.3s;
-            font-size: 16px;
-            font-weight: bold;
-            text-align: center;
-            margin-bottom: 10px;
-        }
-
-            .upload-label:hover {
-                background: linear-gradient(90deg, #287dc8, #5ac8fa);
-            }
-
-            .upload-label::before {
-                content: "📤";
-                font-size: 20px;
-                margin-right: 8px;
-            }
-
-        .sci-fi-loading-bar-container {
-            width: 70%;
-            height: 20px;
-            border: 3px solid #5ac8fa;
-            border-radius: 10px;
-            background: #0d2137;
-            overflow: hidden;
-            box-shadow: 0 0 20px #5ac8fa;
-            position: relative;
-        }
-
-        .sci-fi-loading-bar {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, #5ac8fa, #287dc8, #5ac8fa);
-            position: absolute;
-            top: 0;
-            left: 0;
-            box-shadow: 0 0 10px #5ac8fa, 0 0 20px #5ac8fa, 0 0 30px #287dc8, 0 0 40px #5ac8fa;
-        }
-
-        .upload-container {
-            display: flex;
-            align-items: center;
-            justify-content: start;
-            gap: 20px;
-            transition: all 0.3s;
-        }
-
-            .upload-container:hover {
-                transform: scale(1.05);
-            }
-
-        .sci-fi-loading-bar-container {
-            width: 80%;
-            margin-left: 10px;
-        }
-
-        .upload-label {
-            background: linear-gradient(90deg, #287dc8, #5ac8fa);
-            border: 3px solid #5ac8fa;
-            box-shadow: 0 0 15px rgba(42, 125, 200, 0.6);
-            transition: all 0.3s;
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-
-            .upload-label:hover {
-                transform: translateY(-3px);
-                background: linear-gradient(90deg, #5ac8fa, #287dc8);
-            }
-
-            .upload-label::before {
-                animation: iconBounce 1s infinite alternate;
-            }
-
-        .sci-fi-loading-bar-container {
-            width: 100%;
-            margin-top: 10px;
-        }
-
-        .sci-fi-loading-bar {
-            background-color: #287dc8;
-            height: 5px;
-            border-radius: 5px;
-        }
-
-        .sci-fi-loading-text {
-            color: #5ac8fa;
-            font-size: 14px;
-            margin-top: 5px;
-        }
-
-        @keyframes iconBounce {
-            from {
-                transform: translateY(0);
-            }
-
-            to {
-                transform: translateY(-5px);
-            }
-        }
-
-        .megaproject-icon {
-            width: 100px;
-            height: 100px;
-            display: inline-block;
-            position: relative;
-        }
-
-        .rotating-line {
-            transform-origin: 50% 50%;
-            animation: rotateAnimation 10s infinite linear;
-        }
-
-        @keyframes rotateAnimation {
-            from {
-                transform: rotate(0deg);
-            }
-
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        .pulsing-circle {
-            transform-origin: 50% 50%;
-            animation: pulseAnimation 1.5s infinite alternate;
-        }
-
-        @keyframes pulseAnimation {
-            from {
-                opacity: 0.2;
-                stroke-width: 2px;
-            }
-
-            to {
-                opacity: 1;
-                stroke-width: 3px;
-            }
-        }
-
-        .megaproject-icon-container {
-            position: relative;
-            display: inline-block;
-            cursor: pointer;
-        }
-
-        .cybereum-logo {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 20%; /* Adjusted size */
-            height: 20%; /* Adjusted size */
-            transform: translate(-50%, -50%);
-            z-index: 5;
-        }
-
-        .futuristic-modal {
-            display: none;
-            position: fixed;
-            padding-top: 100px;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background: repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(90, 200, 250, 0.2) 35px, rgba(90, 200, 250, 0.2) 70px);
-            background-color: rgba(0, 0, 0, 0.5); /* Increased transparency */
-            z-index: 1000;
-            overflow-y: auto;
-        }
-
-        .futuristic-modal-content {
-            background: linear-gradient(145deg, #0d2137, #1a3458); /* Gradient background */
-            margin: 10% auto;
-            padding: 20px;
-            width: 60%;
-            max-width: 800px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4), 0 0 20px #5ac8fa; /* Glowing border effect */
-            border: 1px solid #5ac8fa;
-            border-radius: 10px;
-            position: relative;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Sleek font */
-        }
-
-        .futuristic-modal-header {
-            background-color: #5ac8fa;
-            padding: 10px;
-            border-top-left-radius: 8px;
-            border-top-right-radius: 8px;
-            color: white;
-            font-size: 20px;
-        }
-
-        .modal-header {
-            background: linear-gradient(145deg, #287dc8, #5ac8fa); /* Gradient background for header */
-            padding: 10px;
-            margin-bottom: 15px;
-            border-radius: 8px;
-            color: white;
-        }
-
-        .modal-body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-        }
-
-        .futuristic-list {
-            list-style-type: none;
-            padding-left: 0;
-        }
-
-            .futuristic-list li {
-                position: relative;
-                margin-bottom: 10px;
-                padding-left: 20px;
-            }
-
-                .futuristic-list li:before {
-                    content: '•';
-                    position: absolute;
-                    left: 0;
-                    top: 0;
-                    color: #5ac8fa; /* Glowing bullet points */
-                    text-shadow: 0 0 5px #5ac8fa;
-                }
-
-                .futuristic-list li:hover {
-                    color: #5ac8fa; /* Hover effect */
-                    text-shadow: 0 0 5px #5ac8fa;
-                }
-
-        .close-btn {
-            color: white;
-            float: left;
-            font-size: 32px;
-            margin-left: 12px;
-            cursor: pointer;
-            transition: color 0.3s, text-shadow 0.3s;
-        }
-
-            .close-btn:hover {
-                color: red;
-                text-shadow: 0 0 5px #5ac8fa; /* Glowing effect on hover */
-            }
-
-        .hs-form-9535e8fc-88e8-43f6-b6e9-c06e15d584a2_4dcb79cf-c5fb-40ef-a3b4-02eb8c1f695d .hs-form-field label:not(.hs-error-msg) {
-            color: #e0e0e0;
-        }
-
-        .cybereum-logo {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 20%; /* Adjusted size */
-            height: 20%; /* Adjusted size */
-            transform: translate(-50%, -50%);
-            z-index: 5;
-        }
-    </style>
+   
+   
 
     >
 </head></html>
@@ -8105,11 +6461,11 @@
             <img alt="Cybereum Logo" src="https://cybereum.io/wp-content/uploads/2022/12/cropped-circle6.png" style="max-width: 120px; border-radius: 50%; box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);box-shadow: 0 0 40px #5ac8fa;" />
         </div>
         <div id="networkAnimationTooltip" style="position: absolute; display: none; padding: 5px 10px; background-color: rgba(0, 0, 0, 0.8); border-radius: 5px; color: #cdfaff; pointer-events: none; font-size: 14px; transition: opacity 0.3s; z-index: 999;"></div>
-        <div id="connectionLabel" style="position: absolute; display: none; padding: 5px 10px; background-color: rgba(0, 0, 0, 0.8); border-radius: 5px; color: #cdfaff; pointer-events: none; font-size: 14px; transition: opacity 0.3s; z-index: 1000;"></div>
+        <div id="connectionLabel" style="position: absolute; display: none; max-width: 0px !important; padding: 5px 10px; background-color: rgba(0, 0, 0, 0.8); border-radius: 5px; color: #cdfaff; pointer-events: none; font-size: 14px; transition: opacity 0.3s; z-index: 1000;"></div>
         <div class="block-header futuristic-header" style="background: rgba(0, 0, 0, 0.2); border-top-left-radius: 15px; border-top-right-radius: 15px; padding: 10px 20px; box-shadow: 0 0 10px #5ac8fa;position: relative; z-index: 2;">
             <h1 class="block-title text-white" style="text-shadow: 0 0 10px #5ac8fa;"><i class="fas fa-rocket"></i> Welcome to Cybereum - the Future of Project Management</h1>
         </div>
-        <p class="futuristic-introduction" style="color: #cdfaff; font-size: 18px; margin-top: 20px; line-height: 1.6; text-align: center; padding: 0 10%; margin-bottom: 30px;position: relative; z-index: 2;max-width: 600px; text-align: center;">
+        <p class="futuristic-introduction" style="color: #cdfaff; font-size: 18px; margin-top: 20px; line-height: 1.6; text-align: center; padding: 0 10%; margin-bottom: 30px;position: relative; z-index: 2;max-width: 900px; text-align: center;">
             Harness the unmatched power of Cybereum's futuristic project analysis platform, a harmonious blend of advanced algorithms
             and intuitive design. Every piece of project data tells a story, and our tools are crafted meticulously to bring those stories to life to redefine the boundaries of project management.
 
@@ -8152,6 +6508,7 @@
                 transition: opacity 0.3s;
                 z-index: 1000;
                 transform-origin: center;
+                max-width: 0px !important;
             }
         </style>
         <script>
@@ -8369,7 +6726,7 @@
                 formId: "9535e8fc-88e8-43f6-b6e9-c06e15d584a2"
             });</script>
     </div>
-    <section class="dashboard-section introduction-section">
+    <section class="dashboard-section introduction-section" style="margin: 35px !important;">
         <div class="project-selection-container">
             <!--
                 <div class="megaproject-icon-container">
@@ -8449,7 +6806,7 @@
             <input accept=".xml" id="xmlFileInput" name="file" style="display: none;" type="file" />
             <div class="sci-fi-loading-bar-container" style="width: 100%; margin-top: 10px; background: rgba(40, 125, 200, 0.3); border-radius: 8px;">
                 <div class="sci-fi-loading-bar" style="background: linear-gradient(90deg, #287dc8, #5ac8fa); height: 5px; border-radius: 5px; transition: width 0.5s;"></div>
-                <div class="sci-fi-loading-text" style="color: #5ac8fa; font-size: 14px; margin-top: 5px; font-weight: bold; transition: opacity 0.5s;">0%</div>
+                <div class="sci-fi-loading-text" style="color: #5ac8fa; font-size: 14px; margin-top: 5px; font-weight: bold; transition: opacity 0.5s; margin: 0px !important;">0%</div>
                 <span class="uploading-text">Upload in progress...</span>
             </div>
         </label>
@@ -8481,22 +6838,22 @@
     </style>
 
 
-    <div class="dashboard-section" id="dash1">
+    <div class="dashboard-section dashboard-section-css" id="dash1">
         <div id="self-referencing-tasks-warning"><h1>Self Referencing Errors</h1></div>
     </div>
-    <div class="dashboard-card" id="networkViualization">
+    <div class="dashboard-card dashboard-card-css" id="networkViualization" style="">
         <h1>Interactive Project Task Map</h1>
-        <button onclick="openModal('modal0')">More Information about Project Network Visualization</button>
+        <button onclick="openModal('modal0')" class="cus-more-button">More Information about Project Network Visualization</button>
         <div class="control-panel">
-            <div class="dashboard-stat">
+            <div class="dashboard-stat" style="width: 30%;">
                 <label class="control-label">Zoom:</label>
                 <button onclick="zoomIn()">+</button>
-                <button onclick="zoomOut()">-</button>
+                <button onclick="zoomOut()" class="zoom-cus">-</button>
                 <input class="slider" id="zoomSlider" max="100" min="1" type="range" value="50" />
                 <button onclick="zoomExtents()">Extents</button>
                 <label class="control-label">Rotate:</label>
                 <button onclick="rotate(10)">Right</button>
-                <button onclick="rotate(-10)">Left</button>
+                <button onclick="rotate(-10)" class="zoom-cus">Left</button>
             </div>
             <!-- Pan Controls -->
             <div class="dashboard-stat">
@@ -8540,61 +6897,78 @@
             <div class="dashboard-stat">
                 <div class="= dashboard-card2">
                     <label class="control-label">Filter Nodes (in-degree):</label>
-                    <span id="filterValue">&gt; 0</span>
-                    <input class="slider" id="filterSlider" max="5" min="0" step="1" type="range" value="0" />
+                    <div class="range" style="display: flex;">
+                        <span id="filterValue" class="zero-css" >&gt; 0</span>
+                        <input class="slider"  id="filterSlider" max="5" min="0" step="1" type="range" value="0" />
+                    </div>
                 </div>
                 <div class="= dashboard-card2">
                     <div class="label-container">
                         <label class="control-label">Filter Nodes (out-degree):</label>
-                        <span id="outDegreeFilterValue">&gt; 0</span>
-                    </div>
+                        <div class="range" style="display: flex;">
+                        <span id="outDegreeFilterValue" class="zero-css">&gt; 0</span>
+                    
                     <input class="slider" id="outDegreeFilterSlider" max="5" min="0" step="1" type="range" value="0" />
                 </div>
+            </div>
+            </div>
                 <div class="= dashboard-card2">
                     <div class="label-container">
                         <!-- section for degree -->
                         <label class="control-label">Filter Nodes (degree):</label>
-                        <span id="degreeFilterValue">&gt; 0</span>
-                    </div>
+                        <div class="range" style="display: flex;">
+                        <span id="degreeFilterValue" class="zero-css">&gt; 0</span>
+                    
                     <input class="slider" id="degreeFilterSlider" max="10" min="0" step="1" type="range" value="0" />
                 </div>
+                </div>
+                </div>
+
                 <!-- section for risk -->
                 <div class="= dashboard-card2">
                     <div class="label-container">
                         <label class="control-label">Filter Nodes (risk):</label>
-                        <span id="riskFilterValue">&gt; 0</span>
-                    </div>
+                        <div class="range" style="display: flex;">
+                        <span id="riskFilterValue" class="zero-css">&gt; 0</span>
+                   
                     <input class="slider" id="riskFilterSlider" max="1" min="0" step="0.1" type="range" value="0" />
                 </div>
-
+                </div>
+            </div>
                 <!-- section for importance -->
                 <div class="= dashboard-card2">
                     <div class="label-container">
                         <label class="control-label">Filter Nodes (importance):</label>
-                        <span id="importanceFilterValue">&gt; 0</span>
-                    </div>
+                        <div class="range" style="display: flex;">
+
+                        <span id="importanceFilterValue" class="zero-css">&gt; 0</span>
+                    
                     <input class="slider" id="importanceFilterSlider" max="1" min="0" step="0.1" type="range" value="0" />
                 </div>
-            </div>
-            <!-- Accordion for Path Details -->
-            <div class="accordion" style="display: flex;">
-                <button class="accordion-button">Critical Path</button>
-                <div class="panel">
-                    <p id="criticalPathDetails">Critical path details go here...</p>
-                </div>
-                <button class="accordion-button">Outlier Paths</button>
-                <div class="panel">
-                    <p id="outlierPathsDetails">Outlier paths details go here...</p>
-                </div>
-                <button class="accordion-button">All Paths</button>
-                <div class="panel">
-                    <p id="allPathsDetails">All paths details go here...</p>
                 </div>
             </div>
         </div>
+             <!-- Accordion for Path Details -->
+         <div class="accordion" style="display: flex; margin-left: 67px !important;">
+           
+            <div class="panel">
+                <p id="criticalPathDetails">Critical path details go here...</p>
+            </div>
+           
+            <div class="panel">
+                <p id="outlierPathsDetails">Outlier paths details go here...</p>
+            </div>
+            
+            <div class="panel">
+                <p id="allPathsDetails">All paths details go here...</p>
+            </div>
+        </div>
+        </div>
+
+       
         <div class="control-panel">
             <!-- Search and Highlight Controls -->
-            <div class="controls search-controls" style="width: 500px;">
+            <div class="controls search-controls">
                 <input id="searchInput" placeholder="Search by name or ID" type="text" />
             </div>
             <div class="highlight-controls">
@@ -8605,8 +6979,8 @@
             <div id="longestPathDisplay"></div>
             <div id="outlierPathsDisplay"></div>
             <div class="highlight-controls">
-                <label><input id="highlightCriticalPath" type="checkbox" /> Highlight Critical Path</label>
-                <label><input id="highlightOutliers" type="checkbox" /> Highlight Outlier Paths</label>
+                <label style="margin-left: -191px;"><input id="highlightCriticalPath" type="checkbox" /> Highlight Critical Path</label>
+                <label style="padding-left: 40px;"><input id="highlightOutliers" type="checkbox" /> Highlight Outlier Paths</label>
             </div>
             <!-- Info Panel -->
             <div id="infoPanel"></div>
@@ -8614,8 +6988,9 @@
     </div>
     <div id="graph-container">
         <!-- Your other graph-related content here -->
-        <div id="tooltip" style="position: absolute; visibility: hidden; background: #8ce6ff; padding: 8px; border: 2px solid #3292cd; border-radius: 3px; "></div>
+        <div id="tooltip" style="position: absolute;  background: #8ce6ff; padding: 8px; border: 2px solid #3292cd; border-radius: 3px; "></div>
         <svg>
+           
             <defs>
                 <marker id="arrow" markerheight="10" markerwidth="6" orient="auto" refx="9" refy="0" viewbox="0 -6 10 12">
                     <path d="M0,-5 L10,0 L0,5" fill="#cdfaff"></path>
@@ -8626,6 +7001,9 @@
             </defs>
             <g class="container"></g>
         </svg>
+
+
+
     </div>
 
     <div id="sidebar" style="z-index: 1000;">
@@ -8656,40 +7034,10 @@
             <div class="dashboard-card-full" id="dash4">
 
                 <h2>Risk and Importance</h2>
-                <style>
-                    .legend {
-                        display: flex;
-                        align-items: center;
-                        justify-content: space-between;
-                    }
-
-                    .scale {
-                        width: 60px;
-                        height: 20px;
-                        border: 1px solid #000;
-                        display: inline-block;
-                    }
-
-                    .low {
-                        background: rgb(255, 255, 0);
-                    }
-
-                    .medium {
-                        background: rgb(255, 128, 0);
-                    }
-
-                    .high {
-                        background: rgb(255, 0, 0);
-                    }
-
-                    .legend-text {
-                        color: #0d2137; /* Set the text color to white */
-                        font-weight: bold; /* Made the text bold for better visibility */
-                    }
-                </style>
+               
                 <div class="risk-content">
                     <div class="charts-row">
-                        <div class="dashboard-card2" id="chart-container">
+                        <div class="dashboard-card2" id="chart-container" style="margin-left: 0px !important;">
                             <h2>Risk Matrix</h2>
 
                             <div class="legend">
@@ -8698,18 +7046,18 @@
                                 <div class="scale medium">Medium</div>
                                 <div class="scale high">High</div>
                             </div>
-                            <canvas height="280" id="riskMatrix" width="300"></canvas>
+                            <canvas height="288" id="riskMatrix" width="300"></canvas>
                             </br>
                             <button class="learn-more-btn" onclick="openModal('riskMatrixModal')">Learn More</button>
                         </div>
-                        <div class="dashboard-card2" id="RadialRisk">
+                        <div class="dashboard-card2" id="RadialRisk" style="margin-right: 0px !important;">
                             <h2>Radial Risk Chart</h2>
                             <canvas height="280" id="radialChart" width="300"></canvas>
                             </br>
-                            <button class="learn-more-btn" onclick="openModal('radialChartModal')">Learn More</button>
+                            <button class="learn-more-btn learn-more-btn-css" onclick="openModal('radialChartModal')">Learn More</button>
                         </div>
                     </div>
-                    <div class="table-container" id="pathMetrics">
+                    <div class="table-container" id="pathMetrics" style="width: 100% !important;">
                         <!-- Risk Table -->
                         <h2>Risk Table</h2>
                         <table class="sortable" id="riskTable">
@@ -8734,13 +7082,15 @@
                     </div>
 
                     <div class="charts-row">
-                        <div class="dashboard-card2" id="pathsDistributionCurve">
+                        <div class="dashboard-card2" id="pathsDistributionCurve" style="margin-left: 0px !important;">
                             <h2>Paths Distribution Curve</h2>
-                            <div id="path_distribution_chart" style="width: 90%; "></div>
+                            <div id="path_distribution_chart" style="width: 90%;height: 85%;"></div>
                             <br>
-                            <button class="learn-more-btn" onclick="openModal('pathsDistributionCurveModal')">Learn More</button>
+                            <div style="">
+                            <button class="learn-more-btn" onclick="openModal('pathsDistributionCurveModal')" >Learn More</button>
+                           </div>
                         </div>
-                        <div class="dashboard-card2" id="pathDistributionCard">
+                        <div class="dashboard-card2" id="pathDistributionCard" style="margin-right: 0px !important;">
                             <h2>Path Distribution Bar Chart</h2>
                             <canvas height="280" id="pathDistributionStackedBarChart" width="300"></canvas>
                             <br>
@@ -8774,9 +7124,9 @@
                         </table>
                     </div>
 
-                    <div class="dashboard-card2" id="pathDistributionCard">
+                    <div class="dashboard-card2" id="pathDistributionCard" style="width: 100% !important;">
                         <h2>Expected Completion</h2>
-                        <div id="progressBars"></div>
+                        <div id="progressBars" style="width: 100% !important;"></div>
                     </div>
 
 
@@ -8787,12 +7137,13 @@
         </div>
     </div>
 
-    <div class="dashboard-card" id="Proj_Track">
+    <div class="dashboard-card" id="Proj_Track" style="margin: 28px;
+    padding: 40px; margin-top: 0px !important;">
 
         <div class="row">
 
             <!-- Left Side -->
-            <div class="col-2">
+            <div class="col-3">
                 <!-- Schedule Completion Progress Bar -->
                 <div class="block">
                     <div class="block-title text-white">
@@ -8837,7 +7188,7 @@
                 </div>
             </div>
 
-            <div class="col-8">
+            <div class="col-6">
 
                 <!-- Cumulative Distribution of Project Hours -->
                 <div class="block">
@@ -8855,7 +7206,7 @@
             </div>
 
             <!-- Right Side -->
-            <div class="col-2">
+            <div class="col-3">
                 <!-- Task Completion Status -->
                 <div class="task-completion-container" id="taskCompletionContainer">
                     <!-- Task Completion Status -->
@@ -8870,13 +7221,17 @@
                 </div>
 
                 <!-- KEY INTERNAL MILESTONES -->
-                <div class="milestones-container" id="internalMilestones">
-                    <!-- KEY INTERNAL MILESTONES -->
-                    <div class="block">
-                        <h2 class="block-title text-white">Internal Milestones</h2>
-                        <div class="block-content block-content-full overflow-hidden" id="milestonesContent">
-                            <!-- This div will be dynamically populated using the JavaScript function provided earlier. -->
-                        </div>
+               
+            </div>
+
+            <div class="milestones-container" id="internalMilestones" style="padding-top: 35px;
+            width: 100%;
+            line-height: 3.5;">
+                <!-- KEY INTERNAL MILESTONES -->
+                <div class="block">
+                    <h2 class="block-title text-white">Internal Milestones</h2>
+                    <div class="block-content block-content-full overflow-hidden" id="milestonesContent">
+                        <!-- This div will be dynamically populated using the JavaScript function provided earlier. -->
                     </div>
                 </div>
             </div>
@@ -8885,7 +7240,7 @@
             <!-- Center Milestone Table -->
             <div class="table-container" id="pathMetrics">
                 <!-- Milestone Path Table -->
-                <h2>Milestone Paths</h2>
+                <h2 style="padding-top: 50px !important;">Milestone Paths</h2>
                 <table class="sortable" id="milestoneTable">
                     <thead>
                         <tr>
@@ -8907,13 +7262,14 @@
         </div>
         </div>
 
-        <div class="charts-row">
+        <div class="charts-row" style="padding-right: 11px;
+        padding-left: 12px;">
             <div class="dashboard-card2" id="SCurve">
                 <h2>S-Curve (Cumulative Distribution Chart)</h2>
 
-                <div id="scurve_chart" style="width: 300px; height: 280px;"></div>
+                <div id="scurve_chart" style="width: 300px; height: 336px;"></div>
                 </br>
-                <button class="learn-more-btn" onclick="openModal('SCurveModal')">Learn More</button>
+                <button class="learn-more-btn" onclick="openModal('SCurveModal')" >Learn More</button>
             </div>
             <div class="dashboard-card2" id="histogram">
                 <h2>Task Duration Histogram</h2>
@@ -8923,9 +7279,9 @@
             </div>
             <div class="dashboard-card2" id="pieChart">
                 <h2>Distribution of Task Types (Pie Chart)</h2>
-                <div id="pie_chart" style="width: 300px; height: 280px;"></div>
+                <div id="pie_chart" style="width: 300px; height: 336px;"></div>
                 </br>
-                <button class="learn-more-btn" onclick="openModal('pieChartModal')">Learn More</button>
+                <button class="learn-more-btn" onclick="openModal('pieChartModal')" >Learn More</button>
 
             </div>
             <div class="dashboard-card2" id="pathsDistributionCurve">
@@ -8942,7 +7298,7 @@
             </div>
         </div>
 
-        <section id="Kanban">
+        <section id="Kanban" style="margin: 31px !important;">
             <!-- Date Range Slider -->
             <div class="date-slider-container">
                 <input type="text" id="dateRangePicker" placeholder="Select Date Range...">
@@ -8982,7 +7338,7 @@
             <!--
     <button id="clusterBtn">Cluster</button>
     <button id="declusterBtn">De-cluster</button>
-    -->
+    -->         
             <div id="graph-container">
                 <div id="tooltip" style="position: absolute; visibility: hidden; background: #8ce6ff; padding: 8px; border: 2px solid #3292cd; border-radius: 3px; "></div>
                 <div id="path-list" style="position: absolute; top: 0; left: 0; max-height: 600px; overflow-y: auto;"></div>
